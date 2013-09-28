@@ -1,0 +1,4 @@
+[Project]
+Name=Op3nd
+Manager=KDevCMakeManager
+VersionControl=kdevgit
