@@ -1,11 +1,11 @@
-#include "Op3nd.h"
+#include "Op3nD.h"
 
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
 #include <QtGui/QAction>
 
-Op3nd::Op3nd()
+Op3nD::Op3nD()
 {
     QLabel* l = new QLabel( this );
     l->setText( "Hello World!" );
@@ -16,7 +16,7 @@ Op3nd::Op3nd()
     menuBar()->addMenu( "File" )->addAction( a );
 }
 
-Op3nd::~Op3nd()
+Op3nD::~Op3nD()
 {}
 
-#include "Op3nd.moc"
+#include "Op3nD.moc"
