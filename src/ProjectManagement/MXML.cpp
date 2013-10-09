@@ -157,12 +157,17 @@ XMLFile::XMLFile(string file, Tag &r, string d) : MXMLFile(r, d) {
     dir = file;
 }
 
-void XMLFile::write() {
+bool XMLFile::write() {
     std::ofstream file;
     file.open(dir.c_str());
+    if(!file.is_open()){
+      cerr << "file " << dir << " can't be opened or created" << endl;
+      return false;
+    }
     file << "<!DOCTYPE " << root.getName() << " SYSTEM \"" << dtd << "\">" << endl;
     file << root.print() << endl;
     file.close();
+    return true;
 }
 
 string prevToken = "", currToken;
@@ -405,12 +410,13 @@ void BINFile::read() {
     root = tRoot;
 }
 
-void BINFile::write() {
+bool BINFile::write() {
     file.writeString(dtd);
     file.writeString(root.getName());
     write(root);
     char n = 255;
     file.write(&n, sizeof (char));
+    return true;
 }
 
 void BINFile::write(Tag &r) {
@@ -460,7 +466,7 @@ void DTD::newDTD(string dir) {
     DTDmt.lock();
     if (dtdList.find(dir) == dtdList.end()) {
         try {
-            dtdList[dir] = DTD("./files/" + dir);
+            dtdList[dir] = DTD(O3D_FILES_DIR+string("dtd/") + dir);
         } catch (char* ex) {
             cout << "error initialising " << dir << ":" << ex << endl;
         }

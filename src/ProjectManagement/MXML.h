@@ -8,6 +8,8 @@
 #ifndef MXML_H
 #define	MXML_H
 
+#define O3D_FILES_DIR "/usr/local/share/O3D/"
+
 #include <string>
 #include <vector>
 #include <map>
@@ -82,7 +84,7 @@ namespace MXML{
         /**
          * Writes the file
          */
-        virtual void write()=0;  
+        virtual bool write()=0;  
         /**
          * Returns the main tag
          * @return main tag
@@ -97,7 +99,7 @@ namespace MXML{
     public:
         XMLFile(string file, Tag &r, string d=NULL);
         void read();
-        void write();
+        bool write();
     private:
         tToken getTokenType(string tok);
         string dir;
@@ -137,7 +139,7 @@ namespace MXML{
     public:
         BINFile(BINType &f, Tag &r, string d="");
         void read();
-        void write();
+        bool write();
     private:
         void write(Tag &r);
         BINType &file;

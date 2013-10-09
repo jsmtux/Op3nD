@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <widget class="QGraphicsView" name="graphicsView"/>
+     <widget class="QSFMLCanvas" name="SFMLWidget" native="true"/>
     </item>
    </layout>
   </widget>
@@ -44,7 +44,7 @@
      <string>Project</string>
     </property>
     <addaction name="actionNew"/>
-    <addaction name="actionProperties_2"/>
+    <addaction name="actionProjectProperties"/>
     <addaction name="actionAdd_resources"/>
     <addaction name="actionExport"/>
     <addaction name="actionClose_project"/>
@@ -91,21 +91,7 @@
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QTabWidget" name="tabWidget">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="tab">
-        <attribute name="title">
-         <string>Resources</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="tab_2">
-        <attribute name="title">
-         <string>Objects</string>
-        </attribute>
-       </widget>
-      </widget>
+      <widget class="ImageTreeView" name="tvResources"/>
      </item>
     </layout>
    </widget>
@@ -120,7 +106,7 @@
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QTreeWidget" name="treeWidget">
+      <widget class="QTreeWidget" name="twScene">
        <column>
         <property name="text">
          <string notr="true">1</string>
@@ -161,7 +147,7 @@
     <string>Properties</string>
    </property>
   </action>
-  <action name="actionProperties_2">
+  <action name="actionProjectProperties">
    <property name="text">
     <string>Properties</string>
    </property>
@@ -222,6 +208,19 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ImageTreeView</class>
+   <extends>QTreeView</extends>
+   <header>../src/InterfaceModule/ImageTreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QSFMLCanvas</class>
+   <extends>QWidget</extends>
+   <header>../src/InterfaceModule/QSFMLCanvas.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

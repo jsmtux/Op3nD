@@ -10,12 +10,16 @@
 #include "MXML.h"
 using namespace std;
 
-
-typedef enum {PHYSICAL=0,FONT,IMAGE,OBJECT, MAP, SOUND, SKELETON, SHADER, MESH, BOX}FileType;
-
 class Project
 {	
 public:
+    typedef enum {IMAGE,OBJECT, MAP, SOUND, SHADER, MESH, BOX, FILETYPE_END}FileType;
+    /**
+     * Constructor
+     * @param nome
+     */
+    Project(string dir);
+    static bool createProject( string name, string dir, string vers, string desc);
     /**
      * Returns the working directory of the project
      * @return a string to the project
@@ -45,21 +49,6 @@ public:
      */
     string getDesc();
     /**
-     * Returns wether the project has to be portable to mobile devices or not
-     * @return 
-     */
-    bool getPort();
-    /**
-     * Lists all avaliable projects
-     * @return a vector of avaliable projects
-     */
-    static vector<string> listProjs();
-    /**
-     * Constructor
-     * @param nome
-     */
-    Project( string nome);
-    /**
      * Reads the project contents
      */
     void read( );
@@ -69,13 +58,14 @@ public:
     static FileType getType(string dir);
     void setRemoteProjs(vector<string> p);
     vector<string> listFiles(FileType file);
+    static bool isProject(string dir);
+    static string toString(FileType type);
+    
 private:
     string dir;
     string name;
     string desc;
     string vers;
-    bool portable;
-    string toString(FileType type);
     vector<string> remoteProjs;
 };
 

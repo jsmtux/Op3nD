@@ -1,43 +1,49 @@
 /**
  * @(#) Project.cpp
  */
-#define PPATH "./proj/"
+#define PRO_CONF_FILE "project.xml"
+
+#include <algorithm>
 
 #include "Project.h"
 
-Project::Project(string nome){
-    portable=false;
-    dir=nome;
-    vector<string> files=listDirFiles(PPATH);
-    for(vector<string>::const_iterator it=files.begin();it!=files.end();++it){
-            if(dir.compare(*it)==0){
-                return;
-            }
-    }
-    string fullP=getDir();
-    create_directory(PPATH);
-    create_directory(fullP);
-    create_directory(fullP+toString(PHYSICAL));
-    create_directory(fullP+toString(FONT));
-    create_directory(fullP+toString(IMAGE));
-    create_directory(fullP+toString(MAP));
-    create_directory(fullP+toString(SOUND));
-    create_directory(fullP+toString(SKELETON));
-    create_directory(fullP+toString(OBJECT));
-    create_directory(fullP+toString(SHADER));
-    create_directory(fullP+toString(MESH));
+Project::Project(string dir){
+  this->dir=dir;
+  
+  read();
+  
+  create_directories(dir+"/"+toString(IMAGE));
+  create_directories(dir+"/"+toString(MAP));
+  create_directories(dir+"/"+toString(SOUND));
+  create_directories(dir+"/"+toString(OBJECT));
+  create_directories(dir+"/"+toString(SHADER));
+  create_directories(dir+"/"+toString(MESH));
 }
 
-vector<string> Project::listProjs(){
-    return listDirFiles(PPATH);
+bool Project::createProject(string name, string dir, string vers, string desc)
+{
+  if(!create_directories(dir)){
+    return false;
+  }
+  MXML::Tag root("project");
+  root.addChildren(MXML::Tag("name"));
+  root.addChildren(MXML::Tag("description"));
+  root.addChildren(MXML::Tag("version"));
+  root["name"].setAttrib(MXML::Attribute(name));
+  root["version"].setAttrib(MXML::Attribute(vers));
+  root["description"].setAttrib(MXML::Attribute(desc));
+  MXML::XMLFile file(dir+"/"+PRO_CONF_FILE,root,"projects.dtd");
+  file.write();
+  
+  return true;
 }
 
 string Project::getDir(){
-        return PPATH+dir+"/"; 
+        return dir+"/"; 
 }
 
 string Project::getDir(string file, FileType type){
-    return PPATH+dir+toString(type)+"/"+file;
+    return dir+"/"+toString(type)+"/"+file;
 }
 
 string Project::getDir(string file){
@@ -46,36 +52,29 @@ string Project::getDir(string file){
 
 string Project::toString(FileType type){
     switch(type){
-        case PHYSICAL:
-            return("/meshes");
-        case FONT:
-            return("/fonts");
         case IMAGE:
-            return("/images");
+            return("images");
         case OBJECT:
-            return("/objects");
+            return("objects");
         case MAP:
-            return("/maps");
+            return("maps");
         case SOUND:
-            return("/sounds");
-        case SKELETON:    
-            return("/skeletons");
+            return("sounds");
         case SHADER:
-            return("/shaders");
+            return("shaders");
         case MESH:
-            return("/meshes");
+            return("meshes");
     }
 }
 
 
 void Project::read( ){
     MXML::Tag root;
-    MXML::XMLFile file(getDir()+"project.xml",root,"projets.dtd");
+    MXML::XMLFile file(getDir()+"project.xml",root,"projects.dtd");
     file.read();
     name = root["name"].getAttrib().getString();
     desc = root["description"].getAttrib().getString();
     vers = root["version"].getAttrib().getString();
-    portable = root["portable"].getAttrib().getInt();
 }
 
 
@@ -91,36 +90,34 @@ string Project::getDesc(){
     return desc;
 }
 
-bool Project::getPort(){
-    return portable;
-}
-
 void Project::setRemoteProjs(vector<string> p){
     remoteProjs=p;
 }
 
-FileType Project::getType(string dir){
+Project::FileType Project::getType(string dir){
     std::string::size_type dot=dir.find_last_of(".");
+    const vector<string> imageFiles={".png",".jpg",".pcx",".tga"};
+    const vector<string> meshFiles={".md2",".ase",".pk3",".3ds",".obj",".x",".md5mesh",".blend",".dae",".ms3d",".xml"};
     if(dot==string::npos){
         return BOX;
     }
     string extension=dir.substr(dot,dir.size()-dot);
-    if(extension.compare(".png")==0||extension.compare(".jpg")==0
-            ||extension.compare(".pcx")==0||extension.compare(".tga")==0)
-        return IMAGE;
-    if(extension.compare(".md2")==0||extension.compare(".ase")==0
-            ||extension.compare(".pk3")==0||extension.compare(".3ds")==0
-            ||extension.compare(".obj")==0||extension.compare(".x")==0
-            ||extension.compare(".md5mesh")==0||extension.compare(".blend")==0
-            ||extension.compare(".dae")==0||extension.compare(".ms3d")==0)
-        return MESH;
+    if(std::find(imageFiles.begin(),imageFiles.end(),extension)!=imageFiles.end()){
+      return IMAGE;
+    }
+    if(std::find(meshFiles.begin(),meshFiles.end(),extension)!=meshFiles.end()){
+      return MESH;
+    }
     if(extension.compare(".o3s")==0)
         return OBJECT;
-    if(extension.compare(".xml")==0){
-        return PHYSICAL;
-    }
 }
 
 vector<string> Project::listFiles(FileType file){
     return listDirFiles(getDir("",file),false);
+}
+
+bool Project::isProject(string dir)
+{
+  vector<string> files = listDirFiles(dir,false);
+  return std::find(files.begin(),files.end(),PRO_CONF_FILE)!=files.end();
 }
