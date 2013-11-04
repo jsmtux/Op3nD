@@ -35,7 +35,7 @@ public:
      * Returns the name of an image
      * @return name of an image
      */
-    string getType();
+    ResourceType getType();
     void Bind();
     void del();
     static void init();

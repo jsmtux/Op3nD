@@ -3,61 +3,48 @@
 #include <QList>
 #include <QString>
 #include <QPixmap>
+#include <QVariant>
+#include <functional>
+#include <signal.h>
+#include <QObject>
+#include "../Engine/Math/Vector3.h"
+#include "../Engine/Math/Quaternion.h"
 
-class TreeItem{
+class TreeItem: public QObject{
+  Q_OBJECT
 public:
-  TreeItem(QString name="", TreeItem* parent=NULL, QString path=""){
-    parentItem=parent;
-    this->name=name;
-    if(!path.isEmpty()){
-      QPixmap tmpImage;
-      tmpImage.load(path);
-      if(tmpImage.width()>tmpImage.height()){
-	image = new QPixmap(tmpImage.scaledToWidth(30));
-      }else{
-	image = new QPixmap(tmpImage.scaledToHeight(30));
-      }
-    }else{
-      image = NULL;
-    }
-  }
-  ~TreeItem(){
-    qDeleteAll(children);
-    delete image;
-  }
-  void addItem(TreeItem *item){
-    item->setParent(this);
-    children.append(item);
-  }
-  TreeItem* child(int row){
-    return children.at(row);
-  }
-  int childCount(){
-    return children.count();
-  }
-  TreeItem* parent(){
-    return parentItem;
-  }
-  int row() const
-  {
-    if (!parentItem)
-	  return 0;
-    parentItem->children.indexOf(const_cast<TreeItem*>(this));
-  }
-  QString getName(){
-    return name;
-  }
-  void setParent(TreeItem* parent){
-    parentItem=parent;
-  }
-  QPixmap* getPixmap(){
-    return image;
-  }
+  TreeItem(QString name="", TreeItem* parent=NULL, QString path="");
+  TreeItem(QString name, TreeItem* parent, Vector3 vector, function<void (Vector3)> func=[](Vector3){});
+  TreeItem(QString name, TreeItem* parent, Quaternion quaternion, function<void (Quaternion)> func=[](Quaternion){});
+  TreeItem(QString name, TreeItem* parent, QString actionName, function<void ()> func);
+  ~TreeItem();
+  void addItem(TreeItem *item);
+  TreeItem* child(int row);
+  int childCount();
+  TreeItem* parent();
+  int row() const;
+  QString getName();
+  void setParent(TreeItem* parent);
+  QPixmap* getPixmap();
+  void setData(QVariant d);
+  QVariant getData() const;
+  bool isButton();
+  function<void ()> getCallBack();
+public slots:
+  void updateSource();
 private:
+  enum itemType{NONE,VECTOR,QUATERNION,BUTTON};
   TreeItem* parentItem;
   QList<TreeItem*> children;
   QString name;
   QPixmap* image;
+  QVariant data;
+  itemType type;
+  function< void (Vector3)> vectorFunc;
+  function< void (Quaternion)> quaternionFunc;
+  function< void ()> buttonFunc;
+signals:
+  void valueChanged();
 };
 
 #endif

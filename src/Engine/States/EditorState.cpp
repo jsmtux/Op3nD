@@ -4,7 +4,6 @@
 #include "../ObjectTypes/Tile.h"
 #include "../Base.h"
 #include "../ObjectTypes/Camera.h"
-#include "../ObjectTypes/Object.h"
 #include "../../ProjectManagement/Project.h"
 
 EditorState::EditorState(string n):State(n){
@@ -114,6 +113,7 @@ void EditorState::updateElements(){
       if(!handled){
 	movement=currCam->getU()*cont1->getAxis()[A_L]/10;
 	movement=movement-currCam->getV()*cont1->getAxis()[A_R]/10;
+	
 	Editable *sel=static_cast<Editable*>(selected);
 	if(cont1->getKeys()[K_A]){
 	  if(cont1->getAxis()[A_L]!=0||cont1->getAxis()[A_R]!=0){

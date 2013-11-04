@@ -37,17 +37,17 @@ Resource* Resource::Load(string dir){
         case Project::BOX:
             ret=Box::loadBox();
             break;
+	default:
+	  cerr << "Cannot load " << dir << endl;
     }
-    ret->copies++;
+    if(ret){
+      ret->copies++;
+    }
     return ret;
 }
 
 void Resource::Draw(){
     ;
-}
-
-string Resource::getType(){
-    return "unimplemented";
 }
 
 string Resource::getName(){

@@ -21,6 +21,7 @@ using namespace MXML;
 
 #include "../Timer.h"
 #include "../Controller.h"
+#include "../ObjectTypes/Scripted.h"
 #include "../../Network/NetNode.h"
 
 class Editable;
@@ -162,6 +163,8 @@ public:
     tMillis getDiffTime();
     
     void changeResolution();
+    
+    void setDebug(bool debug=true);
 private:
     bool isStopped;
     /**
@@ -179,6 +182,7 @@ protected:
     
     PhysicsWorld *pWorld;
     bool deleteOnEnd;
+    bool debug;
     string name;
     
     NetNode *netNode;
@@ -191,7 +195,7 @@ protected:
     vector<Camera*> cameras;
     Camera* currCam;
     vector<Tile*> tiles;
-    vector<Object*> objects;
+    vector<Scripted*> objects;
     
     tMillis diffTime;
 };

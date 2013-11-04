@@ -39,85 +39,91 @@ bool Project::createProject(string name, string dir, string vers, string desc)
 }
 
 string Project::getDir(){
-        return dir+"/"; 
+  return dir+"/"; 
 }
 
 string Project::getDir(string file, FileType type){
-    return dir+"/"+toString(type)+"/"+file;
+  return dir+"/"+toString(type)+"/"+file;
 }
 
 string Project::getDir(string file){
-    return getDir(file,getType(file));
+  return getDir(file,getType(file));
 }
 
 string Project::toString(FileType type){
-    switch(type){
-        case IMAGE:
-            return("images");
-        case OBJECT:
-            return("objects");
-        case MAP:
-            return("maps");
-        case SOUND:
-            return("sounds");
-        case SHADER:
-            return("shaders");
-        case MESH:
-            return("meshes");
-    }
+  switch(type){
+    case IMAGE:
+      return("images");
+    case OBJECT:
+      return("objects");
+    case MAP:
+      return("maps");
+    case SOUND:
+      return("sounds");
+    case SHADER:
+      return("shaders");
+    case MESH:
+      return("meshes");
+    case PHYSICAL:
+      return("meshes");
+  }
 }
 
 
 void Project::read( ){
-    MXML::Tag root;
-    MXML::XMLFile file(getDir()+"project.xml",root,"projects.dtd");
-    file.read();
-    name = root["name"].getAttrib().getString();
-    desc = root["description"].getAttrib().getString();
-    vers = root["version"].getAttrib().getString();
+  MXML::Tag root;
+  MXML::XMLFile file(getDir()+"project.xml",root,"projects.dtd");
+  file.read();
+  name = root["name"].getAttrib().getString();
+  desc = root["description"].getAttrib().getString();
+  vers = root["version"].getAttrib().getString();
 }
 
 
 string Project::getName(){
-    return name;
+  return name;
 }
 
 string Project::getVers(){
-    return vers;
+  return vers;
 }
 
 string Project::getDesc(){
-    return desc;
+  return desc;
 }
 
 void Project::setRemoteProjs(vector<string> p){
-    remoteProjs=p;
+  remoteProjs=p;
 }
 
 Project::FileType Project::getType(string dir){
-    std::string::size_type dot=dir.find_last_of(".");
-    const vector<string> imageFiles={".png",".jpg",".pcx",".tga"};
-    const vector<string> meshFiles={".md2",".ase",".pk3",".3ds",".obj",".x",".md5mesh",".blend",".dae",".ms3d",".xml"};
-    if(dot==string::npos){
-        return BOX;
-    }
-    string extension=dir.substr(dot,dir.size()-dot);
-    if(std::find(imageFiles.begin(),imageFiles.end(),extension)!=imageFiles.end()){
-      return IMAGE;
-    }
-    if(std::find(meshFiles.begin(),meshFiles.end(),extension)!=meshFiles.end()){
-      return MESH;
-    }
-    if(extension.compare(".o3s")==0)
-        return OBJECT;
-}
-
-vector<string> Project::listFiles(FileType file){
+  std::string::size_type dot=dir.find_last_of(".");
+  const vector<string> imageFiles={".png",".jpg",".pcx",".tga"};
+  const vector<string> meshFiles={".md2",".ase",".pk3",".3ds",".obj",".x",".md5mesh",".blend",".dae",".ms3d"};
+  if(dot==string::npos){
+    return BOX;
+  }
+  string extension=dir.substr(dot,dir.size()-dot);
+  if(std::find(imageFiles.begin(),imageFiles.end(),extension)!=imageFiles.end()){
+    return IMAGE;
+  }
+  if(std::find(meshFiles.begin(),meshFiles.end(),extension)!=meshFiles.end()){
+    return MESH;
+  }
+  if(extension.compare(".o3s")==0)
+    return OBJECT;
+  if(extension.compare(".xml")==0){
+    return PHYSICAL;
+  }
+  }
+  
+  vector<string> Project::listFiles(FileType file){
     return listDirFiles(getDir("",file),false);
-}
-
-bool Project::isProject(string dir)
-{
-  vector<string> files = listDirFiles(dir,false);
-  return std::find(files.begin(),files.end(),PRO_CONF_FILE)!=files.end();
-}
+  }
+  
+  bool Project::isProject(string dir)
+  {
+    vector<string> files = listDirFiles(dir,false);
+    return std::find(files.begin(),files.end(),PRO_CONF_FILE)!=files.end();
+  }
+  

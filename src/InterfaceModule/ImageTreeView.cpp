@@ -25,6 +25,6 @@ void ImageTreeView::drawRow(QPainter* painter, const QStyleOptionViewItem& optio
     pixmap.load("blue.bmp");
     pixmap.scaledToHeight(options.rect.height());
     pixmap.scaledToWidth(15);
-    painter->drawPixmap(QPointF( options.rect.topLeft().x(), options.rect.topRight().y()), *item->getPixmap());
+    painter->drawPixmap(QPointF( options.rect.topLeft().x()+10, options.rect.topRight().y()), *item->getPixmap());
   }
 }

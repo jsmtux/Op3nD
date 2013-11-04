@@ -15,7 +15,7 @@
 
 class Timer;
 
-enum tShape{S_BOX=0,S_SPHERE=8,S_CAPSULE=10,S_UNIMPLEMENTED};
+enum tShape{S_BOX,S_SPHERE,S_CAPSULE,S_COMPOUND,S_UNIMPLEMENTED};
 
 class Physical{
 public:

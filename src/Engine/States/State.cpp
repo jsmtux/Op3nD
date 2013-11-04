@@ -11,7 +11,6 @@
 
 #include "../ObjectTypes/Camera.h"
 #include "../ObjectTypes/Editable.h"
-#include "../ObjectTypes/Object.h"
 #include "../ObjectTypes/Model3d.h"
 #include "../ObjectTypes/Scripted.h"
 #include "../ObjectTypes/Box.h"
@@ -57,8 +56,8 @@ State::State(State& s){
         tiles.push_back(new Tile(*t));
         addToList(tiles.back(),tiles.back()->getId());
     }
-    for(Object *o:s.objects){
-        objects.push_back(new Object(*o));
+    for(Scripted *o:s.objects){
+        objects.push_back(new Scripted(*o));
         addToList(objects.back(),objects.back()->getId());
     }
     isStopped=true;
@@ -215,7 +214,7 @@ void State::draw(){
     for(int i=0;i<objects.size();i++)
         objects[i]->draw();
     Shading::getActive()->setObjMat(Matrix());
-    //if(pWorld)pWorld->draw();
+    if(debug&&pWorld)pWorld->draw();
 #endif
 }
 
@@ -270,7 +269,7 @@ void State::clear(){
     }
     objects.clear();
     for(int i=0;i<cameras.size();i++){
-        delete cameras[i];
+        //delete cameras[i];
     }
     cameras.clear();
     list.clear();
@@ -317,7 +316,7 @@ void State::addElement(Editable *a){
             tiles.push_back(static_cast<Tile*>(a));
             break;
         case E_OBJECT:
-            objects.push_back(static_cast<Object*>(a));
+            objects.push_back(static_cast<Scripted*>(a));
             break;
         case E_CAMERA:
             cameras.push_back(static_cast<Camera*>(a));
@@ -351,7 +350,7 @@ MXML::Tag State::toXML(){
         if(t!=NULL)
                 ret.addChildren(t->toXML());
     }
-    for(Object* o:objects){
+    for(Scripted* o:objects){
         ret.addChildren(o->toXML());
     }
     return ret;
@@ -372,7 +371,7 @@ void State::fromXML(MXML::Tag &code){
         }
         if(c.getName().compare("object")==0){
             id=c["id"].getAttrib().getInt();
-            Object* t=dynamic_cast<Object*> (getByIndex(id));
+            Scripted* t=dynamic_cast<Scripted*> (getByIndex(id));
             if(t==NULL){
                 cout << "UNINITUALIZED\n";
             }else{
@@ -445,3 +444,9 @@ void State::changeResolution()
   Vector3 res = Base::getInstance()->getResolution();
   ptext = new PickingTexture(res.x,res.y);
 }
+
+void State::setDebug(bool debug)
+{
+  this->debug=debug;
+}
+

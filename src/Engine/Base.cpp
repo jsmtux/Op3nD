@@ -9,7 +9,7 @@
 #include "./States/EditorState.h"
 #include "./States/MeshState.h"
 #include "./States/PlayState.h"
-#ifdef _APPSFML
+#ifdef NOGUI
 #include "Graphics/RenderingSFML.h"
 #endif
 
@@ -25,8 +25,9 @@ Base::Base(){
 
 void Base::init(){
 #ifndef NODRAW    
-#ifdef _APPSFML
-    rc = new RenderingSFML();    
+#ifdef NOGUI
+    rc = new RenderingSFML();   
+    rc->init();
 #endif
 #endif
 }

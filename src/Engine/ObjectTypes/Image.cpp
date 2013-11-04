@@ -74,8 +74,8 @@ void Image::Bind(){
 #endif
 }
 
-string Image::getType(){
-    return "Image";
+Resource::ResourceType Image::getType(){
+    return IMAGE;
 }
 
 void Image::Draw(){

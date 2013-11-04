@@ -80,6 +80,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionPlay"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="windowTitle">
@@ -127,7 +128,7 @@
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QTableView" name="tableView"/>
+      <widget class="QTreeView" name="tvProperties"/>
      </item>
     </layout>
    </widget>
@@ -207,18 +208,23 @@
     <string>Connect to server</string>
    </property>
   </action>
+  <action name="actionPlay">
+   <property name="text">
+    <string>Play</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>ImageTreeView</class>
-   <extends>QTreeView</extends>
-   <header>../src/InterfaceModule/ImageTreeView.h</header>
-  </customwidget>
   <customwidget>
    <class>QSFMLCanvas</class>
    <extends>QWidget</extends>
    <header>../src/InterfaceModule/QSFMLCanvas.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ImageTreeView</class>
+   <extends>QTreeView</extends>
+   <header>../src/InterfaceModule/ImageTreeView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

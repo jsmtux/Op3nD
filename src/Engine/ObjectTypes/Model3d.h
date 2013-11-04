@@ -85,6 +85,7 @@ public:
     static Model3d* loadM3d(string file);
     bool isValid();
     void del();
+    ResourceType getType();
 private:
     Model3d(const string filename);
     float getBiggest(aiMesh* tMesh);

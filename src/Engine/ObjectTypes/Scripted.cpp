@@ -22,10 +22,15 @@ lua_State* Scripted::L=NULL;
 vector<Scripted*> Scripted::list;
 Scripted* Scripted::currObject;
 
-Scripted::Scripted(string file, Vector3 p, Vector3 s, Vector3 r){
+Scripted::Scripted(string file, Vector3 p, Vector3 s, Vector3 r):Tile(p,s,r){
     currObject = NULL;
     
     loadFromFile(file);
+}
+
+string Scripted::getPath()
+{
+  return Base::getInstance()->getProj()->getDir(name,Project::OBJECT)+string(".o3s");
 }
 
 void Scripted::loadFromFile(string file){
@@ -34,8 +39,8 @@ void Scripted::loadFromFile(string file){
     
     lua_getglobal(L,(string("new")+file).c_str());
     if (lua_isnil(L,-1) == 1){
-        if(luaL_dofile(L, (Base::getInstance()->getProj()->getDir(file,Project::OBJECT)+string(".o3s")).c_str())){
-            cout << "Error reading file " << Base::getInstance()->getProj()->getDir(file,Project::OBJECT)+string(".o3s") << endl;
+        if(luaL_dofile(L, getPath().c_str())){
+            cout << "Error reading file " << getPath() << endl;
             return;
         }
         
@@ -58,7 +63,6 @@ void Scripted::loadFromFile(string file){
 void Scripted::update( )
 {
     currObject=this;
-    Object::update();
     lua_rawgeti(L, LUA_REGISTRYINDEX, luaRef);//object
     lua_getfield(L,-1,"Update");//function name
     lua_pushvalue(L,-2);//self
@@ -67,6 +71,11 @@ void Scripted::update( )
         cerr << "\t" << lua_tostring(L, -1) << endl;
         lua_pop(L, 1);
     }
+}
+
+string Scripted::getName()
+{
+  return name;
 }
 
 void Scripted::Init(){    
@@ -111,6 +120,10 @@ Scripted* Scripted::getByInd(int ind){
     return list.at(ind);
 }
 
+edType Scripted::getType(){
+    return E_OBJECT;
+}
+
 #include "Tile.h"
 #include "Camera.h"
 class Tile;
@@ -147,7 +160,7 @@ int Scripted::LaddToScene(lua_State* L){
     return 0;
 }
 
-int Scripted::Lload(lua_State *L){
+int Scripted::Lload(lua_State *L){/*************/
     int n= lua_gettop(L);
     if(n<1){
         lua_pushstring(L,"Error in lua load");
@@ -178,12 +191,15 @@ int Scripted::Lload(lua_State *L){
     }
     
     Scripted * tmp=getByInd(ind);
-    tmp->addResource(new Tile(pos,siz,rot,dir));
-    lua_pushnumber(L,tmp->resources.size()-1);
+    tmp->position=pos;
+    tmp->size=siz;
+    tmp->rotation=rot;
+    tmp->setResource(dir);
+    lua_pushnumber(L,0);
     return 1;
 }
 
-int Scripted::LloadPhysical(lua_State* L){
+int Scripted::LloadPhysical(lua_State* L){/**********/
     int n= lua_gettop(L);
     if(n<1){
         lua_pushstring(L,"Error in lua load");
@@ -214,10 +230,12 @@ int Scripted::LloadPhysical(lua_State* L){
     }
     
     Scripted * tmp=getByInd(ind);
-    Tile *tmpRes = new Tile(pos,siz,rot);
-    tmpRes->setPhysical(Physical(dir).toRigidBody());
-    tmp->addResource(tmpRes);
-    lua_pushnumber(L,tmp->resources.size()-1);
+    tmp->position=pos;
+    tmp->size=siz;
+    tmp->rotation = rot;
+    tmp->setPhysical(Physical(dir).toRigidBody());
+    tmp->setResource(dir);
+    lua_pushnumber(L,0);
     return 1;    
 }
 
@@ -441,7 +459,7 @@ int Scripted::LgetElementPos(lua_State* L){
         lua_error(L);
     }
     int ind = lua_tointeger(L,1);
-    Vector3 ret = currObject->resources[ind]->getPos();
+    Vector3 ret = currObject->getPos();
     
     lua_pushnumber(L,ret.x);
     lua_pushnumber(L,ret.y);
@@ -462,7 +480,7 @@ int Scripted::LsetElementPos(lua_State* L){
     pos.z=lua_tonumber(L,3);
     
     int ind = lua_tointeger(L,4);
-    currObject->resources[ind]->setPos(pos);
+    currObject->setPos(pos);
         
     return 0;
 }
@@ -475,7 +493,7 @@ int Scripted::LgetElementRot(lua_State* L){
     }
     Quaternion ret;
     int ind = lua_tointeger(L,1);
-    ret = currObject->resources[ind]->getRot();
+    ret = currObject->getRot();
         
     lua_pushnumber(L,ret.x);
     lua_pushnumber(L,ret.y);
@@ -501,7 +519,7 @@ int Scripted::LsetElementRot(lua_State* L){
     obj= currObject;
     
     if(obj){
-        obj->resources[ind]->setRot(rot);
+        obj->setRot(rot);
     }
     
     return 0;
@@ -524,7 +542,7 @@ int Scripted::LaddElementRot(lua_State* L){
     obj= currObject;
         
     if(obj){
-        obj->resources[ind]->setRot(obj->resources[ind]->getRot()*rot);
+        obj->setRot(obj->getRot()*rot);
     }
     
     return 0;
@@ -539,7 +557,7 @@ int Scripted::LgetElementSize(lua_State* L){
     Vector3 ret;
     
     int ind = lua_tointeger(L,1);
-    ret = currObject->resources[ind]->getSize();
+    ret = currObject->getSize();
 
     lua_pushnumber(L,ret.x);
     lua_pushnumber(L,ret.y);
@@ -560,7 +578,7 @@ int Scripted::LsetElementSize(lua_State* L){
     size.z=lua_tonumber(L,3);
     
     int ind = lua_tointeger(L,4);
-    currObject->resources[ind]->setSize(size);
+    currObject->setSize(size);
     
     return 0;
 }
@@ -757,13 +775,13 @@ int Scripted::LAAtoQuaternion(lua_State *L){
 using namespace MXML;
 
 
-Scripted::Scripted(MXML::Tag &code){
+Scripted::Scripted(MXML::Tag &code):Tile(Vector3(0,0,0),Vector3(0,0,0),Vector3(0,0,0)){
     fromXML(code);
 }
 
 void Scripted::fromXML( MXML::Tag &code ){
     if(code.contains("file"))loadFromFile(code["file"].getAttrib().getString());
-    Object::fromXML(code);
+    Tile::fromXML(code);
 }
 
 MXML::Tag Scripted::toXML( ){
@@ -771,9 +789,7 @@ MXML::Tag Scripted::toXML( ){
     ret.addChildren(Tag("id"));
     ret["id"].setAttrib(Attribute(int(id)));
     ret.addChildren(Tag("file"));
-    for(Tile* t:resources){
-        ret.addChildren(t->toXML());
-    }
+    ret.addChildren(Tile::toXML());
     ret["file"].setAttrib(Attribute(string(name).c_str()));
     return ret;
 }

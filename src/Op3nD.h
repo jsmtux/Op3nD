@@ -1,10 +1,16 @@
 #ifndef Op3nD_H
 #define Op3nD_H
 
-#include <QtGui/QMainWindow>
+#include <QtWidgets/QMainWindow>
 #include "ui_mainWindow.h"
 #include "InterfaceModule/ProjectDialog.h"
 #include "InterfaceModule/ResourceTreeModel.h"
+#include "InterfaceModule/TestDialog.h"
+#include "InterfaceModule/PropertiesTreeModel.h"
+#include "InterfaceModule/SpinBoxDelegate.h"
+#include "InterfaceModule/LuaEditor.h"
+#include "InterfaceModule/PhysicsDialog.h"
+#include "Engine/ObjectTypes/Editable.h"
 
 class Op3nD : public QMainWindow
 {
@@ -15,11 +21,18 @@ public:
 public slots:
   void editProject();
   void changeScene(QTreeWidgetItem* item, int column);
+  void launchTest();
+  void changeSelection(Editable* sel);
+  void execPhysicsDialog(Editable* ed);
 private:
   void updateScenesList();
   Ui::MainWindow window;
   ProjectDialog* projectDialog;
   ResourceTreeModel* resourceModel;
+  PropertiesTreeModel* propertiesModel;
+  LuaEditor* luaEditor;
+  TestDialog testdialog;
+  SpinBoxDelegate delegate;
 };
 
 #endif // Op3nD_H

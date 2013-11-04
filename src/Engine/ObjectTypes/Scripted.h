@@ -9,10 +9,10 @@
 
 #include "../Math/Vector3.h"
 
-#include "Object.h"
+#include "Tile.h"
 #include <map>
 #include <string>
-class Scripted: public Object
+class Scripted: public Tile
 {	
 public:
     void update( );
@@ -22,6 +22,9 @@ public:
     virtual MXML::Tag toXML( );
     static lua_State *getState(){return L;}
     static void Init();
+    edType getType();
+    string getName();
+    string getPath();
 private:
     static Scripted* currObject;
     int luaRef;

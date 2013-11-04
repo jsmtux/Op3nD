@@ -34,8 +34,8 @@ void Line::drawLine(Vector3 b, Vector3 e, Vector3 c){
 #endif
 }
 
-string Line::getType(){
-    return "line";
+Resource::ResourceType Line::getType(){
+    return LINE;
 }
 
 void Line::init(){    

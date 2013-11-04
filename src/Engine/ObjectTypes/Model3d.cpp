@@ -54,6 +54,11 @@ float Model3d::getBiggest(aiMesh* tMesh){
     return biggest;
 }
 
+Resource::ResourceType Model3d::getType()
+{
+  return MODEL3D;
+}
+
 Model3d::Model3d(const string filename){
     name =filename;
     numBones=0;

@@ -13,7 +13,7 @@ using namespace std;
 class Project
 {	
 public:
-    typedef enum {IMAGE,OBJECT, MAP, SOUND, SHADER, MESH, BOX, FILETYPE_END}FileType;
+    typedef enum {IMAGE,OBJECT, MAP, SOUND, SHADER, MESH, BOX, PHYSICAL, FILETYPE_END}FileType;
     /**
      * Constructor
      * @param nome

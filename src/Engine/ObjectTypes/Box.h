@@ -12,7 +12,7 @@
 class Box:public Resource{
 public:
     void Draw();
-    string getType();
+    ResourceType getType();
     static Box* loadBox();
     void del();
 private:

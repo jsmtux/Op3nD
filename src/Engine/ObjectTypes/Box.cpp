@@ -21,8 +21,8 @@ void Box::Draw(){
         Line::drawLine(Vertices[Indices[i]],Vertices[Indices[i+1]],Vector3(1,1,1));*/
 }
 
-string Box::getType(){
-    return "Box";
+Resource::ResourceType Box::getType(){
+    return BOX;
 }
 
 Box* Box::loadBox(){

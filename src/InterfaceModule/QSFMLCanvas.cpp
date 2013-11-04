@@ -1,6 +1,10 @@
 #include "QSFMLCanvas.h"
-#include "../Engine/Base.h"
 #include <QDebug>
+#include <QKeyEvent>
+#include <QAction>
+#include "../Engine/Base.h"
+
+stack<QSFMLCanvas*> QSFMLCanvas::canvasStack;
 
 QSFMLCanvas::QSFMLCanvas(QWidget* Parent,/* const QPoint& Position, const QSize& Size,*/ unsigned int FrameTime) :
 QWidget       (Parent),
@@ -12,24 +16,46 @@ myInitialized (false)
 
     setFocusPolicy(Qt::StrongFocus);
 
-    //move(Position);
-    //resize(Size);
-
     myTimer.setInterval(FrameTime);
     Base::getInstance()->setRC(this);
     Base::getInstance()->addController(this);
+      
+    setContextMenuPolicy(Qt::ActionsContextMenu);
+    editableCopyAction= new QAction(tr("copy"),this);
+    editableDeleteAction= new QAction(tr("delete"),this);
+    objectEditAction= new QAction(tr("edit script"),this);
+    addAction(editableCopyAction);
+    addAction(editableDeleteAction);
+    addAction(objectEditAction);
+    currentSelected=nullptr;
+    connect(objectEditAction,&QAction::triggered,this,&QSFMLCanvas::sendEditSignal);
+    isEnabled=true;
 }
 
 QSFMLCanvas::~QSFMLCanvas()
 {
-
+  canvasStack.pop();
+  if(!canvasStack.empty()){
+    canvasStack.top()->setEnabled(true);
+  }
 }
 
+void QSFMLCanvas::setEnabled(bool enabled)
+{
+  static int sizeDelta=1;
+  isEnabled=enabled;
+  if(enabled){//Hack: Force size change in order to reload camera properties
+    QSize size=parentWidget()->size();
+    size.setWidth(size.width()-sizeDelta);
+    sizeDelta*=-1;
+    parentWidget()->resize(size);
+  }
+}
 
 #ifdef Q_WS_X11
-    #include <Qt/qx11info_x11.h>
-#include <qevent.h>
-    #include <X11/Xlib.h>
+  #include <Qt/qx11info_x11.h>
+  #include <qevent.h>
+  #include <X11/Xlib.h>
 #endif
 
 void QSFMLCanvas::showEvent(QShowEvent*)
@@ -48,6 +74,11 @@ void QSFMLCanvas::showEvent(QShowEvent*)
         myTimer.start();
 
         myInitialized = true;
+	if(!canvasStack.empty()){
+	  canvasStack.top()->setEnabled(false);
+	}
+	canvasStack.push(this);
+	
     }
 }
 
@@ -58,8 +89,14 @@ QPaintEngine* QSFMLCanvas::paintEngine() const
 
 void QSFMLCanvas::paintEvent(QPaintEvent*)
 {
-    OnUpdate();
-    display();
+  if(!isEnabled){
+    return;
+  }
+  OnUpdate();
+  
+  display();
+  setAxis(A_L,0);
+  setAxis(A_R,0);
 }
 
 void QSFMLCanvas::OnInit()
@@ -151,8 +188,46 @@ void QSFMLCanvas::resizeEvent(QResizeEvent* event)
 
 void QSFMLCanvas::mouseDoubleClickEvent(QMouseEvent* event)
 {
-  QWidget::mousePressEvent(event);
-  setSelection(Base::getInstance()->getCurState()->selection(event->x(),event->y()));
-  
+  unsigned int *sel=Base::getInstance()->getCurState()->selection(event->x(),event->y());
+  setSelection(sel);
+  emit selectionChanged(Base::getInstance()->getCurState()->getByIndex(sel[0]));
 }
 
+void QSFMLCanvas::mousePressEvent(QMouseEvent* event)
+{
+  setKey(K_A,true);
+  mousePosition=event->pos();
+  unsigned int *sel=Base::getInstance()->getCurState()->selection(event->x(),event->y());
+  setSelection(sel);
+  currentSelected = Base::getInstance()->getCurState()->getByIndex(sel[0]);
+  if(!currentSelected){
+    editableCopyAction->setEnabled(false);
+    editableDeleteAction->setEnabled(false);
+    objectEditAction->setVisible(false);
+  }else{    
+    editableCopyAction->setEnabled(true);
+    editableDeleteAction->setEnabled(true);
+    objectEditAction->setVisible(currentSelected->getType()==E_OBJECT);
+  }
+  QWidget::mousePressEvent(event);
+}
+
+void QSFMLCanvas::mouseMoveEvent(QMouseEvent* event)
+{
+  QWidget::mouseMoveEvent(event);
+  setAxis(A_L,event->pos().x()-mousePosition.x());
+  setAxis(A_R,event->pos().y()-mousePosition.y());
+  mousePosition=event->pos();
+}
+
+void QSFMLCanvas::mouseReleaseEvent(QMouseEvent* event)
+{
+  setKey(K_A,false);
+  QWidget::mouseReleaseEvent(event);
+}
+
+
+void QSFMLCanvas::sendEditSignal()
+{
+  emit editObjectSource(dynamic_cast<Scripted*>(currentSelected));
+}

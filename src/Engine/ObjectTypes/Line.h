@@ -21,7 +21,7 @@ class Shading;
 class Line: public Resource{
 public:
     void Draw(); 
-    string getType();
+    ResourceType getType();
     void del();
     static void drawLine(Vector3 b, Vector3 e, Vector3 c);
     static void init();

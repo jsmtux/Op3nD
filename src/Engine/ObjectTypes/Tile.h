@@ -41,11 +41,16 @@ public:
     void setSize(Vector3 r);
     void setLinVel(Vector3 v);
     void setAngVel(Vector3 v);
-    edType getType();
+    virtual edType getType();
     void setPhysical(btRigidBody* p);
     void setPhysical(MXML::Tag &code);
     btRigidBody* getPhysical();
-    void addResource(string dirResource);
+    void setResource(string dirResource);
+    Resource* getResource();
+protected:
+    Resource* resource;
+    Vector3 position,size;
+    Quaternion rotation;
 private:
     Matrix getTrans();
     void updateMotionState();
@@ -54,10 +59,7 @@ private:
 #endif
     bool colored;
     void load();
-    vector<Resource*> resources;
     btRigidBody* physInfo;
-    Vector3 position,size;
-    Quaternion rotation;
 };
 
 #endif
