@@ -26,6 +26,7 @@ public:
     MXML::Tag toXML();
     MXML::Tag difference(Networkable& n);
     void fromXML(MXML::Tag &code);
+    void reset();
 protected:
     void setKey(tkeys key,bool value);
     void setAxis(taxis axis,float value);

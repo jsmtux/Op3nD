@@ -104,6 +104,13 @@ int Controller::getId(){
     return id;
 }
 
+void Controller::reset()
+{
+  for(float &f:vaxis){
+    f=0;
+  }
+}
+
 void Controller::init(lua_State* L){
     add_enum_to_lua(L,"KEYS","UP",K_UP,"DOWN",K_DOWN,"LEFT",
             K_LEFT,"RIGHT",K_RIGHT,"A",K_A,"B",K_B,"X",K_X,"Y",K_Y,"Z",K_Z,"R1",

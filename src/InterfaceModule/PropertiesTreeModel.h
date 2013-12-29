@@ -27,7 +27,7 @@ private:
   Editable* editable;
   TreeItem* rootItem;
 signals:
-  void editShape(Editable* editable);
+  void editShape(string resource);
 };
 
 #endif

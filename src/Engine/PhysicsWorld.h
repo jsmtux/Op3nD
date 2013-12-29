@@ -10,6 +10,7 @@
 #include <btBulletDynamicsCommon.h>
 #define UPDATE_STEP float(1./15.)
 #include "Timer.h"
+#include <vector>
 
 enum colType{C_SPHERE=0, C_BOX, C_CAPSULE, C_SHAPE};
 
@@ -27,6 +28,7 @@ public:
     void setCallBack(btInternalTickCallback cb);
     void stepPhys();
     void draw();
+    std::vector<void*> contactTest(btRigidBody* body);
     PhysicsWorld();
     ~PhysicsWorld();
 };

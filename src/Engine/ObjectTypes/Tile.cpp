@@ -10,6 +10,7 @@
 #include "Physical.h"
 #include "../Graphics/Shading.h"
 #include "../Math/Matrix.h"
+#include </home/jsmtux/projects/Op3nD/src/Engine/PhysicsWorld.h>
 #include "../../ProjectManagement/Project.h"
 
 extern Image* imtmp;
@@ -229,6 +230,7 @@ void Tile::setPhysical(btRigidBody* p){
     setRot(tRot);
     physInfo->getCollisionShape()->setLocalScaling(size);
   }
+  physInfo->setUserPointer(this);
 }
 
 void Tile::setPhysical(MXML::Tag &code){
@@ -248,3 +250,14 @@ Resource* Tile::getResource()
   return resource;
 }
 
+std::vector< Tile* > Tile::getColliding()
+{
+  vector<void*> pointers=Base::getInstance()->getCurState()->getPhysicsWorld()->contactTest(physInfo);
+  vector<Tile*> ret;
+  
+  for(void* p:pointers){
+    ret.push_back(static_cast<Tile*>(p));
+  }
+  
+  return ret;
+}

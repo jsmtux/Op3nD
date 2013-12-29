@@ -25,8 +25,16 @@ Op3nD::Op3nD()
   connect(window.twScene,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),SLOT(changeScene(QTreeWidgetItem*,int)));
   connect(window.actionPlay,SIGNAL(triggered(bool)),SLOT(launchTest()));
   connect(window.SFMLWidget,SIGNAL(selectionChanged(Editable*)),SLOT(changeSelection(Editable*)));
-  connect(window.SFMLWidget,&QSFMLCanvas::editObjectSource,luaEditor,&LuaEditor::exec);
   window.actionPlay->setIcon(QIcon::fromTheme("media-playback-start"));
+  
+  editableCopyAction= new QAction(tr("copy"),this);
+  editableDeleteAction= new QAction(tr("delete"),this);
+  objectEditAction= new QAction(tr("edit script"),this);
+  window.SFMLWidget->addAction(editableCopyAction);
+  window.SFMLWidget->addAction(editableDeleteAction);
+  window.SFMLWidget->addAction(objectEditAction);
+  
+  connect(objectEditAction,SIGNAL(triggered(bool)),this,SLOT(editScript()));
   
   while(Base::getInstance()->getProj()==NULL){
     if(projectDialog->shouldExit()){
@@ -43,6 +51,7 @@ Op3nD::Op3nD()
   window.tvResources->setModel(resourceModel);
   updateScenesList();
   propertiesModel=NULL;
+  window.tvResources->setDragEnabled(true);
 }
 
 Op3nD::~Op3nD()
@@ -94,10 +103,25 @@ void Op3nD::changeSelection(Editable* sel)
     window.tvProperties->setModel(propertiesModel);
     window.tvProperties->setItemDelegate(&delegate);
   }
+  
+  if(!sel){
+    editableCopyAction->setEnabled(false);
+    editableDeleteAction->setEnabled(false);
+    objectEditAction->setVisible(false);
+  }else{    
+    editableCopyAction->setEnabled(true);
+    editableDeleteAction->setEnabled(true);
+    objectEditAction->setVisible(sel->getType()==E_OBJECT);
+  }
 }
 
-void Op3nD::execPhysicsDialog(Editable* ed)
+void Op3nD::execPhysicsDialog(string resource)
 {
   PhysicsDialog physDialog;
-  physDialog.exec(ed);
+  physDialog.exec(resource);
+}
+
+void Op3nD::editScript()
+{
+  luaEditor->exec(dynamic_cast<Scripted*>(Base::getInstance()->getCurState()->getByIndex(window.SFMLWidget->getSelected()[0])));
 }

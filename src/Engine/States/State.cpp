@@ -46,7 +46,7 @@ State::State(string n){
 #endif
     netNode=NULL;
     diffTime= chrono::duration_cast<tMillis>(chrono::seconds(0));
-;}
+}
 
 State::State(State& s){
     for(Camera *c:s.cameras){
@@ -144,6 +144,10 @@ void State::updateLoop(){
         
         updateLock->lock();
         updateElements();
+	
+	for(Controller* c:Base::getInstance()->getControllers()){
+	  c->reset();
+	}
         updateLock->unlock();
         
         tMillis sl=std::chrono::milliseconds(int(UPDATE_STEP*1000))- tUpdated.getTicks();
@@ -178,7 +182,7 @@ void State::physicsCallback(btDynamicsWorld *world, btScalar timeStep){
     st->updateElements();
 }
 
-void State::gameLoop(){
+void State::beginUpdateLoop(){
     if(!isStopped){
         cout << "Trying to start already started state\n";
         return;
@@ -219,6 +223,7 @@ void State::draw(){
 }
 
 void State::updateElements(){
+  cout << "Updating\n";
     //Client: send controllers previous to use them to predict
     if(netNode&&!netNode->isServing()){
         netNode->sendUpdate();
@@ -248,7 +253,7 @@ void State::updateElements(){
     }
 }
 
-void State::iteration(){
+void State::iteration(){  
 #ifndef NODRAW
     stest->useProgram();
     stest->update();
@@ -450,3 +455,7 @@ void State::setDebug(bool debug)
   this->debug=debug;
 }
 
+PhysicsWorld* State::getPhysicsWorld()
+{
+  return pWorld;
+}

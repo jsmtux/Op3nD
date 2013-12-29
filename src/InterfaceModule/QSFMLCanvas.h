@@ -33,16 +33,11 @@ private :
   QTimer myTimer;
   bool myInitialized;
   bool isEnabled;
-  QAction* editableCopyAction;
-  QAction* editableDeleteAction;
-  QAction* objectEditAction;
   Editable* currentSelected;
   QPoint mousePosition;
 signals:
   void selectionChanged(Editable* selection);
   void editObjectSource(Scripted* scripted);
-public slots:
-  void sendEditSignal();
 };
 
 #endif

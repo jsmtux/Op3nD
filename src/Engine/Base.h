@@ -37,10 +37,10 @@ public:
      * Begins current state
      * It must be initialised, otherwise prints error
      */
-    static void beginState();
-    static void stopState();
+    void beginState();
+    void stopState();
     /**
-     * Changes current state
+     * Changes current state asynchronously, may be used from interface or networking code
      * @param name new state's name
      */
     void changeState( string name, StateType t );

@@ -47,6 +47,7 @@ public:
     btRigidBody* getPhysical();
     void setResource(string dirResource);
     Resource* getResource();
+    vector<Tile*> getColliding();
 protected:
     Resource* resource;
     Vector3 position,size;

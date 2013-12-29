@@ -21,14 +21,7 @@ myInitialized (false)
     Base::getInstance()->addController(this);
       
     setContextMenuPolicy(Qt::ActionsContextMenu);
-    editableCopyAction= new QAction(tr("copy"),this);
-    editableDeleteAction= new QAction(tr("delete"),this);
-    objectEditAction= new QAction(tr("edit script"),this);
-    addAction(editableCopyAction);
-    addAction(editableDeleteAction);
-    addAction(objectEditAction);
     currentSelected=nullptr;
-    connect(objectEditAction,&QAction::triggered,this,&QSFMLCanvas::sendEditSignal);
     isEnabled=true;
 }
 
@@ -95,8 +88,6 @@ void QSFMLCanvas::paintEvent(QPaintEvent*)
   OnUpdate();
   
   display();
-  setAxis(A_L,0);
-  setAxis(A_R,0);
 }
 
 void QSFMLCanvas::OnInit()
@@ -188,9 +179,6 @@ void QSFMLCanvas::resizeEvent(QResizeEvent* event)
 
 void QSFMLCanvas::mouseDoubleClickEvent(QMouseEvent* event)
 {
-  unsigned int *sel=Base::getInstance()->getCurState()->selection(event->x(),event->y());
-  setSelection(sel);
-  emit selectionChanged(Base::getInstance()->getCurState()->getByIndex(sel[0]));
 }
 
 void QSFMLCanvas::mousePressEvent(QMouseEvent* event)
@@ -199,16 +187,8 @@ void QSFMLCanvas::mousePressEvent(QMouseEvent* event)
   mousePosition=event->pos();
   unsigned int *sel=Base::getInstance()->getCurState()->selection(event->x(),event->y());
   setSelection(sel);
+  emit selectionChanged(Base::getInstance()->getCurState()->getByIndex(sel[0]));
   currentSelected = Base::getInstance()->getCurState()->getByIndex(sel[0]);
-  if(!currentSelected){
-    editableCopyAction->setEnabled(false);
-    editableDeleteAction->setEnabled(false);
-    objectEditAction->setVisible(false);
-  }else{    
-    editableCopyAction->setEnabled(true);
-    editableDeleteAction->setEnabled(true);
-    objectEditAction->setVisible(currentSelected->getType()==E_OBJECT);
-  }
   QWidget::mousePressEvent(event);
 }
 
@@ -224,10 +204,4 @@ void QSFMLCanvas::mouseReleaseEvent(QMouseEvent* event)
 {
   setKey(K_A,false);
   QWidget::mouseReleaseEvent(event);
-}
-
-
-void QSFMLCanvas::sendEditSignal()
-{
-  emit editObjectSource(dynamic_cast<Scripted*>(currentSelected));
 }

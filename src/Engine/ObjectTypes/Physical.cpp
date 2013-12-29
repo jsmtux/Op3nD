@@ -5,14 +5,13 @@
 #include "../../ProjectManagement/MXML.h"
 #include "../../ProjectManagement/Project.h"
 #include "../Base.h"
+#include <bullet/btBulletDynamicsCommon.h>
 
 Physical::Physical(){
     mass=0;
     restitution=0;
     friction=0;
     angularFriction=0;
-    size=Vector3(0,0,0);
-    shapeCategory=S_UNIMPLEMENTED;
 }
 
 Physical::Physical(MXML::Tag& code){
@@ -32,39 +31,47 @@ Physical::Physical(string dir){
 }
 
 void Physical::fromXML(MXML::Tag &code){
-    if(code.contains("sphere")){
-        shapeCategory=S_SPHERE;
-        size.x= code["sphere"]["radius"].getAttrib().getFloat();
-    }else if(code.contains("box")){
-        shapeCategory=S_BOX;
-        size = Vector3(code["box"]["size"]["vector"]);
-    }else if(code.contains("capsule")){
-        shapeCategory=S_CAPSULE;
-        size.x = code["capsule"]["radius"].getAttrib().getFloat();
-        size.y = code["capsule"]["length"].getAttrib().getFloat();
-    }else if(code.contains("shape")){
-        
-        shapeCategory = S_UNIMPLEMENTED;
+  
+  for(Tag t:code.getChildren()){
+    if(t.getName().compare("sphere")==0){
+      ShapeDefinition s;
+      s.shapeCategory=S_SPHERE;
+      s.size.x= code["sphere"]["radius"].getAttrib().getFloat();
+      shape.push_back(s);
+    }if(t.getName().compare("box")==0){
+      ShapeDefinition s;
+      s.shapeCategory=S_BOX;
+      s.size = Vector3(code["box"]["size"]["vector"]);
+      shape.push_back(s);
+    }if(t.getName().compare("capsule")==0){
+      ShapeDefinition s;
+      s.shapeCategory=S_CAPSULE;
+      s.size.x = code["capsule"]["radius"].getAttrib().getFloat();
+      s.size.y = code["capsule"]["length"].getAttrib().getFloat();
+      shape.push_back(s);
+    }if(t.getName().compare("shape")==0){
     }
-    
-    mass = code["mass"].getAttrib().getFloat();
-    restitution = code["restitution"].getAttrib().getFloat();
-    angularFriction = code["rollingFriction"].getAttrib().getFloat();
-    friction = code["friction"].getAttrib().getFloat();
+  }
+  
+  mass = code["mass"].getAttrib().getFloat();
+  restitution = code["restitution"].getAttrib().getFloat();
+  angularFriction = code["rollingFriction"].getAttrib().getFloat();
+  friction = code["friction"].getAttrib().getFloat();
 }
-
 
 btRigidBody* Physical::toRigidBody(){    
     btCollisionShape *col=NULL;
-    switch(shapeCategory){
-        case S_SPHERE:
-            col = new btSphereShape(size.x);
-            break;
-        case S_BOX:
-            col = new btBoxShape(size);
-            break;
-        case S_CAPSULE:
-            col = new btCapsuleShape(size.x,size.y);
+    if(shape.size()==1){
+      col=shape.front().toShape();
+    }else{
+     btCompoundShape* compound = new btCompoundShape();
+     btTransform localTrans;
+     for(ShapeDefinition s:shape){
+       localTrans.setIdentity();
+       localTrans.setOrigin(s.offset);
+       compound->addChildShape(localTrans,s.toShape());
+     }
+     col=compound;
     }
     btVector3 fallInertia(0,0,0);
     col->calculateLocalInertia(mass,fallInertia);
@@ -85,24 +92,31 @@ MXML::Tag Physical::toXML(){
     root["friction"].setAttrib(friction);
     root["rollingFriction"].setAttrib(angularFriction);
     
-    switch(shapeCategory){
-        case S_SPHERE:
-            root.addChildren(Tag("sphere"));
-            root["sphere"].addChildren(Tag("radius"));
-            root["sphere"]["radius"].setAttrib(size.x);
-            break;
-        case S_BOX:
-            root.addChildren(Tag("box"));
-            root["box"].addChildren(Tag("size"));
-            root["box"]["size"].addChildren(size.toXML());
-            break;
-        case S_CAPSULE:
-            root.addChildren(Tag("capsule"));
-            root["capsule"].addChildren(Tag("lenght"));
-            root["capsule"]["lenght"].setAttrib(size.y);
-            root["capsule"].addChildren(Tag("radius"));
-            root["capsule"]["radius"].setAttrib(size.x);
-            break;
+    for(ShapeDefinition s:shape){
+      switch(s.shapeCategory){
+	  case S_SPHERE:
+	      root.addChildren(Tag("sphere"));
+	      root["sphere"].addChildren(Tag("radius"));
+	      root["sphere"]["radius"].setAttrib(s.size.x);
+	      break;
+	  case S_BOX:
+	      root.addChildren(Tag("box"));
+	      root["box"].addChildren(Tag("size"));
+	      root["box"]["size"].addChildren(s.size.toXML());
+	      break;
+	  case S_CAPSULE:
+	      root.addChildren(Tag("capsule"));
+	      root["capsule"].addChildren(Tag("lenght"));
+	      root["capsule"]["lenght"].setAttrib(s.size.y);
+	      root["capsule"].addChildren(Tag("radius"));
+	      root["capsule"]["radius"].setAttrib(s.size.x);
+	      break;
+      }
     }
     return root;
+}
+
+void Physical::addShape(Vector3 size, Vector3 offset, tShape category)
+{
+  shape.push_back(ShapeDefinition(size,offset,category));
 }

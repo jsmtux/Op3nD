@@ -8,22 +8,30 @@ class PhysicsDialog: public QDialog{
   Q_OBJECT
 public:
   PhysicsDialog(QWidget* parent = 0);
-  void exec(Editable* editable);
+  void exec(string resource);
   void closeEvent(QCloseEvent *ev);
+  void accept();
 public slots:
   void addElementMenu(QAction* action);
   void updateShapesList();
+  void selectShape(int row);
+  void deleteShape();
+  void updateShape();
 private:
+  int getNewId();
+  void restoreCanvas();
   Ui::PhysicsDialog physicsDialog;
   QString prevState;
-  Editable* mesh;
+  string toEdit;
   struct shapeInfo{
     int id;
     btRigidBody* rigidBody;
     tShape shapeType;
+    Vector3 size;
+    Vector3 offset;
+    Quaternion rotation;
   };
   QList<shapeInfo> shapes;
-  int numShapes=0;
 };
 
 #endif

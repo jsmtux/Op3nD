@@ -23,7 +23,8 @@ public slots:
   void changeScene(QTreeWidgetItem* item, int column);
   void launchTest();
   void changeSelection(Editable* sel);
-  void execPhysicsDialog(Editable* ed);
+  void execPhysicsDialog(string resource);
+  void editScript();
 private:
   void updateScenesList();
   Ui::MainWindow window;
@@ -33,6 +34,9 @@ private:
   LuaEditor* luaEditor;
   TestDialog testdialog;
   SpinBoxDelegate delegate;
+  QAction* editableCopyAction;
+  QAction* editableDeleteAction;
+  QAction* objectEditAction;
 };
 
 #endif // Op3nD_H

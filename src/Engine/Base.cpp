@@ -65,27 +65,27 @@ void Base::endProj(){
 }
 
 void Base::beginState( ){
-    if(instance->currentState==NULL){
+    if(currentState==NULL){
         cout << "State not initialized\n";
         return;
     }
-    if(instance->netNode){
-        instance->currentState->setNetNode(instance->netNode);
-        instance->netNode->beginState(instance->currentState);
+    if(netNode){
+        currentState->setNetNode(netNode);
+        netNode->beginState(currentState);
     }
-    instance->currentState->gameLoop();
+    currentState->beginUpdateLoop();
 }
 
 void Base::stopState( ){
-    if(instance->currentState==NULL){
+    if(currentState==NULL){
         cout << "State not initialized\n";
         return;
     }
-    instance->currentState->stop();
-    if(!instance->currentState->reusable()){
-        for(int i=0;i<instance->states.size();i++){
-            if(instance->states[i]==instance->currentState)
-                instance->states.erase(instance->states.begin()+i);
+    currentState->stop();
+    if(!currentState->reusable()){
+        for(int i=0;i<states.size();i++){
+            if(states[i]==currentState)
+                states.erase(states.begin()+i);
         }
     }
 }
@@ -179,6 +179,7 @@ void Base::setNode(NetNode* n){
 void Base::gameLoop(){
     while(currentState){
         currentState->iteration();
+	//Check if state needs to be changed and change it
         changeStateMt.lock();
         changeStateMt.unlock();
         if(rc){

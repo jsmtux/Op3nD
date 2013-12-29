@@ -47,7 +47,7 @@ public:
     /**
      * Runs the new state
      */
-    void gameLoop( );
+    void beginUpdateLoop( );
     /**
      * Returns the name of the state
      * @return name of the state
@@ -165,6 +165,8 @@ public:
     void changeResolution();
     
     void setDebug(bool debug=true);
+    
+    PhysicsWorld* getPhysicsWorld();
 private:
     bool isStopped;
     /**

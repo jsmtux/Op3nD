@@ -35,7 +35,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_11"/>
+           <widget class="QDoubleSpinBox" name="sbWeigh"/>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_6">
@@ -45,7 +45,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_12"/>
+           <widget class="QDoubleSpinBox" name="sbRestitution"/>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_7">
@@ -55,7 +55,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_13"/>
+           <widget class="QDoubleSpinBox" name="sbFriction"/>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_8">
@@ -65,7 +65,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_14"/>
+           <widget class="QDoubleSpinBox" name="sbAngularFriction"/>
           </item>
          </layout>
         </widget>
@@ -78,6 +78,12 @@
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QTableWidget" name="twShapes">
+            <property name="selectionMode">
+             <enum>QAbstractItemView::SingleSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
             <attribute name="verticalHeaderVisible">
              <bool>false</bool>
             </attribute>
@@ -123,7 +129,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QStackedWidget" name="stackedWidget">
+           <widget class="QStackedWidget" name="swShapeProp">
             <property name="currentIndex">
              <number>2</number>
             </property>
@@ -145,7 +151,7 @@
                  <item row="0" column="1">
                   <layout class="QHBoxLayout" name="horizontalLayout_10">
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+                    <widget class="QDoubleSpinBox" name="sbShpereSize"/>
                    </item>
                    <item>
                     <spacer name="horizontalSpacer">
@@ -172,13 +178,13 @@
                  <item row="1" column="1">
                   <layout class="QHBoxLayout" name="horizontalLayout_9">
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+                    <widget class="QDoubleSpinBox" name="sbSphereOffX"/>
                    </item>
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+                    <widget class="QDoubleSpinBox" name="sbSphereOffY"/>
                    </item>
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+                    <widget class="QDoubleSpinBox" name="sbSphereOffZ"/>
                    </item>
                   </layout>
                  </item>
@@ -208,13 +214,13 @@
                  <item row="0" column="1">
                   <layout class="QHBoxLayout" name="horizontalLayout_7">
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+                    <widget class="QDoubleSpinBox" name="sbBoxSizeX"/>
                    </item>
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_6"/>
+                    <widget class="QDoubleSpinBox" name="sbBoxSizeY"/>
                    </item>
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_7"/>
+                    <widget class="QDoubleSpinBox" name="sbBoxSizeZ"/>
                    </item>
                   </layout>
                  </item>
@@ -228,13 +234,13 @@
                  <item row="1" column="1">
                   <layout class="QHBoxLayout" name="horizontalLayout_8">
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_8"/>
+                    <widget class="QDoubleSpinBox" name="sbBoxOffX"/>
                    </item>
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_9"/>
+                    <widget class="QDoubleSpinBox" name="sbBoxOffY"/>
                    </item>
                    <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_10"/>
+                    <widget class="QDoubleSpinBox" name="sbBoxOffZ"/>
                    </item>
                   </layout>
                  </item>

@@ -30,6 +30,8 @@ int main(int argc, char** argv)
       return 0;
     }
     
+    cout << argv[1] << endl;
+    
     string pPath=argv[1];
     cout << "New path is " << pPath << endl;
     string map="main.xml";
@@ -56,7 +58,7 @@ int main(int argc, char** argv)
     Base::getInstance()->newState(map,GAMEST);
     Base::getInstance()->changeState(map,GAMEST);
     Base::getInstance()->getCurState()->loadFile();
-    Base::beginState();
+    Base::getInstance()->beginState();
     Base::getInstance()->gameLoop();
 #endif
 }

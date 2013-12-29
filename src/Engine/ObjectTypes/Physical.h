@@ -15,7 +15,7 @@
 
 class Timer;
 
-enum tShape{S_BOX,S_SPHERE,S_CAPSULE,S_COMPOUND,S_UNIMPLEMENTED};
+enum tShape{S_BOX,S_SPHERE,S_CAPSULE,S_UNIMPLEMENTED};
 
 class Physical{
 public:
@@ -29,21 +29,36 @@ public:
     void setRestitution(float r){restitution=r;}
     void setFriction(float f){friction=f;}
     void setAngularFriction(float a){angularFriction=a;}
-    void setSize(Vector3 s){size=s;}
-    void setShape(tShape s){shapeCategory=s;}
     float getMass(){return mass;}
     float getRestitution(){return restitution;}
     float getFriction(){return friction;}
     float getAngularFriction(){return angularFriction;}
-    Vector3 getSize(){return size;}
-    tShape getShape(){return shapeCategory;}
+    void addShape(Vector3 size, Vector3 offset, tShape category);
 private:
     float mass;
     float restitution;
     float friction;
     float angularFriction;
-    Vector3 size;
-    tShape shapeCategory;
+    struct ShapeDefinition{
+      ShapeDefinition(){};
+      ShapeDefinition(Vector3 size, Vector3 offset, tShape shape):size(size), offset(offset), shapeCategory(shape){};
+      Vector3 size;
+      Vector3 offset;
+      tShape shapeCategory;
+      btCollisionShape* toShape(){
+	switch(shapeCategory){
+	  case S_SPHERE:
+	    return new btSphereShape(size.x);
+	    break;
+	  case S_BOX:
+	    return new btBoxShape(size);
+	    break;
+	  case S_CAPSULE:
+	    return new btCapsuleShape(size.x,size.y);
+	}
+      }
+    };
+    vector<ShapeDefinition> shape;
 };
 
 #endif	/* PHYSICAL_H */

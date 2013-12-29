@@ -148,7 +148,7 @@ void PropertiesTreeModel::fillTileProperties(TreeItem* tileItem)
   tileItem->addItem(new TreeItem(tr("Position"),tileItem,editable->getPos(),[=](Vector3 vec){editable->setPos(vec);}));
   tileItem->addItem(new TreeItem(tr("Size"),tileItem,editable->getSize(),[=](Vector3 vec){editable->setSize(vec);}));
   tileItem->addItem(new TreeItem(tr("Rotation"),tileItem,editable->getRot(),[=](Quaternion q){editable->setRot(q);}));
-  tileItem->addItem(new TreeItem(tr("Shape"),tileItem,"edit",[&](){emit editShape(editable);}));
+  tileItem->addItem(new TreeItem(tr("Shape"),tileItem,"edit",[&](){emit editShape(dynamic_cast<Tile*>(editable)->getResource()->getName());}));
 }
 
 void PropertiesTreeModel::addResourceProperties(TreeItem* resItem)
