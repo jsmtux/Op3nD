@@ -20,10 +20,18 @@ public:
   QModelIndex parent(const QModelIndex &index) const;
   int rowCount(const QModelIndex &parent = QModelIndex()) const;
   int columnCount(const QModelIndex &parent = QModelIndex()) const;
+  QStringList mimeTypes() const;
+  QMimeData* mimeData( const QModelIndexList & indexes ) const;
+  bool clearBranch(const QModelIndex &parent=QModelIndex());
+public slots:
   void scanDirs();
 private:
   Project* project;
   TreeItem* rootItem;
+signals:
+  void createScript();
+  void editScript(QString file);
+  void createCamera();
 };
 
 #endif

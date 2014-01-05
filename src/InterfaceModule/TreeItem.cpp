@@ -47,17 +47,18 @@ TreeItem::TreeItem(QString name, TreeItem* parent, Quaternion quaternion, functi
   image=NULL;
   parentItem=parent;
   this->name=name;
+  Vector3 angles= quaternion.toEuler();
   TreeItem *t= new TreeItem("x",this);
-  t->setData((double)quaternion.x);
+  t->setData((double)angles.x);
+  connect(t,&TreeItem::valueChanged,this,&TreeItem::updateSource);
   addItem(t);
   t= new TreeItem("y",this);
-  t->setData((double)quaternion.y);
+  t->setData((double)angles.y);
+  connect(t,&TreeItem::valueChanged,this,&TreeItem::updateSource);
   addItem(t);
   t= new TreeItem("z",this);
-  t->setData((double)quaternion.z);
-  addItem(t);
-  t= new TreeItem("w",this);
-  t->setData((double)quaternion.z);
+  t->setData((double)angles.z);
+  connect(t,&TreeItem::valueChanged,this,&TreeItem::updateSource);
   addItem(t);
   type=QUATERNION;
   quaternionFunc=func;
@@ -80,17 +81,25 @@ void TreeItem::updateSource()
     current.x=children[0]->data.toDouble();
     current.y=children[1]->data.toDouble();
     current.z=children[2]->data.toDouble();
-    qDebug() << "setting pos " << current.x;
     vectorFunc(current);
   }
   if(type==QUATERNION){
-    Quaternion current;
+    Vector3 current;
     current.x=children[0]->data.toDouble();
     current.y=children[1]->data.toDouble();
     current.z=children[2]->data.toDouble();
-    current.w=children[3]->data.toDouble();
-    quaternionFunc(current);
+    quaternionFunc(Quaternion(current));
   }
+}
+
+void TreeItem::setContextMenu(QMenu* menu)
+{
+  contextMenu=menu;
+}
+
+QMenu* TreeItem::getContextMenu()
+{
+  return contextMenu;
 }
 
 TreeItem::~TreeItem()
@@ -98,6 +107,9 @@ TreeItem::~TreeItem()
   qDeleteAll(children);
   if(image){
     delete image;
+  }
+  if(contextMenu){
+    delete contextMenu;
   }
 }
 
@@ -153,4 +165,15 @@ bool TreeItem::isButton()
 function< void ()> TreeItem::getCallBack()
 {
   return buttonFunc;
+}
+
+void TreeItem::setCallBack(function< void ()> func)
+{
+  buttonFunc=func;
+}
+
+void TreeItem::clear()
+{
+  qDeleteAll(children);
+  children.clear();
 }

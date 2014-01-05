@@ -25,6 +25,10 @@ public slots:
   void changeSelection(Editable* sel);
   void execPhysicsDialog(string resource);
   void editScript();
+  void addScene();
+  void saveCurrentScene();
+  void elementDroppedScene(const QMimeData* data);
+  void addCameraToScene();
 private:
   void updateScenesList();
   Ui::MainWindow window;

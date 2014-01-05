@@ -32,6 +32,7 @@ public:
     Vector3 toEuler();
     void fromEuler(Vector3 angle);
     static Quaternion fromAngleMagnitude(float i, float j, float k, float m);
+    static Quaternion one;
 };
 
 #endif	/* QUATERNION_H */

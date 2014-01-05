@@ -9,6 +9,9 @@ vector<string> listDirFiles( const path & directory, bool dirs ,bool recurse_int
                 if(dirs)ret.push_back(iter->path().filename().string());
                 if( recurse_into_subdirs ) listDirFiles(*iter) ;
             }else{
+		string filename = iter->path().filename().string();
+		if(filename.back()=='~')
+		  continue;
                 if(!dirs)ret.push_back(iter->path().filename().string());
             }
         }

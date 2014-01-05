@@ -16,7 +16,7 @@ class Scripted: public Tile
 {	
 public:
     void update( );
-    Scripted(string file, Vector3 p=0, Vector3 s=0, Vector3 r=0);
+    Scripted(string file, Vector3 p=0, Vector3 s=Vector3(1,1,1), Vector3 r=0);
     Scripted(MXML::Tag &code);
     virtual void fromXML( MXML::Tag &code );
     virtual MXML::Tag toXML( );
@@ -25,6 +25,7 @@ public:
     edType getType();
     string getName();
     string getPath();
+    static string getTemplate(string name);
 private:
     static Scripted* currObject;
     int luaRef;
@@ -40,7 +41,6 @@ private:
     static int LgetObject(lua_State *L);
     
     static int Lload(lua_State *L);
-    static int LloadPhysical(lua_State *L);
     
     static int LlockOrientation(lua_State *L);
     
@@ -51,13 +51,6 @@ private:
     static int LaddRot(lua_State *L);
     static int LsetSize(lua_State *L);
     static int LgetSize(lua_State *L);
-    static int LsetElementPos(lua_State *L);
-    static int LgetElementPos(lua_State *L);
-    static int LsetElementRot(lua_State *L);
-    static int LgetElementRot(lua_State *L);  
-    static int LaddElementRot(lua_State *L);
-    static int LsetElementSize(lua_State *L);
-    static int LgetElementSize(lua_State *L);
     
     static int LsetLinVel(lua_State *L);
     static int LgetLinVel(lua_State *L);

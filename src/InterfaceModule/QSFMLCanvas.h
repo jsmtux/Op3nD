@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QMimeData>
 #include <SFML/Graphics.hpp>
 #include <stack>
 #include "../Engine/Graphics/RenderingContext.h"
@@ -16,6 +17,8 @@ public :
   QSFMLCanvas(QWidget* Parent/*, const QPoint& Position, const QSize& Size*/, unsigned int FrameTime = 1);
   virtual ~QSFMLCanvas();
   void setEnabled(bool enabled);
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dropEvent(QDropEvent* event);
 private :
   virtual void OnInit();
   virtual void OnUpdate();
@@ -30,7 +33,7 @@ private :
   virtual void mouseReleaseEvent(QMouseEvent *event);
   virtual void mouseMoveEvent(QMouseEvent *event);
   static stack<QSFMLCanvas*> canvasStack;
-  QTimer myTimer;
+  QTimer repaintTimer;
   bool myInitialized;
   bool isEnabled;
   Editable* currentSelected;
@@ -38,6 +41,7 @@ private :
 signals:
   void selectionChanged(Editable* selection);
   void editObjectSource(Scripted* scripted);
+  void receivedDrop(const QMimeData* data);
 };
 
 #endif

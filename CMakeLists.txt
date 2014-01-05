@@ -94,8 +94,11 @@ qt5_wrap_ui(Op3nD_FORM_HEADERS ${Op3nD_FORMS})
                
 qt5_wrap_cpp(Op3nD_MOCS ${Op3nD_Editor_HEADERS})
 
-add_executable(Op3nD_Editor ${Op3nD_SRCS} ${Op3nD_MOCS} ${Op3nD_FORM_HEADERS} ${Op3nD_Editor_SRCS})
+qt5_add_resources(Op3nD_Resources src/view/op3nd.qrc)
+
+add_executable(Op3nD_Editor ${Op3nD_SRCS} ${Op3nD_MOCS} ${Op3nD_FORM_HEADERS} ${Op3nD_Editor_SRCS} ${Op3nD_Resources})
 qt5_use_modules(Op3nD_Editor Widgets)
+
 add_executable(Op3nD_Interpreter ${Op3nD_SRCS})
 include_directories(${QT_INCLUDES} 
                     ${BULLET_INCLUDE_DIR}

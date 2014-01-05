@@ -12,13 +12,17 @@ class LuaEditor: public QDialog{
   Q_OBJECT
 public:
   LuaEditor(QWidget* parent = 0);
-  void exec(Scripted* scripted);
+public slots:
+  void exec(QString file);
+  void newScript();
+  void accept();
+  void reject();
 private:
-  Scripted* currentScripted;
   Ui::EditorDialog dialog;
   LuaHighlighter* highlighter;
-  QFile *sourceFile;
-  QTextStream *source;
+  QString path;
+signals:
+  void scriptListNeedsReload();
 };
 
 #endif

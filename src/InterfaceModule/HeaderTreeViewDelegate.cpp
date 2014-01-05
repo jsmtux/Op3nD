@@ -1,10 +1,15 @@
 #include "HeaderTreeViewDelegate.h"
 #include <QPalette>
+#include <QDebug>
+
+QRect HeaderTreeViewDelegate::buttonArea;
 
 HeaderTreeViewDelegate::HeaderTreeViewDelegate(QAbstractItemView* view, QObject *parent, 
                          const QPixmap &closeIcon): QStyledItemDelegate(parent)
 {
   this->view=view;
+  moreButton.load(":/images/button.png");
+  moreButton=moreButton.scaledToHeight(15);
 }
 
 void HeaderTreeViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
@@ -29,8 +34,13 @@ void HeaderTreeViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem
       painter->drawLine(r.bottomLeft(),r.bottomRight());
       painter->drawLine(r.topLeft(),r.bottomLeft());
       
+      //BUTTON
+      painter->drawPixmap(QPointF( r.right()-moreButton.width()-5, r.top()+2), moreButton);
+      buttonArea=QRect(r.right()-moreButton.width()-5, r.top()+2,moreButton.size().width(),moreButton.size().height());
+      
       painter->setPen(fontMarkedPen);
-      painter->drawText(r.left()+5, r.top(), r.width(), r.height(), Qt::AlignBottom|Qt::AlignLeft, index.data(Qt::DisplayRole).toString(), &r);
+      painter->drawText(r.left()+5, r.top(), r.width(), r.height(), 
+			Qt::AlignBottom|Qt::AlignLeft, index.data(Qt::DisplayRole).toString(), &r);
     }
 }
 
@@ -42,4 +52,9 @@ QSize HeaderTreeViewDelegate::sizeHint(const QStyleOptionViewItem &option,
     size.setHeight(35);
   }
   return size;
+}
+
+bool HeaderTreeViewDelegate::isButton(QPoint position)
+{
+  return position.x()>=buttonArea.x()&&position.x()<=buttonArea.x()+buttonArea.width();
 }

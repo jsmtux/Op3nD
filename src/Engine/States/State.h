@@ -106,7 +106,7 @@ public:
      * Adds a new camera to the scene
      * @return camera number in the scene
      */
-    int addCam();
+    int addCam(Camera* cam=nullptr);
     /**
      * Sets the current camera
      */

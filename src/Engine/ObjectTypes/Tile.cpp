@@ -230,7 +230,7 @@ void Tile::setPhysical(btRigidBody* p){
     setRot(tRot);
     physInfo->getCollisionShape()->setLocalScaling(size);
   }
-  physInfo->setUserPointer(this);
+  //physInfo->setUserPointer(this);
 }
 
 void Tile::setPhysical(MXML::Tag &code){

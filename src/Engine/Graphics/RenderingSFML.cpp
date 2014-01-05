@@ -28,6 +28,7 @@ void RenderingSFML::update(){
   setKey(K_RIGHT,sf::Keyboard::isKeyPressed(sf::Keyboard::D));
   setKey(K_UP,sf::Keyboard::isKeyPressed(sf::Keyboard::W));
   setKey(K_DOWN,sf::Keyboard::isKeyPressed(sf::Keyboard::S));
+  setKey(K_A,sf::Keyboard::isKeyPressed(sf::Keyboard::Space));
   if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
     exit(0);
   }

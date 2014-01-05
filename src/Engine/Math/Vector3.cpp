@@ -4,6 +4,7 @@
 #include "Matrix.h"
 #include "Quaternion.h"
 
+Vector3 Vector3::zero = Vector3(0,0,0);
 
 Vector3::Vector3(btVector3 v){
     x=v.getX();

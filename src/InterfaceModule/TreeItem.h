@@ -7,6 +7,7 @@
 #include <functional>
 #include <signal.h>
 #include <QObject>
+#include <QMenu>
 #include "../Engine/Math/Vector3.h"
 #include "../Engine/Math/Quaternion.h"
 
@@ -30,6 +31,10 @@ public:
   QVariant getData() const;
   bool isButton();
   function<void ()> getCallBack();
+  void setCallBack(function<void ()> func);
+  void clear();
+  QMenu* getContextMenu();
+  void setContextMenu(QMenu* menu);
 public slots:
   void updateSource();
 private:
@@ -42,7 +47,8 @@ private:
   itemType type;
   function< void (Vector3)> vectorFunc;
   function< void (Quaternion)> quaternionFunc;
-  function< void ()> buttonFunc;
+  function< void ()> buttonFunc=[](){};
+  QMenu* contextMenu=nullptr;
 signals:
   void valueChanged();
 };

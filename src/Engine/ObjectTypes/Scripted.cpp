@@ -24,7 +24,6 @@ Scripted* Scripted::currObject;
 
 Scripted::Scripted(string file, Vector3 p, Vector3 s, Vector3 r):Tile(p,s,r){
     currObject = NULL;
-    
     loadFromFile(file);
 }
 
@@ -33,20 +32,47 @@ string Scripted::getPath()
   return Base::getInstance()->getProj()->getDir(name,Project::OBJECT)+string(".o3s");
 }
 
+string Scripted::getTemplate(string name)
+{
+  string t=name+" = {self.ref}\n"
+	"\n"
+	"function new"+name+"()\n"
+	"	local o= "+name+":New()\n"
+	"	return o\n"
+	"end\n"
+	"\n"
+	"function "+name+":New()\n"
+	"	local o = {}\n"
+	"	setmetatable(o, self)\n"
+	"	self.__index = self\n"
+	"		self.ref=registerObject()\n"
+	"	return o\n"
+	"end\n"
+	"\n"
+	"function "+name+":Update()\n"
+	"end\n";
+  return t;
+}
+
 void Scripted::loadFromFile(string file){
     name =file;
+    if(name.find('.')!=string::npos){
+      if(name.substr(name.find_last_of('.'),3).compare("o3s")){
+	name=name.substr(0,name.find_last_of('.'));
+      }
+    }
     if(!L)Init();
     
-    lua_getglobal(L,(string("new")+file).c_str());
+    lua_getglobal(L,(string("new")+name).c_str());
     if (lua_isnil(L,-1) == 1){
         if(luaL_dofile(L, getPath().c_str())){
             cout << "Error reading file " << getPath() << endl;
             return;
         }
         
-        lua_getglobal(L,(string("new")+file).c_str());
+        lua_getglobal(L,(string("new")+name).c_str());
         if (lua_isnil(L,-1) == 1){
-            cout << "Uninitialised function new" << file << endl;
+            cout << "Uninitialised function new" << name << endl;
             return;
         }
     }
@@ -84,7 +110,6 @@ void Scripted::Init(){
     
     lua_register(L,"addToScene",LaddToScene);
     lua_register(L, "load", Lload);
-    lua_register(L, "loadPhysical", LloadPhysical);
     lua_register(L, "registerObject",Scripted::LregisterObject);
     lua_register(L, "loadObject",Scripted::LloadObject);
     lua_register(L, "getObject",Scripted::LgetObject);
@@ -105,13 +130,6 @@ void Scripted::Init(){
     lua_register(L, "setRot", Scripted::LsetRot);
     lua_register(L, "getRot", Scripted::LgetRot);
     lua_register(L, "addRot", Scripted::LaddRot);
-    lua_register(L, "setElementPos", Scripted::LsetElementPos);
-    lua_register(L, "getElementPos", Scripted::LgetElementPos);
-    lua_register(L, "setElementRot", Scripted::LsetElementRot);
-    lua_register(L, "getElementRot", Scripted::LgetElementRot);
-    lua_register(L, "addElementRot", Scripted::LaddElementRot);
-    lua_register(L, "setElementSize", Scripted::LsetElementSize);
-    lua_register(L, "getElementSize", Scripted::LgetElementSize);
     lua_register(L, "aAtoQuaternion", Scripted::LAAtoQuaternion);
     Controller::init(L);
 }
@@ -160,7 +178,7 @@ int Scripted::LaddToScene(lua_State* L){
     return 0;
 }
 
-int Scripted::Lload(lua_State *L){/*************/
+int Scripted::Lload(lua_State *L){
     int n= lua_gettop(L);
     if(n<1){
         lua_pushstring(L,"Error in lua load");
@@ -171,10 +189,15 @@ int Scripted::Lload(lua_State *L){/*************/
     string dir=lua_tostring(L,2);
     Vector3 pos, siz(1,1,1);
     Quaternion rot(0,0,0,1);
+    Scripted * tmp=getByInd(ind);
+    
+    tmp->setResource(dir);
+    
     if(n>3){
         pos.x = lua_tonumber(L,3);
         pos.y = lua_tonumber(L,4);
         pos.z = lua_tonumber(L,5);
+	tmp->position=pos;
     }
     
     if(n>6){
@@ -182,61 +205,17 @@ int Scripted::Lload(lua_State *L){/*************/
         rot.y = lua_tonumber(L,7);
         rot.z = lua_tonumber(L,8);
         rot.w = lua_tonumber(L,9);
+	tmp->rotation=rot;
     }
     
     if(n>10){
         siz.x = lua_tonumber(L,10);
         siz.y = lua_tonumber(L,11);
         siz.z = lua_tonumber(L,12);
+	tmp->size=siz;
     }
-    
-    Scripted * tmp=getByInd(ind);
-    tmp->position=pos;
-    tmp->size=siz;
-    tmp->rotation=rot;
-    tmp->setResource(dir);
     lua_pushnumber(L,0);
     return 1;
-}
-
-int Scripted::LloadPhysical(lua_State* L){/**********/
-    int n= lua_gettop(L);
-    if(n<1){
-        lua_pushstring(L,"Error in lua load");
-        lua_error(L);
-    }
-    
-    int ind = lua_tointeger(L,1);
-    string dir=lua_tostring(L,2);
-    Vector3 pos, siz(1,1,1);
-    Quaternion rot(0,0,0,1);
-    if(n>3){
-        pos.x = lua_tonumber(L,3);
-        pos.y = lua_tonumber(L,4);
-        pos.z = lua_tonumber(L,5);
-    }
-    
-    if(n>6){
-        rot.x = lua_tonumber(L,6);
-        rot.y = lua_tonumber(L,7);
-        rot.z = lua_tonumber(L,8);
-        rot.w = lua_tonumber(L,9);
-    }
-    
-    if(n>10){
-        siz.x = lua_tonumber(L,10);
-        siz.y = lua_tonumber(L,11);
-        siz.z = lua_tonumber(L,12);
-    }
-    
-    Scripted * tmp=getByInd(ind);
-    tmp->position=pos;
-    tmp->size=siz;
-    tmp->rotation = rot;
-    tmp->setPhysical(Physical(dir).toRigidBody());
-    tmp->setResource(dir);
-    lua_pushnumber(L,0);
-    return 1;    
 }
 
 int Scripted::LregisterObject(lua_State *L){    
@@ -256,14 +235,18 @@ string lastname="";
 int Scripted::LloadObject(lua_State *L){
     int n= lua_gettop(L);
     if(n!=1){
-        lua_pushstring(L,"Error in lua importObject");
+        lua_pushstring(L,"Error in lua loadObject");
         lua_error(L);
     }
     
     string file=lua_tostring(L,1);
-    Scripted tmp(file);
+    
+    Scripted *tmp= new Scripted(file);
+    Base::getInstance()->getCurState()->addElement(tmp);
+    list.push_back(tmp);
+    
     lastname=file;
-    lastRef=tmp.luaRef;
+    lastRef=tmp->luaRef;
     return 0;
 }
 
@@ -448,137 +431,6 @@ int Scripted::LsetSize(lua_State* L){
     }else{
         currObject->setSize(size);
     }
-    
-    return 0;
-}
-
-int Scripted::LgetElementPos(lua_State* L){
-    int n= lua_gettop(L);
-    if(n!=1){
-        lua_pushstring(L,"Error in lua getElementPos");
-        lua_error(L);
-    }
-    int ind = lua_tointeger(L,1);
-    Vector3 ret = currObject->getPos();
-    
-    lua_pushnumber(L,ret.x);
-    lua_pushnumber(L,ret.y);
-    lua_pushnumber(L,ret.z);    
-    
-    return 3;
-}
-
-int Scripted::LsetElementPos(lua_State* L){
-    int n= lua_gettop(L);
-    if(n!=4){
-        lua_pushstring(L,"Error in lua getPos");
-        lua_error(L);
-    }
-    Vector3 pos;
-    pos.x=lua_tonumber(L,1);
-    pos.y=lua_tonumber(L,2);
-    pos.z=lua_tonumber(L,3);
-    
-    int ind = lua_tointeger(L,4);
-    currObject->setPos(pos);
-        
-    return 0;
-}
-
-int Scripted::LgetElementRot(lua_State* L){
-    int n= lua_gettop(L);
-    if(n!=1){
-        lua_pushstring(L,"Error in lua getRot");
-        lua_error(L);
-    }
-    Quaternion ret;
-    int ind = lua_tointeger(L,1);
-    ret = currObject->getRot();
-        
-    lua_pushnumber(L,ret.x);
-    lua_pushnumber(L,ret.y);
-    lua_pushnumber(L,ret.z);    
-    lua_pushnumber(L,ret.w);
-    return 4;
-}
-
-int Scripted::LsetElementRot(lua_State* L){
-    int n= lua_gettop(L);
-    if(n!=5){
-        lua_pushstring(L,"Error in lua setRot");
-        lua_error(L);
-    }
-    Quaternion rot;
-    rot.x=lua_tonumber(L,1);
-    rot.y=lua_tonumber(L,2);
-    rot.z=lua_tonumber(L,3);
-    rot.w=lua_tonumber(L,4);
-    Scripted* obj;
-    
-    int ind = lua_tointeger(L,5);
-    obj= currObject;
-    
-    if(obj){
-        obj->setRot(rot);
-    }
-    
-    return 0;
-}
-
-int Scripted::LaddElementRot(lua_State* L){
-    int n= lua_gettop(L);
-    if(n!=5){
-        lua_pushstring(L,"Error in lua addRot");
-        lua_error(L);
-    }
-    Quaternion rot;
-    rot.x=lua_tonumber(L,1);
-    rot.y=lua_tonumber(L,2);
-    rot.z=lua_tonumber(L,3);
-    rot.w=lua_tonumber(L,4);
-    Scripted* obj;
-    
-    int ind = lua_tointeger(L,5);
-    obj= currObject;
-        
-    if(obj){
-        obj->setRot(obj->getRot()*rot);
-    }
-    
-    return 0;
-}
-
-int Scripted::LgetElementSize(lua_State* L){
-    int n= lua_gettop(L);
-    if(n!=1){
-        lua_pushstring(L,"Error in lua getSize");
-        lua_error(L);
-    }
-    Vector3 ret;
-    
-    int ind = lua_tointeger(L,1);
-    ret = currObject->getSize();
-
-    lua_pushnumber(L,ret.x);
-    lua_pushnumber(L,ret.y);
-    lua_pushnumber(L,ret.z);    
-    
-    return 3;
-}
-
-int Scripted::LsetElementSize(lua_State* L){
-    int n= lua_gettop(L);
-    if(n!=3&&n!=4){
-        lua_pushstring(L,"Error in lua setSize");
-        lua_error(L);
-    }
-    Vector3 size;
-    size.x=lua_tonumber(L,1);
-    size.y=lua_tonumber(L,2);
-    size.z=lua_tonumber(L,3);
-    
-    int ind = lua_tointeger(L,4);
-    currObject->setSize(size);
     
     return 0;
 }
@@ -775,13 +627,15 @@ int Scripted::LAAtoQuaternion(lua_State *L){
 using namespace MXML;
 
 
-Scripted::Scripted(MXML::Tag &code):Tile(Vector3(0,0,0),Vector3(0,0,0),Vector3(0,0,0)){
+Scripted::Scripted(MXML::Tag &code):Tile(Vector3::zero,Vector3(1,1,1),Vector3::zero){
     fromXML(code);
 }
 
 void Scripted::fromXML( MXML::Tag &code ){
     if(code.contains("file"))loadFromFile(code["file"].getAttrib().getString());
-    Tile::fromXML(code);
+    if(code.contains("tile")){
+      Tile::fromXML(code["tile"]);
+    }
 }
 
 MXML::Tag Scripted::toXML( ){

@@ -1,13 +1,40 @@
 #include "ResourceTreeModel.h"
 #include <QDebug>
+#include <QMimeData>
+#include <QFile>
+#include <QMessageBox>
 
 ResourceTreeModel::ResourceTreeModel(Project* project): QAbstractItemModel()
 {
   this->project=project;
   rootItem= new TreeItem("root");
-  rootItem->addItem(new TreeItem("Images"));
-  rootItem->addItem(new TreeItem("Meshes"));
-  rootItem->addItem(new TreeItem("Objects"));
+  TreeItem* tmp=new TreeItem("Images");
+  tmp->setCallBack([](){
+    QMessageBox msg;
+    msg.setText("Clicked images button");
+    msg.exec();
+  });
+  tmp->setData(Project::IMAGE);
+  rootItem->addItem(tmp);
+  tmp=new TreeItem("Meshes");
+  tmp->setData(Project::MESH);
+  tmp->setCallBack([](){
+    QMessageBox msg;
+    msg.setText("Clicked meshes button");
+    msg.exec();
+  });
+  rootItem->addItem(tmp);
+  tmp=new TreeItem("Objects");
+  tmp->setData(Project::OBJECT);
+  tmp->setCallBack([=](){
+    emit createScript();
+  });
+  rootItem->addItem(tmp);
+  tmp=new TreeItem("cameras");
+  tmp->setCallBack([=](){
+    emit createCamera();
+  });
+  rootItem->addItem(tmp);
 }
 
 ResourceTreeModel::~ResourceTreeModel()
@@ -100,14 +127,65 @@ int ResourceTreeModel::columnCount(const QModelIndex& parent) const
   return 1;
 }
 
+QStringList ResourceTreeModel::mimeTypes() const
+{
+  return QStringList() << "application/text.tile";
+}
+
+QMimeData* ResourceTreeModel::mimeData(const QModelIndexList& indexes) const
+{
+  QMimeData *mimeDataPtr = new QMimeData();
+  QByteArray encodedData;
+  QDataStream stream(&encodedData, QIODevice::WriteOnly);
+  
+  foreach (QModelIndex index, indexes) {
+    if (index.isValid()) {
+      stream << QString::number(static_cast<TreeItem*>(index.parent().internalPointer())->getData().toInt());
+      stream << index.data().toString();
+    }
+  }
+  
+  mimeDataPtr->setData("application/text.tile", encodedData);
+  return mimeDataPtr;
+}
+
+bool ResourceTreeModel::clearBranch(const QModelIndex& parent)
+{
+  if(parent==QModelIndex())
+    return false;
+  
+  TreeItem *item=static_cast<TreeItem*>(parent.internalPointer());
+  beginRemoveRows(parent,0,item->childCount());
+  item->clear();
+  endRemoveRows();
+  return true;
+}
+
 void ResourceTreeModel::scanDirs()
 {
   vector<string> imFiles=project->listFiles(Project::IMAGE);
+  
+  clearBranch(index(0,0).child(0,0));
   for(string file:imFiles){
     rootItem->child(0)->addItem(new TreeItem(QString::fromStdString(file),rootItem,QString::fromStdString(project->getDir(file,Project::IMAGE))));
   }
   vector<string> meshFiles=project->listFiles(Project::MESH);
+  clearBranch(index(0,0).child(1,0));
+  rootItem->child(1)->clear();
   for(string file:meshFiles){
     rootItem->child(1)->addItem(new TreeItem(QString::fromStdString(file)));
+  }
+  vector<string> scriptFiles=project->listFiles(Project::OBJECT);
+  clearBranch(index(0,0).child(2,0));
+  rootItem->child(2)->clear();
+  for(string file:scriptFiles){
+    TreeItem* scriptItem=new TreeItem(QString::fromStdString(file));
+    QMenu* scriptMenu=new QMenu();
+    QAction *editScriptAction=new QAction(QString("editScript"),this);
+    connect(editScriptAction,&QAction::triggered,[=](){emit editScript(QString::fromStdString(file));});
+    scriptMenu->addAction(editScriptAction);
+    scriptMenu->addAction("rename");
+    scriptItem->setContextMenu(scriptMenu);
+    rootItem->child(2)->addItem(scriptItem);
   }
 }

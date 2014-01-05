@@ -10,7 +10,6 @@
 class HeaderTreeViewDelegate: public QStyledItemDelegate {
     Q_OBJECT
 public:
-
     HeaderTreeViewDelegate(QAbstractItemView* view, QObject *parent = 0, 
                          const QPixmap &closeIcon = QPixmap());
     
@@ -19,8 +18,12 @@ public:
 
     QSize sizeHint(const QStyleOptionViewItem &option,
                    const QModelIndex &index) const;
+
+    static bool isButton(QPoint position);
 private:
     QAbstractItemView* view;
+    QPixmap moreButton;
+    static QRect buttonArea;
     Q_DISABLE_COPY(HeaderTreeViewDelegate)
 };
 

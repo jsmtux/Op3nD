@@ -16,13 +16,14 @@ myInitialized (false)
 
     setFocusPolicy(Qt::StrongFocus);
 
-    myTimer.setInterval(FrameTime);
+    repaintTimer.setInterval(FrameTime);
     Base::getInstance()->setRC(this);
     Base::getInstance()->addController(this);
       
     setContextMenuPolicy(Qt::ActionsContextMenu);
     currentSelected=nullptr;
     isEnabled=true;
+    setAcceptDrops(true);
 }
 
 QSFMLCanvas::~QSFMLCanvas()
@@ -63,8 +64,8 @@ void QSFMLCanvas::showEvent(QShowEvent*)
         RenderWindow::create(winId());
 
         OnInit();
-        connect(&myTimer, SIGNAL(timeout()), this, SLOT(repaint()));
-        myTimer.start();
+        connect(&repaintTimer, SIGNAL(timeout()), this, SLOT(repaint()));
+        repaintTimer.start();
 
         myInitialized = true;
 	if(!canvasStack.empty()){
@@ -179,16 +180,21 @@ void QSFMLCanvas::resizeEvent(QResizeEvent* event)
 
 void QSFMLCanvas::mouseDoubleClickEvent(QMouseEvent* event)
 {
+  setFocus();
 }
 
 void QSFMLCanvas::mousePressEvent(QMouseEvent* event)
 {
+  setFocus();
   setKey(K_A,true);
   mousePosition=event->pos();
-  unsigned int *sel=Base::getInstance()->getCurState()->selection(event->x(),event->y());
-  setSelection(sel);
-  emit selectionChanged(Base::getInstance()->getCurState()->getByIndex(sel[0]));
-  currentSelected = Base::getInstance()->getCurState()->getByIndex(sel[0]);
+  State* curState = Base::getInstance()->getCurState();
+  if(curState!=nullptr){
+    unsigned int *sel=curState->selection(event->x(),event->y());
+    setSelection(sel);
+    emit selectionChanged(Base::getInstance()->getCurState()->getByIndex(sel[0]));
+    currentSelected = Base::getInstance()->getCurState()->getByIndex(sel[0]);
+  }
   QWidget::mousePressEvent(event);
 }
 
@@ -204,4 +210,16 @@ void QSFMLCanvas::mouseReleaseEvent(QMouseEvent* event)
 {
   setKey(K_A,false);
   QWidget::mouseReleaseEvent(event);
+}
+
+void QSFMLCanvas::dragEnterEvent(QDragEnterEvent* event)
+{
+  if (event->mimeData()->hasFormat("application/text.tile"))
+  event->acceptProposedAction();
+}
+
+void QSFMLCanvas::dropEvent(QDropEvent* event)
+{
+  emit receivedDrop(event->mimeData());
+  event->acceptProposedAction();
 }

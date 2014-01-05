@@ -196,9 +196,12 @@ void State::beginUpdateLoop(){
     }
 }
 
-int State::addCam(){
-   cameras.push_back(new Camera());
-   return cameras.size()-1;
+int State::addCam(Camera* cam){
+  if(!cam){
+    cam= new Camera();
+  }
+  cameras.push_back(cam);
+  return cameras.size()-1;
 }
 
 void State::setCam(int no){
@@ -215,15 +218,16 @@ void State::draw(){
     for(int i=0;i<tiles.size();i++)
         tiles[i]->draw();
     
-    for(int i=0;i<objects.size();i++)
-        objects[i]->draw();
+    for(int i=0;i<objects.size();i++){
+      objects[i]->draw();
+    }
+    
     Shading::getActive()->setObjMat(Matrix());
     if(debug&&pWorld)pWorld->draw();
 #endif
 }
 
 void State::updateElements(){
-  cout << "Updating\n";
     //Client: send controllers previous to use them to predict
     if(netNode&&!netNode->isServing()){
         netNode->sendUpdate();
@@ -349,6 +353,7 @@ Camera* State::getCam(){
 MXML::Tag State::toXML(){
     Tag ret("gameState");
     for(Camera* c:cameras){
+      if(c!=getCam())
         ret.addChildren(c->toXML());
     }
     for(Tile* t:tiles){

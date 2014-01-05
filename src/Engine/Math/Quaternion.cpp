@@ -3,6 +3,8 @@
 #include "../../ProjectManagement/MXML.h"
 #include "Matrix.h"
 
+Quaternion Quaternion::one = Quaternion(0,0,0,1);
+
 Quaternion::Quaternion(float _x, float _y, float _z, float _w){
     x=_x;
     y=_y;

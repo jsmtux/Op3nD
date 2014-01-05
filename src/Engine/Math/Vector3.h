@@ -57,6 +57,7 @@ public:
     Matrix toPositionMatrix() const;
     Matrix toScaleMatrix() const;
     float length() const;
+    static Vector3 zero;
 };
 
 #endif

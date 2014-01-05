@@ -7,9 +7,12 @@ class ImageTreeView: public QTreeView{
 public:
   ImageTreeView( QWidget *parent = 0 );
   ~ImageTreeView();
+public slots:
+  void showContextMenu(QPoint point);
 protected:
-    void drawRow( QPainter *painter, const QStyleOptionViewItem &options, 
+  void drawRow( QPainter *painter, const QStyleOptionViewItem &options, 
 		  const QModelIndex &index ) const;
+  void mousePressEvent(QMouseEvent* event);
 };
 
 #endif
