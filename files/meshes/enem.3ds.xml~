@@ -1,0 +1,31 @@
+<!DOCTYPE physical SYSTEM "physical.dtd">
+ <physical> 
+  <mass> 
+ 50
+  </mass>  
+  <restitution> 
+ 10
+  </restitution>  
+  <friction> 
+ 10
+  </friction>  
+  <rollingFriction> 
+ 10
+  </rollingFriction>  
+  <box> 
+   <size> 
+    <vector> 
+     <x> 
+    1
+     </x>  
+     <y> 
+    1
+     </y>  
+     <z> 
+    1
+     </z>  
+    </vector>  
+   </size>  
+  </box>  
+ </physical>  
+

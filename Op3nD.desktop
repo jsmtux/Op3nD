@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=0.1
+Name=Op3nD
+GenericName=Videogame framework
+Comment=Esas cosas
+Exec=/usr/bin/Op3nD_editor
+Icon=/usr/local/share/O3D/logo.png
+Type=Application
+Terminal=false
+Categories=Development;

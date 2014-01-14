@@ -1,0 +1,4 @@
+<!ELEMENT shader (version,vertex,fragment)>
+<!ELEMENT version #string>
+<!ELEMENT vertex #string>
+<!ELEMENT fragment #string>

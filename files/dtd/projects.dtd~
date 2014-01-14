@@ -1,0 +1,6 @@
+<!ELEMENT project (name,image,description,version,portable)>
+<!ELEMENT name #string>
+<!ELEMENT description #string>
+<!ELEMENT version #string>
+<!ELEMENT portable #integer>
+<!ELEMENT image #string>

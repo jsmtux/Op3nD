@@ -1,0 +1,18 @@
+<!ELEMENT physical(mass,responds,restitution,friction,rollingFriction,sphere,box,capsule,shape)>
+<!ELEMENT mass #float>
+<!ELEMENT responds #int>
+<!ELEMENT restitution #float>
+<!ELEMENT friction #float>
+<!ELEMENT rollingFriction #float>
+<!ELEMENT sphere(radius)>
+<!ELEMENT box(size)>
+<!ELEMENT capsule(length,radius)>
+<!ELEMENT shape(elements)>
+<!ELEMENT size (vector)>
+<!ELEMENT vector(x,y,z)>
+<!ELEMENT y #float>
+<!ELEMENT x #float>
+<!ELEMENT z #float>
+<!ELEMENT radius #float>
+<!ELEMENT length #float>
+<!ELEMENT elements #integer>
