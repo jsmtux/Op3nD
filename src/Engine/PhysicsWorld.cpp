@@ -67,26 +67,31 @@ void PhysicsWorld::setCallBack(btInternalTickCallback cb){
 vector<void*> PhysicsWorld::contactTest(btRigidBody* body)
 {
   struct ContactSensorCallback : public btCollisionWorld::ContactResultCallback {
+    
     ContactSensorCallback(btRigidBody* tgtBody):
 			btCollisionWorld::ContactResultCallback(), body(tgtBody){ }
 
     btRigidBody* body;
     vector<void*> results;
     
+    
     btScalar addSingleResult(btManifoldPoint& cp,
 			    const btCollisionObject* colObj0,int partId0,int index0,
 			    const btCollisionObject* colObj1,int partId1,int index1)
     {
       btVector3 pt;
+      void * newResult;
       if(colObj0==body) {
-      pt = cp.m_localPointA;
-      results.push_back(colObj1->getUserPointer());
+	pt = cp.m_localPointA;
+	newResult = colObj1->getUserPointer();
       } else {
 	assert(colObj1==body && "body does not match either collision object");
 	pt = cp.m_localPointB;
-      results.push_back(colObj0->getUserPointer());
+	newResult = colObj0->getUserPointer();
       }
-      
+      if(newResult){
+	results.push_back(newResult);
+      }
       return 0;
     }
   };

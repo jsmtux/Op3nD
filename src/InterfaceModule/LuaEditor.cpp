@@ -39,7 +39,7 @@ void LuaEditor::newScript()
     }
     name=QInputDialog::getText(NULL,"Please enter new script name",
 				      "Name:",QLineEdit::Normal,"",&ok);
-  }while(!name.contains('.'));
+  }while(name.contains('.'));
   
   if(ok&&!name.isEmpty()){
     string path=Base::getInstance()->getProj()->getDir((name+".o3s").toStdString(),Project::OBJECT);

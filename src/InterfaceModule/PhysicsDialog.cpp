@@ -1,6 +1,7 @@
 #include "PhysicsDialog.h"
 #include "../src/Engine/Base.h"
 #include "../src/Engine/ObjectTypes/Resource.h"
+#include </home/jsmtux/projects/Op3nD/src/Engine/PhysicsWorld.h>
 #include </home/jsmtux/projects/Op3nD/src/ProjectManagement/Project.h>
 #include <QMenu>
 #include <QMessageBox>
@@ -58,6 +59,7 @@ void PhysicsDialog::accept()
     XMLFile out(Base::getInstance()->getProj()->getDir(toEdit+".xml",Project::MESH),root,"physical.dtd");
     out.write();
   }
+  clear();
   restoreCanvas();
   QDialog::accept();
 }
@@ -75,7 +77,31 @@ void PhysicsDialog::exec(string resource)
   Tag root;
   XMLFile in(Base::getInstance()->getProj()->getDir(toEdit+".xml",Project::MESH),root,"physical.dtd");
   in.read();
-  cout << root.getChildren().size()<< endl;
+  
+  Physical phys;
+  phys.fromXML(root);
+  physicsDialog.sbWeigh->setValue(phys.getMass());
+  physicsDialog.sbRestitution->setValue(phys.getRestitution());
+  physicsDialog.sbFriction->setValue(phys.getFriction());
+  physicsDialog.sbAngularFriction->setValue(phys.getAngularFriction());
+
+  
+  for(Tag t:root.getChildren()){
+    if(t.getName().compare("box")==0){
+      Vector3 size(t["size"]);
+      btRigidBody *body=new btRigidBody(0,new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0))),
+					new btBoxShape(size));
+      Base::getInstance()->getCurState()->addRigidBody(body);
+      shapes.push_back(shapeInfo{getNewId(),body,S_BOX,Vector3::zero,size});
+    }else if(t.getName().compare("sphere")==0){
+      float size=Vector3(t["size"]).x;
+      btRigidBody *body=new btRigidBody(0,new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0))),
+					new btSphereShape(size));
+      Base::getInstance()->getCurState()->addRigidBody(body);
+      shapes.push_back(shapeInfo{getNewId(),body,S_SPHERE,Vector3::zero,Vector3(size,0,0)});
+    }
+  }
+  updateShapesList();
   QDialog::exec();
 }
 
@@ -200,4 +226,12 @@ void PhysicsDialog::restoreCanvas(){
   Base::getInstance()->getCurState()->clear();
   Base::getInstance()->changeState(prevState.toStdString(),EDITORST);
   Base::getInstance()->beginState();
+}
+
+void PhysicsDialog::clear()
+{
+  for(shapeInfo s:shapes){
+    Base::getInstance()->getCurState()->getPhysicsWorld()->deleteRigidBody(s.rigidBody);
+  }
+  shapes.clear();
 }

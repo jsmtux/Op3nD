@@ -75,6 +75,13 @@ void State::addToList(Editable* a, unsigned int i){
     }
 }
 
+void State::deleteElement(unsigned int id)
+{
+  Editable* element=getByIndex(id);
+  delete element;
+  list.erase(list.begin()+id-1);
+}
+
 State::~State(){
     clear();
 }
@@ -133,7 +140,9 @@ void State::initPhysicsWorld(){
 
 void State::stepPhysWorld(){
     if(pWorld){
+	lockUpdate();
         pWorld->stepPhys();
+	unlockUpdate();
     }
 }
 
@@ -167,6 +176,7 @@ void State::physicsCallback(btDynamicsWorld *world, btScalar timeStep){
     State *st=Base::getInstance()->getCurState();
     st->diffTime=st->tUpdated.getTicks();
     st->tUpdated.reset();
+    
     if(!st->netNode||!st->netNode->thinClient()){
         btCollisionObjectArray objects = world->getCollisionObjectArray();
         world->clearForces();
@@ -179,6 +189,7 @@ void State::physicsCallback(btDynamicsWorld *world, btScalar timeStep){
              rigidBody->applyGravity();
         }
     }
+    
     st->updateElements();
 }
 
@@ -223,7 +234,7 @@ void State::draw(){
     }
     
     Shading::getActive()->setObjMat(Matrix());
-    if(debug&&pWorld)pWorld->draw();
+    if(pWorld&&debug)pWorld->draw();
 #endif
 }
 
@@ -234,14 +245,28 @@ void State::updateElements(){
     }
     if(currCam)currCam->view();
     if(!netNode||!netNode->thinClient()){
-        for(int i=0;i<objects.size();i++){
-            objects[i]->update();
-        }
-        if(netNode){
-            for(int i=0;i<list.size();i++){
-                list[i]->draw();
-            }
-        }
+      bool needsClean=false;
+      for(int i=0;i<objects.size();i++){
+	if(!objects[i]->needsDelete()){
+	  objects[i]->update();
+	}
+	needsClean=needsClean||objects[i]->needsDelete();
+      }
+      if(needsClean){
+	std::vector<Scripted*>::iterator iter;
+	for (iter = objects.begin(); iter != objects.end(); ) {
+	    if ((*iter)->needsDelete()){
+	      delete (*iter);
+	      iter = objects.erase(iter);
+	    }else
+		++iter;
+	}
+      }
+      if(netNode){
+	  for(int i=0;i<list.size();i++){
+	      list[i]->draw();
+	  }
+      }
     }
     //Server: send state once it gets updated
     if(netNode&&netNode->isServing()){

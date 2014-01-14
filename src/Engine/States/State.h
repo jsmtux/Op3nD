@@ -83,12 +83,16 @@ public:
      */
     void addElement(Editable *a);
     /**
-     * Adds a new element to elements' list
+     * Adds a new element to elements' list, asigning it an id
      */
     void addToList(Editable *a,unsigned int i=0);
     /**
-     * Loads an state saved in a file
+     * Deletes an ellement
      */
+    void deleteElement(unsigned int id);
+    /**
+     * Loads an state saved in a file
+     */    
     void loadFile();
     /**
      * Draws the scene

@@ -84,6 +84,11 @@ public:
     void Draw();
     static Model3d* loadM3d(string file);
     bool isValid();
+    vector<string> getAnimations();
+    string getCurrentAnimation();
+    void changeAnimation(string newAnimation);
+    float getAnimationTime();
+    void setLoop(bool isLoop);
     void del();
     ResourceType getType();
 private:
@@ -93,6 +98,7 @@ private:
     static map<string,Model3d*> list;
     void initMaterials(const aiScene *scene);
     void boneTransform(float timeInSeconds, vector<Matrix>& transforms);
+    float timeToAnimationTime(float t);
     void readNodeHierarchy(float animationTime, const aiNode* pNode, const Matrix& parentTransform);
     Matrix getTransform();
     
@@ -133,6 +139,7 @@ private:
     Matrix scaleTransform;
     bool activeAnimation;
     unsigned int currentAnimation;
+    bool loopAnimation;
 };
 
 #endif

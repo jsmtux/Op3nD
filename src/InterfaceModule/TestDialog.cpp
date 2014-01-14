@@ -29,6 +29,7 @@ void TestDialog::accept()
   QStringList arguments;
   arguments << "-hold" << "-e" << "Op3nD_Interpreter" << currentProject->getDir().c_str() << "-map"<<
 	    testDialog.cbTestOptions->currentText() << "-res" << testDialog.cbResOptions->currentText();
+	    
   if(testDialog.cbFullScreen->checkState()==Qt::Checked){
     arguments << "-fullscreen";
   }

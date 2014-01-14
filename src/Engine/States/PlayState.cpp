@@ -6,6 +6,7 @@
 PlayState::PlayState(string n):State(n){
     initPhysicsWorld();
     deleteOnEnd=true;
+    setDebug(true);
 }
 
 PlayState::PlayState(State* s):State(s->getName()){

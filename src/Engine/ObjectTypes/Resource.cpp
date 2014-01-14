@@ -21,7 +21,7 @@ Resource::Resource(){
 void Resource::free(){
     copies--;
     if(!copies){
-        del();
+      del();
     }
 }
 

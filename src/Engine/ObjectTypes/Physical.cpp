@@ -12,6 +12,7 @@ Physical::Physical(){
     restitution=0;
     friction=0;
     angularFriction=0;
+    contactResponse = true;
 }
 
 Physical::Physical(MXML::Tag& code){
@@ -50,6 +51,8 @@ void Physical::fromXML(MXML::Tag &code){
       s.size.y = code["capsule"]["length"].getAttrib().getFloat();
       shape.push_back(s);
     }if(t.getName().compare("shape")==0){
+    }if(t.getName().compare("responds")==0){
+      contactResponse = code["responds"].getAttrib().getInt();
     }
   }
   
@@ -75,7 +78,11 @@ btRigidBody* Physical::toRigidBody(){
     }
     btVector3 fallInertia(0,0,0);
     col->calculateLocalInertia(mass,fallInertia);
-    return new btRigidBody(mass,new btDefaultMotionState(btTransform(Quaternion(0,0,0,1),Vector3(0,0,0))),col,fallInertia);
+    btRigidBody* ret=new btRigidBody(mass,new btDefaultMotionState(btTransform(Quaternion(0,0,0,1),Vector3(0,0,0))),col,fallInertia);
+    if(!contactResponse){
+      ret->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
+    }
+    return ret;
 }
 
 using namespace MXML;
@@ -120,3 +127,14 @@ void Physical::addShape(Vector3 size, Vector3 offset, tShape category)
 {
   shape.push_back(ShapeDefinition(size,offset,category));
 }
+
+void Physical::setContactResponse(bool responds)
+{
+  contactResponse=responds;
+}
+
+bool Physical::getContactResponse()
+{
+  return contactResponse;
+}
+

@@ -149,6 +149,9 @@ void PropertiesTreeModel::fillTileProperties(TreeItem* tileItem)
   tileItem->addItem(new TreeItem(tr("Size"),tileItem,editable->getSize(),[=](Vector3 vec){editable->setSize(vec);}));
   tileItem->addItem(new TreeItem(tr("Rotation"),tileItem,editable->getRot(),[=](Quaternion q){editable->setRot(q);}));
   tileItem->addItem(new TreeItem(tr("Shape"),tileItem,"edit",[&](){emit editShape(dynamic_cast<Tile*>(editable)->getResource()->getName());}));
+  TreeItem* animationItem=new TreeItem(tr("Animation"),tileItem);
+  tileItem->addItem(animationItem);
+  setAnimationProperties(animationItem);
 }
 
 void PropertiesTreeModel::addResourceProperties(TreeItem* resItem)
@@ -181,3 +184,8 @@ void PropertiesTreeModel::addResourceProperties(TreeItem* resItem)
   }
 }
 
+void PropertiesTreeModel::setAnimationProperties(TreeItem* animationItem)
+{
+  Resource* res=dynamic_cast<Tile*>(editable)->getResource();
+  Model3d* model= dynamic_cast<Model3d*>(res);
+}

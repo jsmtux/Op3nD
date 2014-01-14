@@ -20,6 +20,14 @@ int main(int argc, char** argv)
     op3nd.show();
     return app.exec();
 #else
+    /*argc=6;
+    argv=new char*[6];
+    argv[1]="/home/jsmtux/O3D/Naves";
+    argv[2]="-map";
+    argv[3]="new.xml";
+    argv[4]="-res";
+    argv[5]="640x480";*/
+    
     if(argc<2){
       cout << "usage: " << argv[0] << " " << "<project path> <options>" << endl
 	   << "Options: \n"

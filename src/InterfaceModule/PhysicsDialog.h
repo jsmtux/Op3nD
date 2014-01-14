@@ -20,6 +20,7 @@ public slots:
 private:
   int getNewId();
   void restoreCanvas();
+  void clear();
   Ui::PhysicsDialog physicsDialog;
   QString prevState;
   string toEdit;

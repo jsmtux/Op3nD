@@ -24,6 +24,7 @@ private:
   void fillTileProperties(TreeItem* tileItem);
   void addResourceProperties(TreeItem* resItem);
   void fillObjectProperties(TreeItem* objectItem);
+  void setAnimationProperties(TreeItem* animationItem);
   Editable* editable;
   TreeItem* rootItem;
 signals:

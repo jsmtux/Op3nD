@@ -49,10 +49,14 @@ Tile::Tile(MXML::Tag &code){
   fromXML(code);
 }
 
-Tile::~Tile(){    
-  if(physInfo)Base::getInstance()->getCurState()->deleteRigidBody(physInfo);
-  if(resource)
+Tile::~Tile(){
+  if(physInfo){
+    Base::getInstance()->getCurState()->deleteRigidBody(physInfo);
+    physInfo->setUserPointer(NULL);
+  }
+  if(resource){
     resource->free();
+  }
 }
 
 void Tile::load(){
@@ -201,14 +205,16 @@ MXML::Tag Tile::toXML(){
   ret.addChildren(Tag("position"));
   ret.addChildren(Tag("rotation"));
   ret.addChildren(Tag("size"));
-  ret.addChildren(Tag("image"));
   ret.addChildren(Tag("id"));
   
   ret["id"].setAttrib(Attribute(int(id)));
   ret["position"].addChildren(position.toXML());
   ret["rotation"].addChildren(rotation.toXML());
   ret["size"].addChildren(size.toXML());
-  ret["image"].setAttrib(Attribute(string(resource->getName()).c_str()));
+  if(resource){
+    ret.addChildren(Tag("image"));
+    ret["image"].setAttrib(Attribute(string(resource->getName()).c_str()));
+  }
   return ret;
 }
 
@@ -218,7 +224,8 @@ edType Tile::getType(){
 
 void Tile::setPhysical(btRigidBody* p){
   if(physInfo)Base::getInstance()->getCurState()->deleteRigidBody(physInfo);
-					Vector3 tPos=position;
+  
+  Vector3 tPos=position;
   Quaternion tRot=rotation;
   physInfo = p;
   if(p){
@@ -229,8 +236,8 @@ void Tile::setPhysical(btRigidBody* p){
     setPos(tPos);
     setRot(tRot);
     physInfo->getCollisionShape()->setLocalScaling(size);
+    physInfo->setUserPointer(this);
   }
-  //physInfo->setUserPointer(this);
 }
 
 void Tile::setPhysical(MXML::Tag &code){
@@ -254,7 +261,6 @@ std::vector< Tile* > Tile::getColliding()
 {
   vector<void*> pointers=Base::getInstance()->getCurState()->getPhysicsWorld()->contactTest(physInfo);
   vector<Tile*> ret;
-  
   for(void* p:pointers){
     ret.push_back(static_cast<Tile*>(p));
   }

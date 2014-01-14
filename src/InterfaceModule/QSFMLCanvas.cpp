@@ -131,6 +131,9 @@ void QSFMLCanvas::keyPressEvent(QKeyEvent* event)
     case 68:
       setKey(K_RIGHT,true);
       break;
+    case 32:
+      setKey(K_A,true);
+      break;
   }
 }
 
@@ -161,6 +164,9 @@ void QSFMLCanvas::keyReleaseEvent(QKeyEvent* event)
       break;
     case 68:
       setKey(K_RIGHT,false);
+      break;
+    case 32:
+      setKey(K_A,false);
       break;
   }
 }

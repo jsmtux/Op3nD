@@ -69,19 +69,19 @@ void Camera::reloadMatrix()
 }
 
 
-void Camera::view( ){    
-    Matrix camMat;
-    N = target.normalized();
-    U = up.normalized();
-    U = U.cross(N);
-    V = N.cross(U);
+void Camera::view( ){
+  Matrix camMat;
+  N = target.normalized();
+  U = up.normalized();
+  U = U.cross(N);
+  V = N.cross(U);
 
-    camMat.m[0][0] = U.x; camMat.m[0][1] = U.y; camMat.m[0][2] = U.z; camMat.m[0][3] = 0.0f;
-    camMat.m[1][0] = V.x; camMat.m[1][1] = V.y; camMat.m[1][2] = V.z; camMat.m[1][3] = 0.0f;
-    camMat.m[2][0] = N.x; camMat.m[2][1] = N.y; camMat.m[2][2] = N.z; camMat.m[2][3] = 0.0f;
-    camMat.m[3][0] = 0.0f; camMat.m[3][1] = 0.0f; camMat.m[3][2] = 0.0f; camMat.m[3][3] = 1.0f;
+  camMat.m[0][0] = U.x; camMat.m[0][1] = U.y; camMat.m[0][2] = U.z; camMat.m[0][3] = 0.0f;
+  camMat.m[1][0] = V.x; camMat.m[1][1] = V.y; camMat.m[1][2] = V.z; camMat.m[1][3] = 0.0f;
+  camMat.m[2][0] = N.x; camMat.m[2][1] = N.y; camMat.m[2][2] = N.z; camMat.m[2][3] = 0.0f;
+  camMat.m[3][0] = 0.0f; camMat.m[3][1] = 0.0f; camMat.m[3][2] = 0.0f; camMat.m[3][3] = 1.0f;
 #ifndef NODRAW    
-    Shading::getActive()->setWVP(perspMat*camMat*(-pos).toPositionMatrix());
+  Shading::getActive()->setWVP(perspMat*camMat*(-pos).toPositionMatrix());
 #endif
 }
 
@@ -162,10 +162,12 @@ void Camera::orientate(Vector3 v){
     if(targetDefined){
         Vector3 difference=(direction-pos);
         angleH=atan(difference.z/-difference.x);
+	float radH=angleH;
         angleH=((angleH*180)/M_PI);
         if(difference.x<0)angleH+=180;
-        
-        angleV=0;
+	
+        angleV=atan((difference.z*-sin(radH)+difference.x*cos(radH))/difference.y);
+        angleV=((angleV*180)/M_PI)+90;
     }else{
         angleH+=v.x;
         angleV+=v.y;        

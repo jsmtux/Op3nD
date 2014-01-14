@@ -34,11 +34,14 @@ public:
     float getFriction(){return friction;}
     float getAngularFriction(){return angularFriction;}
     void addShape(Vector3 size, Vector3 offset, tShape category);
+    void setContactResponse(bool responds);
+    bool getContactResponse();
 private:
     float mass;
     float restitution;
     float friction;
     float angularFriction;
+    bool contactResponse=true;
     struct ShapeDefinition{
       ShapeDefinition(){};
       ShapeDefinition(Vector3 size, Vector3 offset, tShape shape):size(size), offset(offset), shapeCategory(shape){};

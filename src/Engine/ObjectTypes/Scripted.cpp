@@ -27,6 +27,11 @@ Scripted::Scripted(string file, Vector3 p, Vector3 s, Vector3 r):Tile(p,s,r){
     loadFromFile(file);
 }
 
+Scripted::~Scripted()
+{
+  
+}
+
 string Scripted::getPath()
 {
   return Base::getInstance()->getProj()->getDir(name,Project::OBJECT)+string(".o3s");
@@ -52,6 +57,11 @@ string Scripted::getTemplate(string name)
 	"function "+name+":Update()\n"
 	"end\n";
   return t;
+}
+
+bool Scripted::needsDelete()
+{
+  return deleted;
 }
 
 void Scripted::loadFromFile(string file){
@@ -92,6 +102,7 @@ void Scripted::update( )
     lua_rawgeti(L, LUA_REGISTRYINDEX, luaRef);//object
     lua_getfield(L,-1,"Update");//function name
     lua_pushvalue(L,-2);//self
+    //Allways at the end, in case the caller is being deleted!!!
     if(lua_pcall(L,1,1,0)){
         cerr << "Error updating " << name << " in lua:" << endl;
         cerr << "\t" << lua_tostring(L, -1) << endl;
@@ -130,7 +141,16 @@ void Scripted::Init(){
     lua_register(L, "setRot", Scripted::LsetRot);
     lua_register(L, "getRot", Scripted::LgetRot);
     lua_register(L, "addRot", Scripted::LaddRot);
-    lua_register(L, "aAtoQuaternion", Scripted::LAAtoQuaternion);
+    lua_register(L, "setSize", Scripted::LsetSize);
+    lua_register(L, "getSize", Scripted::LgetSize);
+    lua_register(L, "getObjectAnimations",Scripted::LgetObjectAnimations);
+    lua_register(L, "getCurrentAnimation",Scripted::LgetCurrentObjectAnimation);
+    lua_register(L, "changeObjectAnimation",Scripted::LchangeObjectAnimation);
+    lua_register(L, "getAnimationTime", Scripted::LgetAnimationTime);
+    lua_register(L, "setLoopAnimation", Scripted::LsetLoopAnimation);
+    lua_register(L,"getName",Scripted::LgetName);
+    lua_register(L,"getCollidingObjects", Scripted::LgetCollidingObjects);
+    lua_register(L,"deleteObject",Scripted::LdeleteObject);
     Controller::init(L);
 }
 
@@ -144,6 +164,7 @@ edType Scripted::getType(){
 
 #include "Tile.h"
 #include "Camera.h"
+#include "Model3d.h"
 class Tile;
 
 int Scripted::LaddToScene(lua_State* L){
@@ -186,12 +207,16 @@ int Scripted::Lload(lua_State *L){
     }
     
     int ind = lua_tointeger(L,1);
-    string dir=lua_tostring(L,2);
+    string dir;
+    if(n>1){
+      dir=lua_tostring(L,2);
+    }
     Vector3 pos, siz(1,1,1);
     Quaternion rot(0,0,0,1);
     Scripted * tmp=getByInd(ind);
-    
-    tmp->setResource(dir);
+    if(!dir.empty()){
+      tmp->setResource(dir);
+    }
     
     if(n>3){
         pos.x = lua_tonumber(L,3);
@@ -331,40 +356,40 @@ int Scripted::LgetRot(lua_State* L){
         lua_pushstring(L,"Error in lua getRot");
         lua_error(L);
     }
-    Quaternion ret;
+    Quaternion q;
     if(n>0){
         int ind = lua_tointeger(L,1);
-        ret = getByInd(ind)->getRot();
+        q = getByInd(ind)->getRot();
     }else{
-        ret = currObject->getRot();
+        q = currObject->getRot();
     }
+    Vector3 ret=q.toEuler();
     lua_pushnumber(L,ret.x);
     lua_pushnumber(L,ret.y);
-    lua_pushnumber(L,ret.z);    
-    lua_pushnumber(L,ret.w);
-    return 4;
+    lua_pushnumber(L,ret.z);
+    return 3;
 }
 
 int Scripted::LsetRot(lua_State* L){
     int n= lua_gettop(L);
-    if(n!=4&&n!=5){
+    if(n!=3&&n!=4){
         lua_pushstring(L,"Error in lua setRot");
         lua_error(L);
     }
-    Quaternion rot;
+    Vector3 rot;
     rot.x=lua_tonumber(L,1);
     rot.y=lua_tonumber(L,2);
     rot.z=lua_tonumber(L,3);
-    rot.w=lua_tonumber(L,4);
+    Quaternion q(rot);
     Scripted* obj;
-    if(n>4){
-        int ind = lua_tointeger(L,5);
+    if(n>3){
+        int ind = lua_tointeger(L,4);
         obj = getByInd(ind);
     }else{
         obj= currObject;
     }
     if(obj){
-        obj->setRot(rot);
+        obj->setRot(q);
     }
     
     return 0;
@@ -381,6 +406,7 @@ int Scripted::LaddRot(lua_State* L){
     rot.y=lua_tonumber(L,2);
     rot.z=lua_tonumber(L,3);
     rot.w=lua_tonumber(L,4);
+    rot.fromAngleMagnitude(rot.x,rot.y,rot.z,rot.w);
     Scripted* obj;
     if(n>4){
         int ind = lua_tointeger(L,5);
@@ -433,6 +459,28 @@ int Scripted::LsetSize(lua_State* L){
     }
     
     return 0;
+}
+
+int Scripted::LgetName(lua_State* L)
+{
+  int n=lua_gettop(L);
+  Tile* current=currObject;
+  if(n>0){
+    int ind = lua_tonumber(L,1);
+    current=getByInd(ind);
+  }
+  
+  string name;
+  
+  if(current->getType()==E_OBJECT){
+    Scripted* object = dynamic_cast<Scripted*>(current);
+    name=object->getName();
+  }else{
+    name= current->getResource()->getName();
+  }
+  
+  lua_pushstring(L,name.c_str());
+  return 1;
 }
 
 int Scripted::LsetLinVel(lua_State *L){
@@ -607,21 +655,152 @@ int Scripted::LsetCamTarget(lua_State *L){
     return 0;
 }
 
-int Scripted::LAAtoQuaternion(lua_State *L){
-    int n=lua_gettop(L);
-    if(n!=4){
-        lua_pushstring(L,"Error in angle axis to quaternion");
-        lua_error(L);
+int Scripted::LgetCollidingObjects(lua_State* L)
+{
+  int n=lua_gettop(L);
+  Scripted* collider;
+  if(n==0){
+    collider=currObject;
+  }else{
+    int ind = lua_tointeger(L,1);
+    collider=getByInd(ind);
+  }
+  
+  vector<Tile*> colliding=collider->getColliding();
+  vector<Scripted*> collidingObjects;
+  
+  for(Tile* t:colliding){
+    if(t->getType()==E_OBJECT){
+      collidingObjects.push_back(dynamic_cast<Scripted*>(t));
     }
-    Quaternion q= Quaternion::fromAngleMagnitude(lua_tonumber(L,1), lua_tonumber(L,2), 
-            lua_tonumber(L,3), lua_tonumber(L,4));
-    
-    lua_pushnumber(L,q.w);
-    lua_pushnumber(L,q.x);
-    lua_pushnumber(L,q.y);
-    lua_pushnumber(L,q.z);
-    
-    return 4;
+  }
+  
+  lua_newtable(L);
+
+  for (int i = 0; i < collidingObjects.size(); i++) {
+    lua_rawgeti(L, LUA_REGISTRYINDEX, collidingObjects[i]->luaRef);
+    luaL_checktype(L, -1, LUA_TTABLE); 
+        
+    luaL_getmetatable(L,lastname.c_str());
+    lua_setmetatable(L,-1);
+    lua_rawseti(L, -2, i+1);
+  }
+  
+  return 1;
+}
+
+int Scripted::LdeleteObject(lua_State* L)
+{
+  int n = lua_gettop(L);
+  if(n!=1){
+    lua_pushstring(L,"Error in delete object");
+    lua_error(L);
+  }
+  Scripted* toDelete=getByInd(lua_tonumber(L,1));
+  toDelete->deleted=true;
+  
+}
+
+int Scripted::LgetObjectAnimations(lua_State *L){
+  int n = lua_gettop(L);
+  if(n!=1){
+    lua_pushstring(L,"Error getObjectAnimations");
+    lua_error(L);
+  }
+  
+  Scripted* object=getByInd(lua_tonumber(L,1));
+  Resource* res=object->getResource();
+  if(res->getType()!=Resource::MODEL3D)
+    return 0;
+  
+  Model3d* model=dynamic_cast<Model3d*>(res);
+  vector<string> animationNames=model->getAnimations();
+  
+  lua_createtable(L, animationNames.size(), 0);
+  for (int i=0;i<animationNames.size();i++) {
+    lua_pushstring(L, animationNames[i].c_str());
+    lua_rawseti (L, -2, i);
+  }
+  
+  return 1;
+}
+
+int Scripted::LgetCurrentObjectAnimation(lua_State *L){  
+  int n = lua_gettop(L);
+  if(n!=1){
+    lua_pushstring(L,"Error in getCurrentObjectAnimation");
+    lua_error(L);
+  }
+  
+  Scripted* object=getByInd(lua_tonumber(L,1));
+  Resource* res=object->getResource();
+  if(res->getType()!=Resource::MODEL3D)
+    return 0;
+  
+  Model3d* model=dynamic_cast<Model3d*>(res);
+  
+  lua_pushstring(L,model->getCurrentAnimation().c_str());
+  
+  return 1;
+}
+
+int Scripted::LchangeObjectAnimation(lua_State *L){
+  int n = lua_gettop(L);
+  if(n!=2){
+    lua_pushstring(L,"Error in changeObjectAnimation");
+    lua_error(L);
+  }
+  Scripted* object=getByInd(lua_tonumber(L,1));
+  Resource* res=object->getResource();
+  if(res->getType()!=Resource::MODEL3D)
+    return 0;
+  
+  Model3d* model=dynamic_cast<Model3d*>(res);
+  
+  string name=lua_tostring(L,2);
+  model->changeAnimation(name);
+  
+  return 0;
+}
+
+int Scripted::LgetAnimationTime(lua_State* L)
+{
+  int n = lua_gettop(L);
+  if(n!=1){
+    lua_pushstring(L,"Error in getAnimationTime");
+    lua_error(L);
+  }
+  
+  Scripted* object=getByInd(lua_tonumber(L,1));
+  Resource* res=object->getResource();
+  if(res->getType()!=Resource::MODEL3D)
+    return 0;
+  
+  Model3d* model=dynamic_cast<Model3d*>(res);
+  
+  lua_pushnumber(L,model->getAnimationTime());
+  
+  return 1;
+}
+
+int Scripted::LsetLoopAnimation(lua_State* L)
+{
+  int n = lua_gettop(L);
+  if(n!=2){
+    lua_pushstring(L,"Error in setLoopAnimation");
+    lua_error(L);
+  }
+  
+  Scripted* object=getByInd(lua_tonumber(L,1));
+  Resource* res=object->getResource();
+  if(res->getType()!=Resource::MODEL3D)
+    return 0;
+  
+  Model3d* model=dynamic_cast<Model3d*>(res);
+  bool isLoop= lua_toboolean(L,2);
+  model->setLoop(isLoop);
+  
+  return 0;
 }
 
 using namespace MXML;
