@@ -57,6 +57,7 @@ set(Op3nD_SRCS
                src/Engine/States/MeshState.cpp
                src/Engine/States/PlayState.cpp
                src/Engine/States/State.cpp
+               src/Engine/States/StateManager.cpp
                )
 
 set(Op3nD_Editor_SRCS  src/Op3nD.cpp
@@ -121,8 +122,7 @@ SET(CPACK_SET_DESTDIR "on")
 SET(CPACK_PACKAGING_INSTALL_PREFIX "/tmp")
 SET(CPACK_GENERATOR "DEB")
 
-SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-set (CPACK_DEBIAN_PACKAGE_DEPENDS "libsfml (>= 2.0)" )
+set (CPACK_DEBIAN_PACKAGE_DEPENDS "libassimp3 (>= 2.0.863), libboost-filesystem1.49.0 (>= 1.49.0-1), libboost-system1.49.0 (>= 1.49.0-1), libbullet2.80, libc6 (>= 2.14), libgcc1 (>= 1:4.1.1), libglew1.8 (>= 1.8.0), liblua5.2-0, libqt5core5 (>= 5.0.2), libqt5gui5 (>= 5.0.2), libqt5widgets5 (>= 5.0.2), libstdc++6 (>= 4.6), libsfml-system2, libsfml-audio2, libsfml-window2, libsfml-graphics2")
 
 SET(CPACK_PACKAGE_DESCRIPTION "Op3nD game framework")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "bla bla bla... bah")

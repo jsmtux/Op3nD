@@ -2,6 +2,7 @@
 #include "../src/Engine/Base.h"
 #include "../src/Engine/ObjectTypes/Resource.h"
 #include </home/jsmtux/projects/Op3nD/src/Engine/PhysicsWorld.h>
+#include </home/jsmtux/projects/Op3nD/src/Engine/States/MeshState.h>
 #include </home/jsmtux/projects/Op3nD/src/ProjectManagement/Project.h>
 #include <QMenu>
 #include <QMessageBox>
@@ -67,13 +68,12 @@ void PhysicsDialog::accept()
 void PhysicsDialog::exec(string resource)
 {
   toEdit=resource;
-  prevState= Base::getInstance()->getCurState()->getName().c_str();
-  Base::getInstance()->newState("meshEditor",MESHST);
-  Base::getInstance()->changeState("meshEditor",MESHST);
+  StateManager* stateManager= Base::getInstance()->getStateManager();
+  State* meshState= new MeshState("meshEditor");
   Tile* mesh=new Tile(Vector3(0,0,0),Vector3(1,1,1),Quaternion(0,0,0,1),resource);
   mesh->setPhysical(NULL);
-  Base::getInstance()->getCurState()->addElement(mesh);
-  Base::getInstance()->beginState();
+  meshState->addElement(mesh);
+  stateManager->newState(meshState);
   Tag root;
   XMLFile in(Base::getInstance()->getProj()->getDir(toEdit+".xml",Project::MESH),root,"physical.dtd");
   in.read();
@@ -91,13 +91,13 @@ void PhysicsDialog::exec(string resource)
       Vector3 size(t["size"]);
       btRigidBody *body=new btRigidBody(0,new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0))),
 					new btBoxShape(size));
-      Base::getInstance()->getCurState()->addRigidBody(body);
+      Base::getInstance()->getStateManager()->getCurState()->addRigidBody(body);
       shapes.push_back(shapeInfo{getNewId(),body,S_BOX,Vector3::zero,size});
     }else if(t.getName().compare("sphere")==0){
       float size=Vector3(t["size"]).x;
       btRigidBody *body=new btRigidBody(0,new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,0,0))),
 					new btSphereShape(size));
-      Base::getInstance()->getCurState()->addRigidBody(body);
+      Base::getInstance()->getStateManager()->getCurState()->addRigidBody(body);
       shapes.push_back(shapeInfo{getNewId(),body,S_SPHERE,Vector3::zero,Vector3(size,0,0)});
     }
   }
@@ -113,7 +113,7 @@ void PhysicsDialog::closeEvent(QCloseEvent* ev)
 
 void PhysicsDialog::addElementMenu(QAction* action)
 {
-  State* current = Base::getInstance()->getCurState();
+  State* current = Base::getInstance()->getStateManager()->getCurState();
   btRigidBody* rigidBody;
   switch(action->data().toInt()){
     case S_SPHERE:
@@ -172,7 +172,7 @@ void PhysicsDialog::selectShape(int row)
 void PhysicsDialog::deleteShape()
 {
   int row= physicsDialog.twShapes->currentRow();
-  State* current = Base::getInstance()->getCurState();
+  State* current = Base::getInstance()->getStateManager()->getCurState();
   current->deleteRigidBody(shapes[row].rigidBody);
   shapes.removeAt(row);
   updateShapesList();
@@ -222,16 +222,14 @@ void PhysicsDialog::updateShape()
 }
 
 void PhysicsDialog::restoreCanvas(){  
-  Base::getInstance()->getCurState()->stop();
-  Base::getInstance()->getCurState()->clear();
-  Base::getInstance()->changeState(prevState.toStdString(),EDITORST);
-  Base::getInstance()->beginState();
+  StateManager * stateManager= Base::getInstance()->getStateManager();
+  stateManager->deleteState();
 }
 
 void PhysicsDialog::clear()
 {
   for(shapeInfo s:shapes){
-    Base::getInstance()->getCurState()->getPhysicsWorld()->deleteRigidBody(s.rigidBody);
+    Base::getInstance()->getStateManager()->getCurState()->getPhysicsWorld()->deleteRigidBody(s.rigidBody);
   }
   shapes.clear();
 }

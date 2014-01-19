@@ -29,7 +29,6 @@ State::State(string n){
     isStopped=true;
     name=n;
     pWorld =NULL;
-    deleteOnEnd=false;
     updateTh = NULL;
     updateLock= new mutex;
 #ifndef NODRAW
@@ -38,7 +37,7 @@ State::State(string n){
     sselect=new Shading();
     sselect->initShader("picking.sfx");
 
-    Vector3 res=Base::getInstance()->getResolution();    
+    Vector3 res=Base::getInstance()->getRC()->getResolution();    
     
     ptext = new PickingTexture(res.x,res.y);
     
@@ -173,7 +172,10 @@ void State::unlockUpdate(){
 }
 
 void State::physicsCallback(btDynamicsWorld *world, btScalar timeStep){
-    State *st=Base::getInstance()->getCurState();
+    State *st=Base::getInstance()->getStateManager()->getCurState();
+    if(!st){
+      return;
+    }
     st->diffTime=st->tUpdated.getTicks();
     st->tUpdated.reset();
     
@@ -328,17 +330,12 @@ string State::getName(){
     return name;
 }
 
-bool State::reusable(){
-    return !deleteOnEnd;
-}
-
-void State::stop(){
+void State::pause(){
     isStopped=true;
     if(updateTh)
         updateTh->join();
     delete updateTh;
     updateTh = NULL;
-    if(!reusable())clear();
     cout << "State " << name << " stopped\n";
 }
 
@@ -470,13 +467,13 @@ tMillis State::getDiffTime(){
     return diffTime;
 }
 
-void State::changeResolution()
+void State::updateResolution()
 {
   for(Camera* cam:cameras){
     cam->reloadMatrix();
   }
   delete ptext;
-  Vector3 res = Base::getInstance()->getResolution();
+  Vector3 res = Base::getInstance()->getRC()->getResolution();
   ptext = new PickingTexture(res.x,res.y);
 }
 

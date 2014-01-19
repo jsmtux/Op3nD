@@ -10,8 +10,7 @@ EditorState::EditorState(string n):State(n){
   selected=NULL;
   handler = new Tile(Vector3(5,0,0),Vector3(1,1,1),Quaternion(0.,0.,0.,1.),"untitled.3ds");
   //initPhysicsWorld();
-  Vector3 res=Base::getInstance()->getResolution();
-  cameras.push_back(new Camera(res.x/res.y));
+  cameras.push_back(new Camera());
   currCam=cameras[0];
   currCam->setPosition(Vector3(0,0,-100));
 }
@@ -88,27 +87,7 @@ void EditorState::updateElements(){
     }
   }
   if(!netNode||!netNode->thinClient()){
-    if(selected!=NULL){
-      Quaternion rotation =Quaternion(0,0,0,1);
-      if(cont1->getKeys()[K_L]){
-	rotation = rotation * Quaternion::fromAngleMagnitude(0.1,1,0,0);
-	changed =true;
-      }
-      if(cont1->getKeys()[K_J]){
-	rotation = rotation * Quaternion::fromAngleMagnitude(-0.1,1,0,0);
-	changed =true;
-      }
-      if(cont1->getKeys()[K_I]){
-	rotation = rotation * Quaternion::fromAngleMagnitude(0.1,0,1,0);
-	changed =true;
-      }
-      if(cont1->getKeys()[K_K]){
-	rotation = rotation * Quaternion::fromAngleMagnitude(-0.1,0,1,0);
-	changed =true;
-      }
-      
-      selected->setRot(selected->getRot()*rotation);
-      
+    if(selected!=NULL){      
       Vector3 movement;
       if(!handled){
 	movement=currCam->getU()*cont1->getAxis()[A_L]/10;

@@ -50,7 +50,9 @@ ProjectDialog::ProjectDialog()
 
 void ProjectDialog::accept(QString directory)
 {
-  Base::getInstance()->setProj(directory.toStdString());
+  Project *proj = new Project(directory.toStdString());
+  Base::getInstance()->setProj(proj);
+  proj->read();
   
   addProjectToRecent(directory);
   

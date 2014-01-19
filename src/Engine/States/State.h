@@ -59,13 +59,9 @@ public:
      */
     virtual StateType getType();
     /**
-     * Returns wether we should delete the state once finished
-     */
-    bool reusable();
-    /**
      * Stops the state
      */
-    void stop();
+    void pause();
     /**
      * Selects the object in the positions x y
      * @param x mouse postition
@@ -166,7 +162,7 @@ public:
      */
     tMillis getDiffTime();
     
-    void changeResolution();
+    void updateResolution();
     
     void setDebug(bool debug=true);
     

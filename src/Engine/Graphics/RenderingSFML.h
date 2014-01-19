@@ -19,6 +19,7 @@ public:
     void init();
     void update();
     RenderingSFML();
+    void gameLoop();
 };
 
 #endif

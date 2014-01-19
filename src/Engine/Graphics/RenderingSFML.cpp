@@ -13,7 +13,7 @@ RenderingSFML::RenderingSFML(){
 
 void RenderingSFML::init()
 {
-  Vector3 resolution=Base::getInstance()->getResolution();
+  Vector3 resolution=getResolution();
   window= new sf::Window(sf::VideoMode(resolution.x,resolution.y,resolution.z),appName);
   window->setFramerateLimit(60);
   window->setActive();
@@ -34,7 +34,15 @@ void RenderingSFML::update(){
   }
   if(sf::Keyboard::isKeyPressed(sf::Keyboard::F)){
     delete window;
-    Vector3 resolution=Base::getInstance()->getResolution();
+    Vector3 resolution = getResolution();
     window=new sf::Window(sf::VideoMode(resolution.x,resolution.y,resolution.z),appName,sf::Style::Fullscreen);
+  }
+}
+
+
+void RenderingSFML::gameLoop(){
+  StateManager* stateManager=Base::getInstance()->getStateManager();
+  while(stateManager->iteration()){
+    update();
   }
 }

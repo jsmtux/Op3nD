@@ -5,6 +5,11 @@
 #include "RenderingContext.h"
 #include "../Base.h"
 
+RenderingContext::RenderingContext()
+{
+  setResolution(Vector3(640,480,32));
+}
+
 void RenderingContext::init(){
 #ifndef ANDROID
     GLenum res = glewInit();
@@ -22,6 +27,22 @@ void RenderingContext::init(){
     glEnable(GL_DEPTH_TEST);
 }
 
-void RenderingContext::update(){
-    ;
+Vector3 RenderingContext::getResolution()
+{
+  return resolution;
 }
+
+void RenderingContext::setResolution(Vector3 res)
+{
+  resolution=res;
+  State* current=Base::getInstance()->getStateManager()->getCurState();
+  if(current){
+    current->updateResolution();
+  }
+}
+
+float RenderingContext::getRatio()
+{
+  return resolution.x/resolution.y;
+}
+

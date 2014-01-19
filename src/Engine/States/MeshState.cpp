@@ -7,8 +7,7 @@
 MeshState::MeshState(string name):State(name){
     initPhysicsWorld();
     
-    Vector3 res=Base::getInstance()->getResolution();
-    cameras.push_back(new Camera(res.x/res.y));
+    cameras.push_back(new Camera());
     currCam=cameras[0];
     currCam->setPosition(Vector3(0,0,-10));
 }

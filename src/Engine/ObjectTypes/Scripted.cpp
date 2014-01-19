@@ -195,7 +195,7 @@ int Scripted::LaddToScene(lua_State* L){
         siz.z = lua_tonumber(L,11);
     }
     
-    Base::getInstance()->getCurState()->addElement(new Tile(pos,siz,rot,dir));
+    Base::getInstance()->getStateManager()->getCurState()->addElement(new Tile(pos,siz,rot,dir));
     return 0;
 }
 
@@ -267,7 +267,7 @@ int Scripted::LloadObject(lua_State *L){
     string file=lua_tostring(L,1);
     
     Scripted *tmp= new Scripted(file);
-    Base::getInstance()->getCurState()->addElement(tmp);
+    Base::getInstance()->getStateManager()->getCurState()->addElement(tmp);
     list.push_back(tmp);
     
     lastname=file;
@@ -593,7 +593,7 @@ int Scripted::LnewCam(lua_State* L){
         lua_pushstring(L,"Error in lua new cam");
         lua_error(L);
     }
-    int ret= Base::getInstance()->getCurState()->addCam();
+    int ret= Base::getInstance()->getStateManager()->getCurState()->addCam();
     lua_pushnumber(L,ret);
     return 1;
 }
@@ -606,7 +606,7 @@ int Scripted::LchangeCurrCam(lua_State *L){
     }
     
     int newCam = lua_tointeger(L,1);
-    Base::getInstance()->getCurState()->setCam(newCam);
+    Base::getInstance()->getStateManager()->getCurState()->setCam(newCam);
     return 0;
 }
 
@@ -617,7 +617,7 @@ int Scripted::LgetCamPos(lua_State *L){
         lua_error(L);
     }
     
-    Vector3 ret=Base::getInstance()->getCurState()->getCam()->getPos();
+    Vector3 ret=Base::getInstance()->getStateManager()->getCurState()->getCam()->getPos();
     lua_pushnumber(L,ret.x);
     lua_pushnumber(L,ret.y);
     lua_pushnumber(L,ret.z);
@@ -635,7 +635,7 @@ int Scripted::LsetCamPos(lua_State *L){
     pos.y= lua_tonumber(L,2);
     pos.z= lua_tonumber(L,3);
     
-    Base::getInstance()->getCurState()->getCam()->setPos(pos);
+    Base::getInstance()->getStateManager()->getCurState()->getCam()->setPos(pos);
     
     return 0;
 }
@@ -650,7 +650,7 @@ int Scripted::LsetCamTarget(lua_State *L){
     pos.x= lua_tonumber(L,1);
     pos.y= lua_tonumber(L,2);
     pos.z= lua_tonumber(L,3);
-    Base::getInstance()->getCurState()->getCam()->setTarget(pos);
+    Base::getInstance()->getStateManager()->getCurState()->getCam()->setTarget(pos);
     
     return 0;
 }

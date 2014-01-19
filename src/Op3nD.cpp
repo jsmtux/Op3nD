@@ -10,6 +10,7 @@
 #include "./Engine/Base.h"
 #include "Engine/ObjectTypes/Resource.h"
 #include "Engine/ObjectTypes/Camera.h"
+#include "Engine/States/EditorState.h"
 #include "InterfaceModule/ResourceTreeModel.h"
 #include "InterfaceModule/SpinBoxDelegate.h"
 
@@ -90,10 +91,10 @@ void Op3nD::updateScenesList()
 void Op3nD::changeScene(QTreeWidgetItem* item, int column)
 {
   qDebug() << "Changing scene to :" << item->text(0);
-  Base::getInstance()->newState(item->text(0).toStdString(),EDITORST);
-  Base::getInstance()->changeState(item->text(0).toStdString(),EDITORST);
-  Base::getInstance()->beginState();
-  Base::getInstance()->getCurState()->loadFile();
+  StateManager* stateManager = Base::getInstance()->getStateManager();
+  State* edState= new EditorState(item->text(0).toStdString());
+  edState->loadFile();
+  stateManager->newState(edState);
 }
 
 void Op3nD::launchTest()
@@ -137,7 +138,7 @@ void Op3nD::editScript()
 {
   luaEditor->exec(
     dynamic_cast<Scripted*>(
-      Base::getInstance()->getCurState()->getByIndex(window.SFMLWidget->getSelected()[0])
+      Base::getInstance()->getStateManager()->getCurState()->getByIndex(window.SFMLWidget->getSelected()[0])
     )->getPath().c_str());
 }
 
@@ -164,7 +165,7 @@ void Op3nD::addScene()
 
 void Op3nD::saveCurrentScene()
 {
-  State* curScene=Base::getInstance()->getCurState();
+  State* curScene=Base::getInstance()->getStateManager()->getCurState();
   Tag sceneXML = curScene->toXML();
   XMLFile sceneFile(Base::getInstance()->getProj()->getDir(curScene->getName(),Project::MAP).c_str(),
 		    sceneXML,"maps.dtd");
@@ -184,7 +185,7 @@ void Op3nD::elementDroppedScene(const QMimeData* data)
   
   for(int i=0;i<elements.size();i+=2){
     Project::FileType type = Project::FileType(elements[i].toInt());
-    State* curState = Base::getInstance()->getCurState();
+    State* curState = Base::getInstance()->getStateManager()->getCurState();
     if(!curState){
       QMessageBox msgBox;
       msgBox.setText(tr("Please choose a scene"));
@@ -192,7 +193,7 @@ void Op3nD::elementDroppedScene(const QMimeData* data)
       return;
     }
     Editable* toAdd;
-    Vector3 pos = Base::getInstance()->getCurState()->getCam()->getPos();
+    Vector3 pos = curState->getCam()->getPos();
     if(type==Project::OBJECT){
       toAdd = new Scripted(elements[i+1].toStdString());
       toAdd->setPos(pos);
@@ -205,7 +206,7 @@ void Op3nD::elementDroppedScene(const QMimeData* data)
 
 void Op3nD::addCameraToScene()
 {
-  State* curState=Base::getInstance()->getCurState();
+  State* curState=Base::getInstance()->getStateManager()->getCurState();
   if(!curState){
     QMessageBox msgBox;
     msgBox.setText(tr("Please choose a scene"));

@@ -18,11 +18,16 @@
 
 class RenderingContext{
 protected:
-    Vector3 bgColor;
-    string appName;
+  Vector3 bgColor;
+  string appName;
 public:
-    virtual void init();
-    virtual void update();
+  RenderingContext();
+  virtual void init();
+  Vector3 getResolution();
+  void setResolution(Vector3 res);
+  float getRatio();
+private:
+  Vector3 resolution;
 };
 
 #endif

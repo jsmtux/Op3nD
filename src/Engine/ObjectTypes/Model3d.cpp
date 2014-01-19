@@ -132,7 +132,6 @@ Model3d::Model3d(const string filename){
             TexCoords.push_back(Vector2(pTexCoord->x, pTexCoord->y));
         }
         //populate bones
-        cout << "Num bones is: " << paiMesh->mNumBones << endl;
         for(int i=0;i< paiMesh->mNumBones;i++){
             
             unsigned int boneIndex=0;
@@ -231,7 +230,7 @@ void Model3d::Draw(){
     
     vector<Matrix> transforms;
     boneTransform(animTime,transforms);
-    animTime+=TIME_TO_SECONDS(Base::getInstance()->getCurState()->getDiffTime());
+    animTime+=TIME_TO_SECONDS(Base::getInstance()->getStateManager()->getCurState()->getDiffTime());
     
     for(int i=0;i<transforms.size();i++){
         Shading::getActive()->setBoneTransform(i,transforms[i]);

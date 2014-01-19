@@ -51,7 +51,7 @@ Tile::Tile(MXML::Tag &code){
 
 Tile::~Tile(){
   if(physInfo){
-    Base::getInstance()->getCurState()->deleteRigidBody(physInfo);
+    Base::getInstance()->getStateManager()->getCurState()->deleteRigidBody(physInfo);
     physInfo->setUserPointer(NULL);
   }
   if(resource){
@@ -223,14 +223,14 @@ edType Tile::getType(){
 }
 
 void Tile::setPhysical(btRigidBody* p){
-  if(physInfo)Base::getInstance()->getCurState()->deleteRigidBody(physInfo);
+  if(physInfo)Base::getInstance()->getStateManager()->getCurState()->deleteRigidBody(physInfo);
   
   Vector3 tPos=position;
   Quaternion tRot=rotation;
   physInfo = p;
   if(p){
     p->setActivationState(DISABLE_DEACTIVATION);
-    State *tmp=Base::getInstance()->getCurState();
+    State *tmp=Base::getInstance()->getStateManager()->getCurState();
     if(tmp)
       tmp->addRigidBody(physInfo);
     setPos(tPos);
@@ -259,7 +259,7 @@ Resource* Tile::getResource()
 
 std::vector< Tile* > Tile::getColliding()
 {
-  vector<void*> pointers=Base::getInstance()->getCurState()->getPhysicsWorld()->contactTest(physInfo);
+  vector<void*> pointers=Base::getInstance()->getStateManager()->getCurState()->getPhysicsWorld()->contactTest(physInfo);
   vector<Tile*> ret;
   for(void* p:pointers){
     ret.push_back(static_cast<Tile*>(p));

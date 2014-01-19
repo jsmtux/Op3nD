@@ -3,6 +3,7 @@
 #include <QKeyEvent>
 #include <QAction>
 #include "../Engine/Base.h"
+#include "../Engine/ObjectTypes/Scripted.h"
 
 stack<QSFMLCanvas*> QSFMLCanvas::canvasStack;
 
@@ -98,9 +99,8 @@ void QSFMLCanvas::OnInit()
 
 void QSFMLCanvas::OnUpdate()
 {
-  if(Base::getInstance()->getCurState()){
-    Base::getInstance()->getCurState()->iteration();
-  }
+  Base::getInstance()->setRC(this);
+  Base::getInstance()->getStateManager()->iteration();
 }
 
 void QSFMLCanvas::keyPressEvent(QKeyEvent* event)
@@ -179,7 +179,7 @@ void QSFMLCanvas::resizeEvent(QResizeEvent* event)
   int h=event->size().height();
   Vector3 resolution(w,h,32);
   
-  Base::getInstance()->setResolution(resolution);
+  setResolution(resolution);
   
   glViewport(0,0,w,h);
 }
@@ -194,12 +194,12 @@ void QSFMLCanvas::mousePressEvent(QMouseEvent* event)
   setFocus();
   setKey(K_A,true);
   mousePosition=event->pos();
-  State* curState = Base::getInstance()->getCurState();
+  State* curState = Base::getInstance()->getStateManager()->getCurState();
   if(curState!=nullptr){
     unsigned int *sel=curState->selection(event->x(),event->y());
     setSelection(sel);
-    emit selectionChanged(Base::getInstance()->getCurState()->getByIndex(sel[0]));
-    currentSelected = Base::getInstance()->getCurState()->getByIndex(sel[0]);
+    emit selectionChanged(curState->getByIndex(sel[0]));
+    currentSelected = curState->getByIndex(sel[0]);
   }
   QWidget::mousePressEvent(event);
 }

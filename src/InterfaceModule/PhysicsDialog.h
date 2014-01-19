@@ -22,7 +22,6 @@ private:
   void restoreCanvas();
   void clear();
   Ui::PhysicsDialog physicsDialog;
-  QString prevState;
   string toEdit;
   struct shapeInfo{
     int id;

@@ -8,7 +8,7 @@
 #include <stack>
 #include "../Engine/Graphics/RenderingContext.h"
 #include "../Engine/Controller.h"
-#include "../Engine/ObjectTypes/Tile.h"
+#include "../Engine/ObjectTypes/Editable.h"
 #include "../Engine/ObjectTypes/Scripted.h"
 
 class QSFMLCanvas : public QWidget, public sf::RenderWindow, public RenderingContext, public Controller{
