@@ -1,9 +1,9 @@
 #include "PhysicsDialog.h"
 #include "../src/Engine/Base.h"
 #include "../src/Engine/ObjectTypes/Resource.h"
-#include </home/jsmtux/projects/Op3nD/src/Engine/PhysicsWorld.h>
-#include </home/jsmtux/projects/Op3nD/src/Engine/States/MeshState.h>
-#include </home/jsmtux/projects/Op3nD/src/ProjectManagement/Project.h>
+#include "../src/Engine/PhysicsWorld.h"
+#include "../src/Engine/States/MeshState.h"
+#include "../src/ProjectManagement/Project.h"
 #include <QMenu>
 #include <QMessageBox>
 #include <QDebug>

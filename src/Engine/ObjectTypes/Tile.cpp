@@ -10,7 +10,7 @@
 #include "Physical.h"
 #include "../Graphics/Shading.h"
 #include "../Math/Matrix.h"
-#include </home/jsmtux/projects/Op3nD/src/Engine/PhysicsWorld.h>
+#include "../PhysicsWorld.h"
 #include "../../ProjectManagement/Project.h"
 
 extern Image* imtmp;
