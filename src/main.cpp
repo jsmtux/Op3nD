@@ -49,7 +49,6 @@ int main(int argc, char** argv)
     cout << "0\n";
     
     string pPath=argv[1];
-    cout << "New path is " << pPath << endl;
     string map="main.xml";
     string res="640x480";
     bool fullscreen=false;

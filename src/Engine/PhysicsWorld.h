@@ -8,7 +8,6 @@
 #ifndef PHYSICS_H
 #define	PHYSICS_H
 #include <btBulletDynamicsCommon.h>
-#define UPDATE_STEP float(1./15.)
 #include "Timer.h"
 #include <vector>
 

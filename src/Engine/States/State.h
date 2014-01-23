@@ -7,7 +7,6 @@
 #include <vector>
 #include <string>
 #include <thread>
-#include <mutex>
 using namespace std;
 #ifndef ANDROID
 #include <GL/glew.h>
@@ -31,6 +30,7 @@ class Camera;
 class PhysicsWorld;
 class PickingTexture;
 class Tile;
+class StateUpdate;
 
 typedef enum {EMPTYST, MESHST, EDITORST, GAMEST}StateType;
 
@@ -128,12 +128,6 @@ public:
      */
     void stepPhysWorld();
     /**
-     * Function called every time the physics world is going to be updated
-     * @param world pointer to the physics world
-     * @param timeStep amount of time elapsed since last call
-     */
-    static void physicsCallback(btDynamicsWorld *world, btScalar timeStep);
-    /**
      * Adds a new physical rigid body object to the physics world
      * @param body body to be added
      */
@@ -153,8 +147,6 @@ public:
     MXML::Tag difference(Networkable &n);
     
     void setNetNode(NetNode *n);
-    void lockUpdate();
-    void unlockUpdate();
     
     /**
      * Returns the time elapsed since last update
@@ -167,21 +159,8 @@ public:
     void setDebug(bool debug=true);
     
     PhysicsWorld* getPhysicsWorld();
-private:
-    bool isStopped;
-    /**
-     * Alternative to the physics callback, unused otherwise
-     * TODO: update to use thread library
-     * @param p
-     * @return 
-     */
-    void updateLoop();
-    thread *updateTh;
-    Timer tUpdated;
-    mutex *updateLock;
-
 protected:
-    
+    StateUpdate* stateUpdate;
     PhysicsWorld *pWorld;
     bool deleteOnEnd;
     bool debug;
@@ -198,8 +177,6 @@ protected:
     Camera* currCam;
     vector<Tile*> tiles;
     vector<Scripted*> objects;
-    
-    tMillis diffTime;
 };
 
 #endif

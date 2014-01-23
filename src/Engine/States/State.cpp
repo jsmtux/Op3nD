@@ -22,15 +22,16 @@
 #include "../../ProjectManagement/Project.h"
 #include "../ObjectTypes/Image.h"
 
+#include "StateUpdate.h"
+#include "PhysicsStateUpdate.h"
+#include "BasicStateUpdate.h"
+
 #include <chrono>
 #include <thread>
 
 State::State(string n){
-    isStopped=true;
     name=n;
     pWorld =NULL;
-    updateTh = NULL;
-    updateLock= new mutex;
 #ifndef NODRAW
     stest=new Shading();
     stest->initShader("normal.sfx");
@@ -44,7 +45,7 @@ State::State(string n){
     stest->useProgram();
 #endif
     netNode=NULL;
-    diffTime= chrono::duration_cast<tMillis>(chrono::seconds(0));
+    stateUpdate=NULL;
 }
 
 State::State(State& s){
@@ -59,7 +60,6 @@ State::State(State& s){
         objects.push_back(new Scripted(*o));
         addToList(objects.back(),objects.back()->getId());
     }
-    isStopped=true;
 }
 
 void State::addToList(Editable* a, unsigned int i){    
@@ -130,7 +130,7 @@ StateType State::getType(){
 }
 
 void State::initPhysicsWorld(){
-    if(!isStopped){
+    if(stateUpdate&&!stateUpdate->getStopped()){
         cerr << "Cannot add physics to an already started state" << endl;
         return;
     }
@@ -138,75 +138,20 @@ void State::initPhysicsWorld(){
 }
 
 void State::stepPhysWorld(){
-    if(pWorld){
-	lockUpdate();
+    if(pWorld&&stateUpdate){
+	stateUpdate->lockUpdate();
         pWorld->stepPhys();
-	unlockUpdate();
+	stateUpdate->unlockUpdate();
     }
-}
-
-void State::updateLoop(){
-    while(!isStopped){
-        diffTime=tUpdated.getTicks();
-        tUpdated.reset();
-        
-        updateLock->lock();
-        updateElements();
-	
-	for(Controller* c:Base::getInstance()->getControllers()){
-	  c->reset();
-	}
-        updateLock->unlock();
-        
-        tMillis sl=std::chrono::milliseconds(int(UPDATE_STEP*1000))- tUpdated.getTicks();
-        std::this_thread::sleep_for(sl);
-    }
-}
-
-void State::lockUpdate(){
-    updateLock->lock();
-}
-
-void State::unlockUpdate(){
-    updateLock->unlock();
-}
-
-void State::physicsCallback(btDynamicsWorld *world, btScalar timeStep){
-    State *st=Base::getInstance()->getStateManager()->getCurState();
-    if(!st){
-      return;
-    }
-    st->diffTime=st->tUpdated.getTicks();
-    st->tUpdated.reset();
-    
-    if(!st->netNode||!st->netNode->thinClient()){
-        btCollisionObjectArray objects = world->getCollisionObjectArray();
-        world->clearForces();
-
-        for (int i = 0; i < objects.size(); i++) {
-             btRigidBody *rigidBody = btRigidBody::upcast(objects[i]);
-             if (!rigidBody) {
-                  continue;
-             }
-             rigidBody->applyGravity();
-        }
-    }
-    
-    st->updateElements();
 }
 
 void State::beginUpdateLoop(){
-    if(!isStopped){
-        cout << "Trying to start already started state\n";
-        return;
-    }
-    isStopped=false;
-    //update thread
-    if(pWorld ==NULL){//in case physics world is created it will automatically call update
-        updateTh=new thread(&State::updateLoop,this);
+    if(pWorld ==NULL){
+      stateUpdate = new BasicStateUpdate();
     }else{
-        pWorld->setCallBack(physicsCallback);//set function to be called in order to update
+      stateUpdate = new PhysicsStateUpdate(pWorld);
     }
+    stateUpdate->init([=](){updateElements();});
 }
 
 int State::addCam(Camera* cam){
@@ -292,7 +237,7 @@ void State::iteration(){
 }
 
 void State::clear(){
-    if(!isStopped){
+    if(stateUpdate&&!stateUpdate->getStopped()){
         cout << "State needs to be stopped in order to clear it\n";
         return;
     }
@@ -331,12 +276,10 @@ string State::getName(){
 }
 
 void State::pause(){
-    isStopped=true;
-    if(updateTh)
-        updateTh->join();
-    delete updateTh;
-    updateTh = NULL;
-    cout << "State " << name << " stopped\n";
+  if(!stateUpdate){
+    return;
+  }
+  stateUpdate->pause();
 }
 
 void State::addElement(Editable *a){
@@ -463,8 +406,12 @@ void State::setNetNode(NetNode *n){
     netNode=n;
 }
 
-tMillis State::getDiffTime(){
-    return diffTime;
+tMillis State::getDiffTime()
+{
+  if(!stateUpdate){
+    return tMillis(0);
+  }
+  return stateUpdate->getDiffTime();
 }
 
 void State::updateResolution()

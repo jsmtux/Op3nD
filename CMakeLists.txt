@@ -58,6 +58,9 @@ set(Op3nD_SRCS
                src/Engine/States/PlayState.cpp
                src/Engine/States/State.cpp
                src/Engine/States/StateManager.cpp
+               src/Engine/States/StateUpdate.cpp
+               src/Engine/States/BasicStateUpdate.cpp
+               src/Engine/States/PhysicsStateUpdate.cpp
                )
 
 set(Op3nD_Editor_SRCS  src/Op3nD.cpp
