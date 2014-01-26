@@ -8,9 +8,7 @@
 #include "../../ProjectManagement/Project.h"
 #include "Model3d.h"
 
-#ifdef ANDROID
 #include "./stb_image/stb_image.h"
-#endif
 
 map<string, Image*> Image::list;
 #ifndef NODRAW
@@ -20,25 +18,26 @@ GLuint Image::IBO;
 
 Image::Image(string dir){
 #ifndef NODRAW
-#ifndef ANDROID
-    image.loadFromFile(Base::getInstance()->getProj()->getDir(dir,Project::IMAGE));
-    sf::Texture::bind(&image,sf::Texture::Pixels);
+    int width, height, comp;
+    unsigned char* data = stbi_load(Base::getInstance()->getProj()->getDir(dir,Project::IMAGE).c_str(),&width,&height,&comp,0);
+    glGenTextures(1,&imageId);
+    glBindTexture(GL_TEXTURE_2D,imageId);
+#ifndef ANDROID    
     glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 #else
-    int width, height, depth;
-    data = stbi_load(Base::getInstance()->getProj()->getDir(dir,IMAGE).c_str(),&width,&height,&depth,0);
-    glGenTextures(1,&imageId);
-    glBindTexture(GL_TEXTURE_2D,imageId);
-    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    delete data;
 #endif
+    if(comp==4){
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    }else{
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    }
+    stbi_image_free(data);
 #endif
     name = dir;
 }
@@ -55,22 +54,12 @@ Image* Image::loadIm(string dir){
 
 void Image::del(){
     list.erase(name);
-#ifndef NODRAW
-#ifndef ANDROID
-    image.~Texture();
-#endif
-#endif
 }
 
 void Image::Bind(){
 #ifndef NODRAW
-#ifndef ANDROID
-    glActiveTexture(GL_TEXTURE0);
-    sf::Texture::bind(&image,sf::Texture::Pixels);
-#else
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, imageId);
-#endif
 #endif
 }
 

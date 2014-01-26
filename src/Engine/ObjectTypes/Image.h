@@ -42,12 +42,7 @@ public:
 private:
 #ifndef NODRAW
     static GLuint IBO,VBO;
-#ifndef ANDROID
-    sf::Texture image;
-#else
     GLuint imageId;
-    unsigned char* data;
-#endif
 #endif
     static map<string,Image*> list;
     Image(string dir);
