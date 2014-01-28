@@ -14,7 +14,15 @@ RenderingSFML::RenderingSFML(){
 void RenderingSFML::init()
 {
   Vector3 resolution=getResolution();
-  window= new sf::Window(sf::VideoMode(resolution.x,resolution.y,resolution.z),appName);
+  
+  sf::ContextSettings settings;
+	settings.depthBits = 24;
+	settings.stencilBits = 8;
+	settings.antialiasingLevel = 4;
+	settings.majorVersion = 3;
+	settings.minorVersion = 3;
+  window= new sf::Window(sf::VideoMode(resolution.x,resolution.y,resolution.z),appName,sf::Style::Default,settings);
+
   window->setFramerateLimit(60);
   window->setActive();
   window->display();
