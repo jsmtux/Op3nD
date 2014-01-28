@@ -5,19 +5,24 @@
 
 #include <algorithm>
 
+#define COMMON_PATH "/usr/local/share/O3D/"
+
 #include "Project.h"
+
+Project* Project::commonProject=new Project(COMMON_PATH);
 
 Project::Project(string dir){
   this->dir=dir;
   
-  read();
-  
-  create_directories(dir+"/"+toString(IMAGE));
-  create_directories(dir+"/"+toString(MAP));
-  create_directories(dir+"/"+toString(SOUND));
-  create_directories(dir+"/"+toString(OBJECT));
-  create_directories(dir+"/"+toString(SHADER));
-  create_directories(dir+"/"+toString(MESH));
+  if(dir.compare(COMMON_PATH)!=0){
+    read();
+    create_directories(dir+"/"+toString(IMAGE));
+    create_directories(dir+"/"+toString(MAP));
+    create_directories(dir+"/"+toString(SOUND));
+    create_directories(dir+"/"+toString(OBJECT));
+    create_directories(dir+"/"+toString(SHADER));
+    create_directories(dir+"/"+toString(MESH));
+  }
 }
 
 bool Project::createProject(string name, string dir, string vers, string desc)
@@ -115,15 +120,19 @@ Project::FileType Project::getType(string dir){
   if(extension.compare(".xml")==0){
     return PHYSICAL;
   }
-  }
-  
-  vector<string> Project::listFiles(FileType file){
-    return listDirFiles(getDir("",file),false);
-  }
-  
-  bool Project::isProject(string dir)
-  {
-    vector<string> files = listDirFiles(dir,false);
-    return std::find(files.begin(),files.end(),PRO_CONF_FILE)!=files.end();
-  }
-  
+}
+
+vector<string> Project::listFiles(FileType file){
+  return listDirFiles(getDir("",file),false);
+}
+
+bool Project::isProject(string dir)
+{
+  vector<string> files = listDirFiles(dir,false);
+  return std::find(files.begin(),files.end(),PRO_CONF_FILE)!=files.end();
+}
+
+Project* Project::common()
+{
+  return commonProject;
+}

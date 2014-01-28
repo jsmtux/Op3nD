@@ -71,7 +71,7 @@ Model3d::Model3d(const string filename){
     // Create the buffers for the vertices atttributes
     glGenBuffers(5, m_Buffers);
     
-    scene=importer.ReadFile(Base::getInstance()->getProj()->getDir(filename,Project::MESH),
+    scene=importer.ReadFile(filename,
             aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
     if(!scene){
         cout << "Error in file " << filename << endl;
@@ -257,6 +257,7 @@ void Model3d::Draw(){
 		#endif
     }
     glBindBuffer(GL_ARRAY_BUFFER,0);
+    Image::unBind();
 #endif
 }
 
@@ -306,9 +307,10 @@ void Model3d::setLoop(bool isLoop)
 
 Model3d* Model3d::loadM3d(string file ){
     map<string,Model3d*>::iterator ret;
-    if((ret=list.find(file))!=list.end())
+    if((ret=list.find(file))!=list.end()){
         return ret->second;
-    cout << "Loading " << file << endl;
+    }
+    
     Model3d* tmp= new Model3d(file);
     if(!tmp->isValid()){
         delete tmp;

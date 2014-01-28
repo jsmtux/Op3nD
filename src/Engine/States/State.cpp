@@ -34,9 +34,9 @@ State::State(string n){
     pWorld =NULL;
 #ifndef NODRAW
     stest=new Shading();
-    stest->initShader("normal.sfx");
+    stest->initShader(Project::common()->getDir("normal.sfx",Project::SHADER));
     sselect=new Shading();
-    sselect->initShader("picking.sfx");
+    sselect->initShader(Project::common()->getDir("picking.sfx",Project::SHADER));
 
     Vector3 res=Base::getInstance()->getRC()->getResolution();    
     

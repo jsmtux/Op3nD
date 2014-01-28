@@ -3,7 +3,6 @@
  */
 
 #include "Image.h"
-#include "../Base.h"
 #include "../Graphics/Shading.h"
 #include "../../ProjectManagement/Project.h"
 #include "Model3d.h"
@@ -19,7 +18,7 @@ GLuint Image::IBO;
 Image::Image(string dir){
 #ifndef NODRAW
     int width, height, comp;
-    unsigned char* data = stbi_load(Base::getInstance()->getProj()->getDir(dir,Project::IMAGE).c_str(),&width,&height,&comp,0);
+    unsigned char* data = stbi_load(dir.c_str(),&width,&height,&comp,0);
     glGenTextures(1,&imageId);
     glBindTexture(GL_TEXTURE_2D,imageId);
 #ifndef ANDROID    
@@ -109,4 +108,9 @@ void Image::init(){
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 #endif
+}
+
+void Image::unBind()
+{
+  glBindTexture(GL_TEXTURE_2D,0);
 }

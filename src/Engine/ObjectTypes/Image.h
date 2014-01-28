@@ -39,6 +39,7 @@ public:
     void Bind();
     void del();
     static void init();
+    static void unBind();
 private:
 #ifndef NODRAW
     static GLuint IBO,VBO;

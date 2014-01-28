@@ -61,12 +61,14 @@ public:
     static bool isProject(string dir);
     static string toString(FileType type);
     
+    static Project* common();
 private:
     string dir;
     string name;
     string desc;
     string vers;
     vector<string> remoteProjs;
+    static Project* commonProject;
 };
 
 #endif

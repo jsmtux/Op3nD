@@ -6,6 +6,8 @@
 #include "Line.h"
 #include "Physical.h"
 
+#include "../Base.h"
+
 #ifdef ANDROID
 #include <android/log.h>
 
@@ -27,6 +29,11 @@ void Resource::free(){
 
 Resource* Resource::Load(string dir){
     Resource *ret=NULL;
+    if(dir[0]=='*'){
+      dir=Project::common()->getDir(dir.c_str()+1,Project::getType(dir));
+    }if(dir.find('/')==string::npos){
+      dir=Base::getInstance()->getProj()->getDir(dir,Project::getType(dir));
+    }
     switch(Project::getType(dir)){
         case Project::IMAGE:
             ret=Image::loadIm(dir);

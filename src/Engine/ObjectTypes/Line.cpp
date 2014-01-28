@@ -1,6 +1,7 @@
 #include "Line.h"
 #include "../Math/Vector3.h"
 #include "../Graphics/Shading.h"
+#include "../../ProjectManagement/Project.h"
 
 #ifndef NODRAW
 GLuint Line::VBO;
@@ -42,7 +43,7 @@ void Line::init(){
 #ifndef NODRAW
 #ifndef ANDROID
     colorShader = new Shading();
-    colorShader->initShader("color.sfx");
+    colorShader->initShader(Project::common()->getDir("color.sfx",Project::SHADER));
     glGenBuffers(1, &VBO);
 #endif
 #endif

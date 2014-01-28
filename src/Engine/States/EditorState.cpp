@@ -8,7 +8,7 @@
 
 EditorState::EditorState(string n):State(n){
   selected=NULL;
-  handler = new Tile(Vector3(5,0,0),Vector3(1,1,1),Quaternion(0.,0.,0.,1.),"untitled.3ds");
+  handler = new Tile(Vector3(5,0,0),Vector3(1,1,1),Quaternion(0.,0.,0.,1.),"*untitled.3ds");
   //initPhysicsWorld();
   cameras.push_back(new Camera());
   currCam=cameras[0];

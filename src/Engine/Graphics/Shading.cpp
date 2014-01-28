@@ -40,7 +40,7 @@ Shading::Shading():program(glCreateProgram()){
 
 void Shading::initShader(string file){
   MXML::Tag root;
-  MXML::XMLFile shaderFile(Base::getInstance()->getProj()->getDir(file,Project::SHADER),root,"shaders.dtd");
+  MXML::XMLFile shaderFile(file,root,"shaders.dtd");
   shaderFile.read();
   #ifndef ANDROID
   string vshader ="#version " + root["version"].getAttrib().getString()+ "\n";
