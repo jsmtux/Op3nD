@@ -308,7 +308,8 @@ void Model3d::setLoop(bool isLoop)
 Model3d* Model3d::loadM3d(string file ){
     map<string,Model3d*>::iterator ret;
     if((ret=list.find(file))!=list.end()){
-        return ret->second;
+      ret->second->copies++;
+      return ret->second;
     }
     
     Model3d* tmp= new Model3d(file);
@@ -530,13 +531,10 @@ Matrix Model3d::getTransform(){
 }
 
 void Model3d::del(){
-//    for(Resource *i:maps){
-//        i->free();
-//        delete i;
-//    }
-//    maps.clear();
-//    for(MeshEntry m:meshes){
-//        m.~MeshEntry();
-//    }
-//    list.erase(name);
+    for(Resource *i:maps){
+        i->free();
+        delete i;
+    }
+    maps.clear();
+    list.erase(name);
 }

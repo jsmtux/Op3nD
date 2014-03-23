@@ -29,6 +29,7 @@ public slots:
   void saveCurrentScene();
   void elementDroppedScene(const QMimeData* data);
   void addCameraToScene();
+  void addFontToProject();
 private:
   void updateScenesList();
   Ui::MainWindow window;

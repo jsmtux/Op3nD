@@ -48,11 +48,13 @@ Image* Image::loadIm(string dir){
         list.insert(pair<string, Image*>(dir,ret));
         return ret;
     }
+    tmp->second->copies++;
     return tmp->second;
 }
 
 void Image::del(){
-    list.erase(name);
+  glDeleteTextures(1,&imageId);
+  list.erase(name);
 }
 
 void Image::Bind(){

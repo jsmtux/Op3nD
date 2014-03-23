@@ -10,7 +10,7 @@
 
 #include "../../Network/Networkable.h"
 
-typedef enum {E_TILE,E_OBJECT,E_CAMERA}edType;
+typedef enum {E_TILE,E_OBJECT,E_CAMERA,E_TEXT}edType;
 
 class Vector3;
 class Quaternion;

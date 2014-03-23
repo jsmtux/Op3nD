@@ -27,7 +27,7 @@ public:
     Tile(MXML::Tag &code);
     Tile(Vector3 p, Vector3 s, Quaternion r, string dirResource="");
     ~Tile();
-    void draw( );
+    virtual void draw( );
     MXML::Tag toXML();
     MXML::Tag difference(Networkable &n);
     void fromXML(MXML::Tag &code);
@@ -46,6 +46,7 @@ public:
     void setPhysical(MXML::Tag &code);
     btRigidBody* getPhysical();
     void setResource(string dirResource);
+    void setResource(Resource* res);
     Resource* getResource();
     vector<Tile*> getColliding();
 protected:

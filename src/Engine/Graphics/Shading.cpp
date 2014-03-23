@@ -183,6 +183,11 @@ void Shading::setObjMat(Matrix obj){
   glUniformMatrix4fv(objMatId, 1, GL_TRUE, &(objMat).m[0][0]);
 }
 
+Matrix Shading::getObjMat()
+{
+  return objMat;
+}
+
 void Shading::useProgram(){
   active=this;
   glUseProgram(program);

@@ -1,15 +1,19 @@
 #include "Op3nD.h"
 
 #include <QDebug>
+#include <QProcess>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QAction>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QFileDialog>
 #include "./Engine/Base.h"
 #include "Engine/ObjectTypes/Resource.h"
 #include "Engine/ObjectTypes/Camera.h"
+#include "Engine/ObjectTypes/Font.h"
+#include "Engine/ObjectTypes/Text.h"
 #include "Engine/States/EditorState.h"
 #include "InterfaceModule/ResourceTreeModel.h"
 #include "InterfaceModule/SpinBoxDelegate.h"
@@ -59,6 +63,7 @@ Op3nD::Op3nD()
   connect(resourceModel,SIGNAL(createScript()),luaEditor,SLOT(newScript()));
   connect(resourceModel,SIGNAL(editScript(QString)),luaEditor,SLOT(exec(QString)));
   connect(resourceModel,SIGNAL(createCamera()),SLOT(addCameraToScene()));
+  connect(resourceModel,SIGNAL(importFont()),SLOT(addFontToProject()));
   
   window.tvResources->setModel(resourceModel);
   updateScenesList();
@@ -194,11 +199,25 @@ void Op3nD::elementDroppedScene(const QMimeData* data)
     }
     Editable* toAdd;
     Vector3 pos = curState->getCam()->getPos();
-    if(type==Project::OBJECT){
-      toAdd = new Scripted(elements[i+1].toStdString());
-      toAdd->setPos(pos);
-    }else{
-      toAdd = new Tile(pos,Vector3(1,1,1),Quaternion::one,elements[i+1].toStdString());
+    Resource* res;
+    Tile* tmp;
+    switch(type){
+      case Project::OBJECT:
+	toAdd = new Scripted(elements[i+1].toStdString());
+	toAdd->setPos(pos);
+	break;
+      case Project::IMAGE:
+      case Project::MESH:
+	toAdd = new Tile(pos,Vector3(1,1,1),Quaternion::one,elements[i+1].toStdString());
+	break;
+      case Project::FONT:
+	tmp = new Tile(pos,Vector3(1,1,1),Quaternion::one);
+	res = Text::loadText("Test",Base::getInstance()->getProj()->getDir(elements[i+1].toStdString(),Project::FONT));
+	tmp->setResource(res);
+	toAdd = tmp;
+	break;
+      default:
+	break;
     }
     curState->addElement(toAdd);
   }
@@ -217,4 +236,17 @@ void Op3nD::addCameraToScene()
   Vector3 pos = curState->getCam()->getPos();
   toAdd->setPos(pos);
   curState->addCam(toAdd);
+}
+
+void Op3nD::addFontToProject()
+{
+  QString fontPath=QFileDialog::getOpenFileName(this,tr("Please choose font file"),QDir::homePath(),"*.ttf");
+  if(fontPath.isEmpty()){
+    return;
+  }
+  QString name=fontPath.mid(fontPath.lastIndexOf('/')+1,fontPath.lastIndexOf('.')-fontPath.lastIndexOf('/')-1);
+  QString outPath=QString::fromStdString(Base::getInstance()->getProj()->getDir("",Project::FONT))+name+".o3f";
+  QProcess fontConverter;
+  fontConverter.start("./fontConverter",QStringList()<<fontPath<<outPath);
+  resourceModel->scanDirs();
 }

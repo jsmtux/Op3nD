@@ -22,6 +22,7 @@ Project::Project(string dir){
     create_directories(dir+"/"+toString(OBJECT));
     create_directories(dir+"/"+toString(SHADER));
     create_directories(dir+"/"+toString(MESH));
+    create_directories(dir+"/"+toString(FONT));
   }
 }
 
@@ -71,6 +72,10 @@ string Project::toString(FileType type){
       return("meshes");
     case PHYSICAL:
       return("meshes");
+    case FONT:
+      return("fonts");
+    default:
+      return "";
   }
 }
 
@@ -115,10 +120,14 @@ Project::FileType Project::getType(string dir){
   if(std::find(meshFiles.begin(),meshFiles.end(),extension)!=meshFiles.end()){
     return MESH;
   }
-  if(extension.compare(".o3s")==0)
+  if(extension.compare(".o3s")==0){
     return OBJECT;
+  }
   if(extension.compare(".xml")==0){
     return PHYSICAL;
+  }
+  if(extension.compare(".o3f")==0){
+    return FONT;
   }
 }
 

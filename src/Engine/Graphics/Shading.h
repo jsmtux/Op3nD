@@ -72,6 +72,7 @@ public:
     void setWVP(Matrix w);
     void setWorldPos(Matrix pos);
     void setObjMat(Matrix obj);
+    Matrix getObjMat();
     void setColor(Vector3 col);
     void setBoneTransform(uint ind, const Matrix& transform);
     void update();

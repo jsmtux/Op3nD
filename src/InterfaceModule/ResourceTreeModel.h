@@ -32,6 +32,7 @@ signals:
   void createScript();
   void editScript(QString file);
   void createCamera();
+  void importFont();
 };
 
 #endif

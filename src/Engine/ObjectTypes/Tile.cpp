@@ -185,6 +185,22 @@ void Tile::fromXML(MXML::Tag &code){
 
 using namespace MXML;
 
+void Tile::setResource(Resource* res)
+{
+  if(resource){
+    cerr << "Adding resource to already resourced\n\n";
+    return;
+  }
+  resource=res;
+  string name;
+  if(exists(name=(Base::getInstance()->getProj()->getDir(res->getName())+".xml"))){
+    Tag data;
+    XMLFile pdata(name,data,"physical.dtd");
+    pdata.read();
+    setPhysical(data);
+  }
+}
+
 void Tile::setResource(string dirResource){
   if(resource){
     cerr << "Adding resource to already resourced\n\n";

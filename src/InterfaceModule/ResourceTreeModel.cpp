@@ -35,6 +35,12 @@ ResourceTreeModel::ResourceTreeModel(Project* project): QAbstractItemModel()
     emit createCamera();
   });
   rootItem->addItem(tmp);
+  tmp=new TreeItem("fonts");
+  tmp->setData(Project::FONT);
+  tmp->setCallBack([=](){
+    emit importFont();
+  });
+  rootItem->addItem(tmp);
 }
 
 ResourceTreeModel::~ResourceTreeModel()
@@ -187,5 +193,11 @@ void ResourceTreeModel::scanDirs()
     scriptMenu->addAction("rename");
     scriptItem->setContextMenu(scriptMenu);
     rootItem->child(2)->addItem(scriptItem);
+  }
+  vector<string> fonts=project->listFiles(Project::FONT);
+  clearBranch(index(0,0).child(4,0));
+  rootItem->child(4)->clear();
+  for(string file:fonts){
+    rootItem->child(4)->addItem(new TreeItem(QString::fromStdString(file)));
   }
 }

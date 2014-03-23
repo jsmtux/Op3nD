@@ -5,6 +5,7 @@
 #include "Box.h"
 #include "Line.h"
 #include "Physical.h"
+#include "Font.h"
 
 #include "../Base.h"
 
@@ -36,14 +37,17 @@ Resource* Resource::Load(string dir){
     }
     switch(Project::getType(dir)){
         case Project::IMAGE:
-            ret=Image::loadIm(dir);
-            break;
+          ret=Image::loadIm(dir);
+          break;
         case Project::MESH:
-            ret=Model3d::loadM3d(dir);
-            break;
+          ret=Model3d::loadM3d(dir);
+          break;
         case Project::BOX:
-            ret=Box::loadBox();
-            break;
+          ret=Box::loadBox();
+          break;
+	case Project::FONT:
+	  ret=Font::loadFont(dir);
+	  break;
 	default:
 	  cerr << "Cannot load " << dir << endl;
     }

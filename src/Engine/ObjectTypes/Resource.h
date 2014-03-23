@@ -15,7 +15,7 @@ using namespace std;
 
 class Resource{
 public:
-  enum ResourceType{BOX,IMAGE,LIGHT,LINE,MODEL3D,TEXT};
+  enum ResourceType{BOX,IMAGE,LIGHT,LINE,MODEL3D,FONT,TEXT};
   static Resource *Load(string dir);
   Resource(Resource &r)=delete;
   virtual void Draw(); 

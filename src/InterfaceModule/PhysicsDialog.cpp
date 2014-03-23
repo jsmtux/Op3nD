@@ -65,6 +65,13 @@ void PhysicsDialog::accept()
   QDialog::accept();
 }
 
+void PhysicsDialog::reject()
+{
+  clear();
+  restoreCanvas();
+  QDialog::reject();
+}
+
 void PhysicsDialog::exec(string resource)
 {
   toEdit=resource;

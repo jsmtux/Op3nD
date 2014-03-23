@@ -53,6 +53,7 @@ set(Op3nD_SRCS
                src/Engine/ObjectTypes/Scripted.cpp
                src/Engine/ObjectTypes/Text.cpp
                src/Engine/ObjectTypes/Tile.cpp
+               src/Engine/ObjectTypes/Font.cpp
                src/Engine/States/EditorState.cpp
                src/Engine/States/MeshState.cpp
                src/Engine/States/PlayState.cpp

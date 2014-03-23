@@ -11,6 +11,7 @@ public:
   void exec(string resource);
   void closeEvent(QCloseEvent *ev);
   void accept();
+  void reject();
 public slots:
   void addElementMenu(QAction* action);
   void updateShapesList();

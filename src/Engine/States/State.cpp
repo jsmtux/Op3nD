@@ -170,18 +170,19 @@ void State::setCam(int no){
 
 void State::draw(){
 #ifndef NODRAW
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    currCam->view();
-    
-    for(int i=0;i<tiles.size();i++)
-        tiles[i]->draw();
-    
-    for(int i=0;i<objects.size();i++){
-      objects[i]->draw();
-    }
-    
-    Shading::getActive()->setObjMat(Matrix());
-    if(pWorld&&debug)pWorld->draw();
+  glClearColor(1,1,1,1);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  currCam->view();
+  
+  for(int i=0;i<tiles.size();i++)
+      tiles[i]->draw();
+  
+  for(int i=0;i<objects.size();i++){
+    objects[i]->draw();
+  }
+  
+  Shading::getActive()->setObjMat(Matrix());
+  if(pWorld&&debug)pWorld->draw();
 #endif
 }
 

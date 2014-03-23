@@ -179,7 +179,7 @@ void PropertiesTreeModel::addResourceProperties(TreeItem* resItem)
       tmpChild->setData(QString::fromStdString(dynamic_cast<Model3d*>(res)->getName()));
       tmp->addItem(tmpChild);
       break;
-    case Resource::TEXT:
+    case Resource::FONT:
       break;
   }
 }
