@@ -165,6 +165,7 @@ edType Scripted::getType(){
 #include "Tile.h"
 #include "Camera.h"
 #include "Model3d.h"
+#include "Text.h"
 class Tile;
 
 int Scripted::LaddToScene(lua_State* L){
@@ -800,6 +801,44 @@ int Scripted::LsetLoopAnimation(lua_State* L)
   bool isLoop= lua_toboolean(L,2);
   model->setLoop(isLoop);
   
+  return 0;
+}
+
+int Scripted::LgetCurrentText(lua_State *L)
+{
+  int n = lua_gettop(L);
+  if(n!=1){
+    lua_pushstring(L,"Error in getCurrentText");
+    lua_error(L);
+  }
+  
+  string ret;
+  Scripted* object=getByInd(lua_tonumber(L,1));
+  Resource* res= object->getResource();
+  if(res->getType()==Resource::TEXT){
+    Text* t= dynamic_cast<Text*>(res);
+    ret = t->getText();
+  }
+  
+  lua_pushstring(L,ret.c_str());  
+  return 1;
+}
+
+int Scripted::LsetCurrentText(lua_State *L)
+{
+  int n = lua_gettop(L);
+  if(n!=2){
+    lua_pushstring(L,"Error in setCurrentText");
+    lua_error(L);
+  }
+  Scripted* object=getByInd(lua_tonumber(L,1));
+  Resource* res=object->getResource();
+  if(res->getType()==Resource::TEXT)
+  {
+    string text=lua_tostring(L,2);
+    Text* t= dynamic_cast<Text*>(res);
+    t->setText(text);
+  }
   return 0;
 }
 

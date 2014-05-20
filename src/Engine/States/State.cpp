@@ -21,6 +21,7 @@
 #include "../Graphics/RenderingContext.h"
 #include "../../ProjectManagement/Project.h"
 #include "../ObjectTypes/Image.h"
+#include "../ObjectTypes/Font.h"
 
 #include "StateUpdate.h"
 #include "PhysicsStateUpdate.h"
@@ -89,6 +90,7 @@ void State::loadFile(){
     Image::init();
     Line::init();
     Scripted::Init();
+    Font::init();
     if(getType()==EMPTYST)
         return;
     MXMLFile *file;
@@ -170,7 +172,6 @@ void State::setCam(int no){
 
 void State::draw(){
 #ifndef NODRAW
-  glClearColor(1,1,1,1);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   currCam->view();
   

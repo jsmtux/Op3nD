@@ -82,6 +82,9 @@ private:
     static int LgetAnimationTime(lua_State *L);
     static int LsetLoopAnimation(lua_State *L);
     
+    static int LgetCurrentText(lua_State *L);
+    static int LsetCurrentText(lua_State *L);
+    
     void loadFromFile(string file);
 };
 

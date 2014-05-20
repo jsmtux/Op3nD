@@ -2,12 +2,14 @@
 #define _FONT_H
 #include "Resource.h"
 #include "Image.h"
+#include "../Graphics/Shading.h"
 
 class Font: public Resource{
 public:
   ResourceType getType();
   static Font* loadFont(string dir);
   void Draw(string text);
+  static void init();
 private:
   Font(string dir);
   void del();
@@ -24,6 +26,7 @@ private:
   int line_height;
   float tex_line_height;
   GLuint texture;
+  static Shading* textShader;
 };
 
 #endif

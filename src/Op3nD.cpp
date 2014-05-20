@@ -212,7 +212,7 @@ void Op3nD::elementDroppedScene(const QMimeData* data)
 	break;
       case Project::FONT:
 	tmp = new Tile(pos,Vector3(1,1,1),Quaternion::one);
-	res = Text::loadText("Test",Base::getInstance()->getProj()->getDir(elements[i+1].toStdString(),Project::FONT));
+	res = Text::loadText("Test is ok",Base::getInstance()->getProj()->getDir(elements[i+1].toStdString(),Project::FONT));
 	tmp->setResource(res);
 	toAdd = tmp;
 	break;
@@ -247,6 +247,8 @@ void Op3nD::addFontToProject()
   QString name=fontPath.mid(fontPath.lastIndexOf('/')+1,fontPath.lastIndexOf('.')-fontPath.lastIndexOf('/')-1);
   QString outPath=QString::fromStdString(Base::getInstance()->getProj()->getDir("",Project::FONT))+name+".o3f";
   QProcess fontConverter;
-  fontConverter.start("./fontConverter",QStringList()<<fontPath<<outPath);
+  fontConverter.start("./fontConverter",QStringList()<<fontPath<<outPath<<"40");
+   if (!fontConverter.waitForFinished())
+         return;
   resourceModel->scanDirs();
 }

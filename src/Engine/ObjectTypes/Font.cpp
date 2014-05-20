@@ -3,15 +3,24 @@
 #include "../Math/Vector2.h"
 #include "../Graphics/Shading.h"
 #include "Model3d.h"
+#include "../../ProjectManagement/Project.h"
 
 map<string, Font*> Font::list;
 GLuint Font::IBO=0;
+Shading* Font::textShader;
 
 template<class T, class S>
 void readObject(T& to_read, S& in)
 {
   in.read(reinterpret_cast<char*>(&to_read), sizeof(T));
 }
+
+void Font::init()
+{
+  textShader= new Shading;
+  textShader->initShader(Project::common()->getDir("text.sfx",Project::SHADER));
+}
+
 Font::Font(string dir)
 {
   init_VBO();
@@ -47,10 +56,10 @@ Font::Font(string dir)
     float tex_y2= tex_y1+tex_line_height;
     
     Vertex Vertices[4] = {
-    Vertex(Vector3(.5f, -0.5f, 0.0f), Vector2(tex_x1, tex_y1), Vector3(0.0f,1.0f,0.0f)),
-    Vertex(Vector3(.5f, 0.5f, 0.0f), Vector2(tex_x1, tex_y2), Vector3(0.0f,1.0f,0.0f)),
-    Vertex(Vector3(-0.5f, 0.5f, 0.0f), Vector2(tex_x2, tex_y2), Vector3(0.0f,1.0f,0.0f)),
-    Vertex(Vector3(-.5f, -0.5f, 0.0f), Vector2(tex_x2, tex_y1), Vector3(0.0f,1.0f,0.0f)) };
+    Vertex(Vector3(.5f, -0.5f, 0.0f), Vector2(tex_x2, tex_y2), Vector3(0.0f,1.0f,0.0f)),
+    Vertex(Vector3(.5f, 0.5f, 0.0f), Vector2(tex_x2, tex_y1), Vector3(0.0f,1.0f,0.0f)),
+    Vertex(Vector3(-0.5f, 0.5f, 0.0f), Vector2(tex_x1, tex_y1), Vector3(0.0f,1.0f,0.0f)),
+    Vertex(Vector3(-.5f, -0.5f, 0.0f), Vector2(tex_x1, tex_y2), Vector3(0.0f,1.0f,0.0f)) };
     
     glGenBuffers(1, &tmp.VBO);
     glBindBuffer(GL_ARRAY_BUFFER, tmp.VBO);
@@ -72,6 +81,10 @@ Font::Font(string dir)
   // Generate an alpha texture with it.
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA8, width, height, 0, GL_ALPHA,
@@ -133,7 +146,7 @@ void Font::Draw(string text)
     trans.setTranslationTransform(x,y,0);
     Shading::getActive()->setObjMat(baseMat * trans );
     draw(g);
-    x+=g.advance;
+    x+=g.advance*0.1;
   }
   Shading::getActive()->setObjMat(baseMat);
 }
@@ -141,9 +154,18 @@ void Font::Draw(string text)
 void Font::draw(Glyph g)
 {
 #ifndef NODRAW
+  Shading::push();
+  textShader->useProgram();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glAlphaFunc(GL_GREATER, 0.1f);
+    glEnable(GL_ALPHA_TEST);
     glEnableVertexAttribArray(Shading::getActive()->getPosLocation());
     glEnableVertexAttribArray(Shading::getActive()->getTexLocation());
     
@@ -156,8 +178,10 @@ void Font::draw(Glyph g)
     
     glDisableVertexAttribArray(Shading::getActive()->getPosLocation());
     glDisableVertexAttribArray(Shading::getActive()->getTexLocation());
+    glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     glBindTexture(GL_TEXTURE_2D, 0);
+  Shading::pop();
 #endif
 }
 
