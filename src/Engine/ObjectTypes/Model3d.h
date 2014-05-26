@@ -36,7 +36,7 @@
 #include "../Math/Vector3.h"
 #include "../Math/Matrix.h"
 #include "Resource.h"
-#include "Animation.h"
+//#include "Animation.h"
 
 class Image;
 
@@ -79,7 +79,7 @@ struct VertexBoneData{
     void AddBoneData(uint BoneID, float Weight);
 };
 
-class Model3d: public Resource, Animation
+class Model3d: public Resource//, Animation
 {	
 public:
     void Draw();

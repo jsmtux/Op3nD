@@ -66,7 +66,6 @@ public:
     GLuint getTexLocation();
     GLuint getNormLocation();
     GLuint getSamplerLocation();
-    GLint getId(string name);
     void deleteShading();
     static Shading* getActive();
     void setWVP(Matrix w);
@@ -79,17 +78,22 @@ public:
     void setObjInd(unsigned int ind);
     void setMeshInd(unsigned int ind);
     void setAnimated(bool animated);
+    GLint getVarLocation(string name, int index=-1);
     static void push();
     static void pop();
 private:
+    void addShader(string shader, GLenum shadertype);
+    GLint getId(string name, int index=-1);
+    virtual void initVars();
+    
     static Shading* active;
     static vector<GLuint> shaderlist;
     static stack<Shading*> shaderStack;
+    map<string, GLint> shaderLocs;
     
-    void addShader(string shader, GLenum shadertype);
-    virtual void initVars();
-    GLuint wvpId, worldMatId, objMatId, animatedId;
     static Matrix WVP, worldMat, objMat;
+    
+    GLuint wvpId, worldMatId, objMatId, animatedId;
     GLuint objId, meshId;
     GLint program;
     GLuint colorId;

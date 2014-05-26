@@ -70,16 +70,6 @@ void Shading::update(){
   #endif
 }
 
-GLint Shading::getId(string name){
-  GLint Location= glGetUniformLocation(program, name.c_str());
-  if (Location == 0xFFFFFFFF)
-  {
-    //cerr << "Warning! Unable to get the location of uniform " << name << endl;
-  }
-  
-  return Location;
-}
-
 void Shading::deleteShading(){
   for (vector<GLuint>::iterator it = shaderlist.begin() ; it != shaderlist.end() ; ++it)
   {
@@ -131,6 +121,29 @@ void Shading::compileShader(){
   initVars();
 }
 
+GLint Shading::getId(string name, int index)
+{
+  if(index != -1){
+    stringstream str;
+    str << name << "[" << index <<"]";
+    name = str.str();
+  }
+  return glGetUniformLocation(program, name.c_str());
+}
+
+GLint Shading::getVarLocation(string name, int index)
+{
+  map<string,GLint>::iterator tmp;
+  if((tmp=shaderLocs.find(name))==shaderLocs.end()){
+    cout << name << "not found";
+    GLint ret = getId(name, index);
+    shaderLocs.insert(pair<string, GLint>(name,ret));
+    cout << "Its location is " << ret << endl;
+    return ret;
+  }
+  return tmp->second;
+}
+
 void Shading::initVars(){
   #ifdef ANDROID
   posId = glGetAttribLocation(gProgram, "Position");
@@ -157,12 +170,11 @@ void Shading::initVars(){
   colorId=getId("color");
   
   animatedId=getId("animated");
-  
+
   for(int i=0;i<MAX_BONES;i++){
-    stringstream str;
-    str << "gBones[" << i <<"]";
-    boneLocation[i]= getId(str.str());
+    boneLocation[i] = getId("gBones", i);
   }
+
 }
 
 void  Shading::setBoneTransform(uint ind, const Matrix& transform){

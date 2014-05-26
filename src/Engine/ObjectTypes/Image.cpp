@@ -57,10 +57,18 @@ void Image::del(){
   list.erase(name);
 }
 
-void Image::Bind(){
+void Image::Bind(Vector2 offset, Vector2 size){
 #ifndef NODRAW
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, imageId);
+  Shading* current = Shading::getActive();
+  GLuint pos;
+  if((pos=current->getVarLocation("offset"))!=-1){
+    glUniform2f(pos, offset.x, offset.y);
+  }
+  if((pos=current->getVarLocation("size"))!=-1){
+    glUniform2f(pos, size.x, size.y);
+  }
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, imageId);
 #endif
 }
 
@@ -71,21 +79,22 @@ Resource::ResourceType Image::getType(){
 void Image::Draw(){
     Bind();
 #ifndef NODRAW
+    Shading* current = Shading::getActive();
     glDisable(GL_CULL_FACE);
-    glEnableVertexAttribArray(Shading::getActive()->getPosLocation());
-    glEnableVertexAttribArray(Shading::getActive()->getTexLocation());
+    glEnableVertexAttribArray(current->getPosLocation());
+    glEnableVertexAttribArray(current->getTexLocation());
 //    glEnableVertexAttribArray(Shading::getActive()->getNormLocation());
     
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(Shading::getActive()->getPosLocation(), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-    glVertexAttribPointer(Shading::getActive()->getTexLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
+    glVertexAttribPointer(current->getPosLocation(), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    glVertexAttribPointer(current->getTexLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
 //    glVertexAttribPointer(getNormLocation(), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
     
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*)0);
     
-    glDisableVertexAttribArray(Shading::getActive()->getPosLocation());
-    glDisableVertexAttribArray(Shading::getActive()->getTexLocation());
+    glDisableVertexAttribArray(current->getPosLocation());
+    glDisableVertexAttribArray(current->getTexLocation());
 //    glDisableVertexAttribArray(Shading::getActive()->getNormLocation());
     glEnable(GL_CULL_FACE);
 #endif

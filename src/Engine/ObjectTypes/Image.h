@@ -20,6 +20,7 @@
 #include <map>
 using namespace std;
 #include "Resource.h"
+#include "../Math/Vector2.h"
 
 class Image: public Resource
 {	
@@ -36,7 +37,7 @@ public:
      * @return name of an image
      */
     ResourceType getType();
-    void Bind();
+    void Bind(Vector2 offset=Vector2(0,0), Vector2 size=Vector2(1,1));
     void del();
     static void init();
     static void unBind();

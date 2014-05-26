@@ -42,10 +42,15 @@
 		uniform sampler2D gSampler;
 		uniform unsigned int gObjectIndex;
 		uniform unsigned int gMeshIndex;
+		uniform vec2 offset = vec2(0.0, 0.0);
+		uniform vec2 size = vec2(1.0, 1.0);
 		
 		void main()
 		{
-		    FragColor = texture2D(gSampler, TexCoord0.xy);
+		    vec2 texture_coordinate = vec2(TexCoord0);
+	        texture_coordinate += offset;
+	        texture_coordinate *= size;
+		    FragColor = texture2D(gSampler, texture_coordinate.xy);
 		}
 	</fragment>
 </shader>
