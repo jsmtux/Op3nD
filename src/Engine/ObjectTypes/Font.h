@@ -9,6 +9,7 @@ public:
   ResourceType getType();
   static Font* loadFont(string dir);
   void Draw(string text);
+  void Draw(){Draw("Test");}
   static void init();
 private:
   Font(string dir);

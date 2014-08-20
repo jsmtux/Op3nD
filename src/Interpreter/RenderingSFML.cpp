@@ -2,9 +2,10 @@
  * @(#) RenderingSFML.cpp
  */
 
-#include "RenderingSFML.h"
-#include "../Base.h"
+#include <Graphics/RenderingContext.h>
+#include <Base.h>
 #include <SFML/Window/Keyboard.hpp>
+#include "RenderingSFML.h"
 
 RenderingSFML::RenderingSFML(){
   appName="Open3D";

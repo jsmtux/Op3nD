@@ -31,7 +31,8 @@ public:
      * @return pointer to the image
      */
     static Image *loadIm(string dir);
-    void Draw();
+    void Draw(Vector2 offset, Vector2 size);
+    void Draw(){Draw(Vector2(0,0), Vector2(1,1));}
     /**
      * Returns the name of an image
      * @return name of an image

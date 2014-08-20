@@ -1,8 +1,8 @@
 #include "LuaEditor.h"
 #include <QInputDialog>
 #include <QMessageBox>
-#include "../src/Engine/Base.h"
-#include "../src/ProjectManagement/Project.h"
+#include <Base.h>
+#include <Project.h>
 
 LuaEditor::LuaEditor(QWidget* parent): QDialog(parent)
 {

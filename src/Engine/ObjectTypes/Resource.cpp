@@ -1,5 +1,5 @@
 #include "Resource.h"
-#include "../../ProjectManagement/Project.h"
+#include <Project.h>
 #include "Image.h"
 #include "Model3d.h"
 #include "Box.h"
@@ -55,10 +55,6 @@ Resource* Resource::Load(string dir){
       ret->copies++;
     }
     return ret;
-}
-
-void Resource::Draw(){
-    ;
 }
 
 string Resource::getName(){

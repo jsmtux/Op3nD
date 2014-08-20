@@ -6,7 +6,7 @@
 #ifndef _LUA_TYPED_ENUMS_H_
 #define _LUA_TYPED_ENUMS_H_
 
-#include <lua5.2/lua.hpp>
+#include <lua.hpp>
 
 // Adds an enumerated type into Lua.
 //

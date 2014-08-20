@@ -23,6 +23,7 @@ Project::Project(string dir){
     create_directories(dir+"/"+toString(SHADER));
     create_directories(dir+"/"+toString(MESH));
     create_directories(dir+"/"+toString(FONT));
+    create_directories(dir+"/"+toString(SPRITE));
   }
 }
 
@@ -74,6 +75,8 @@ string Project::toString(FileType type){
       return("meshes");
     case FONT:
       return("fonts");
+    case SPRITE:
+      return("sprites");
     default:
       return "";
   }
@@ -128,6 +131,9 @@ Project::FileType Project::getType(string dir){
   }
   if(extension.compare(".o3f")==0){
     return FONT;
+  }
+  if(extension.compare(".o3sp")==0){
+    return SPRITE;
   }
 }
 

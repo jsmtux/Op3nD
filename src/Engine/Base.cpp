@@ -4,7 +4,7 @@
 #include "Base.h"
 
 
-#include "../ProjectManagement/Project.h"
+#include <Project.h>
 
 #ifdef NOGUI
 #include "Graphics/RenderingSFML.h"

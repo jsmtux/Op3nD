@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <QMimeData>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics.hpp>
 #include <stack>
 #include "../Engine/Graphics/RenderingContext.h"

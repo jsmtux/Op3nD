@@ -5,8 +5,8 @@
 #ifndef RENDERINGSFML_H_H
 #define RENDERINGSFML_H_H
 
-#include "RenderingContext.h"
-#include "../Controller.h"
+#include <Graphics/RenderingContext.h>
+#include <Controller.h>
 #include <SFML/Window.hpp>
 #include <string>
 using namespace std;

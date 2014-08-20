@@ -5,7 +5,7 @@
 #ifndef SCRIPTED_H_H
 #define SCRIPTED_H_H
 
-#include <lua5.2/lua.hpp>
+#include <lua.h>
 
 #include "../Math/Vector3.h"
 

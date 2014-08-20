@@ -7,7 +7,7 @@
 #include <vector>
 using namespace std;
 
-#include <lua5.2/lua.hpp>
+#include <lua.h>
 #include "../Network/Networkable.h"
 
 enum tkeys{K_UP,K_DOWN,K_LEFT,K_RIGHT,K_A,K_B,K_X,K_Y,K_Z,K_I,K_K,K_J,K_L,K_R1,K_R2,K_L1,K_L2,K_START,K_END};

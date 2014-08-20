@@ -76,8 +76,9 @@ Resource::ResourceType Image::getType(){
     return IMAGE;
 }
 
-void Image::Draw(){
-    Bind();
+void Image::Draw(Vector2 offset, Vector2 size){
+    Bind(offset, size);
+    cout << "Drawing!!!!!!!!!!1111" << endl;
 #ifndef NODRAW
     Shading* current = Shading::getActive();
     glDisable(GL_CULL_FACE);

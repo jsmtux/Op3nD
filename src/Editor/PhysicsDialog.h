@@ -2,7 +2,7 @@
 #define _PHYSICSDIALOG
 
 #include "ui_physicsDialog.h"
-#include "../src/Engine/ObjectTypes/Physical.h"
+#include <ObjectTypes/Physical.h>
 
 class PhysicsDialog: public QDialog{
   Q_OBJECT

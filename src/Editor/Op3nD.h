@@ -3,14 +3,14 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_mainWindow.h"
-#include "InterfaceModule/ProjectDialog.h"
-#include "InterfaceModule/ResourceTreeModel.h"
-#include "InterfaceModule/TestDialog.h"
-#include "InterfaceModule/PropertiesTreeModel.h"
-#include "InterfaceModule/SpinBoxDelegate.h"
-#include "InterfaceModule/LuaEditor.h"
-#include "InterfaceModule/PhysicsDialog.h"
-#include "Engine/ObjectTypes/Editable.h"
+#include "ProjectDialog.h"
+#include "ResourceTreeModel.h"
+#include "TestDialog.h"
+#include "PropertiesTreeModel.h"
+#include "SpinBoxDelegate.h"
+#include "LuaEditor.h"
+#include "PhysicsDialog.h"
+#include <ObjectTypes/Editable.h>
 
 class Op3nD : public QMainWindow
 {

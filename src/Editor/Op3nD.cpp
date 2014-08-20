@@ -9,14 +9,14 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QFileDialog>
-#include "./Engine/Base.h"
-#include "Engine/ObjectTypes/Resource.h"
-#include "Engine/ObjectTypes/Camera.h"
-#include "Engine/ObjectTypes/Font.h"
-#include "Engine/ObjectTypes/Text.h"
-#include "Engine/States/EditorState.h"
-#include "InterfaceModule/ResourceTreeModel.h"
-#include "InterfaceModule/SpinBoxDelegate.h"
+#include <Base.h>
+#include <ObjectTypes/Resource.h>
+#include <ObjectTypes/Camera.h>
+#include <ObjectTypes/Font.h>
+#include <ObjectTypes/Text.h>
+#include <States/EditorState.h>
+#include "ResourceTreeModel.h"
+#include "SpinBoxDelegate.h"
 
 Op3nD::Op3nD()
 {

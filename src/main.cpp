@@ -10,7 +10,7 @@ using namespace std;
 #include "Engine/Base.h"
 #include "Engine/Graphics/RenderingSFML.h"
 #include "Engine/States/PlayState.h"
-#include "ProjectManagement/Project.h"
+#include <Project.h>
 #endif
 
 int main(int argc, char** argv)

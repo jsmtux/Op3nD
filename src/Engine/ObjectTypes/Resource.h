@@ -18,7 +18,7 @@ public:
   enum ResourceType{BOX,IMAGE,LIGHT,LINE,MODEL3D,FONT,TEXT,ANIMATION};
   static Resource *Load(string dir);
   Resource(Resource &r)=delete;
-  virtual void Draw(); 
+  virtual void Draw()=0; 
   virtual ResourceType getType()=0;
   string getName();
   void free();

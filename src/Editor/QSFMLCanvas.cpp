@@ -220,12 +220,15 @@ void QSFMLCanvas::mouseReleaseEvent(QMouseEvent* event)
 
 void QSFMLCanvas::dragEnterEvent(QDragEnterEvent* event)
 {
-  if (event->mimeData()->hasFormat("application/text.tile"))
-  event->acceptProposedAction();
+  if (event->mimeData()->hasFormat("application/text.tile")){
+    event->acceptProposedAction();
+    cout << "Accepted action!!" << endl;
+  }
 }
 
 void QSFMLCanvas::dropEvent(QDropEvent* event)
 {
+  cout << "Received drop!!" << endl;
   emit receivedDrop(event->mimeData());
   event->acceptProposedAction();
 }

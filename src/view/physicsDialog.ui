@@ -278,7 +278,7 @@
   <customwidget>
    <class>QSFMLCanvas</class>
    <extends>QWidget</extends>
-   <header>../src/InterfaceModule/QSFMLCanvas.h</header>
+   <header>QSFMLCanvas.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

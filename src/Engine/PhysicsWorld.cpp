@@ -76,18 +76,18 @@ vector<void*> PhysicsWorld::contactTest(btRigidBody* body)
     
     
     btScalar addSingleResult(btManifoldPoint& cp,
-			    const btCollisionObject* colObj0,int partId0,int index0,
-			    const btCollisionObject* colObj1,int partId1,int index1)
+			    const btCollisionObjectWrapper* colObj0,int partId0,int index0,
+			    const btCollisionObjectWrapper* colObj1,int partId1,int index1)
     {
       btVector3 pt;
       void * newResult;
-      if(colObj0==body) {
+      if(colObj0->m_collisionObject==body) {
 	pt = cp.m_localPointA;
-	newResult = colObj1->getUserPointer();
+	newResult = colObj1->m_collisionObject->getUserPointer();
       } else {
-	assert(colObj1==body && "body does not match either collision object");
+	assert(colObj1->m_collisionObject==body && "body does not match either collision object");
 	pt = cp.m_localPointB;
-	newResult = colObj0->getUserPointer();
+	newResult = colObj0->m_collisionObject->getUserPointer();
       }
       if(newResult){
 	results.push_back(newResult);

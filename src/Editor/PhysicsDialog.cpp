@@ -1,9 +1,9 @@
 #include "PhysicsDialog.h"
-#include "../src/Engine/Base.h"
-#include "../src/Engine/ObjectTypes/Resource.h"
-#include "../src/Engine/PhysicsWorld.h"
-#include "../src/Engine/States/MeshState.h"
-#include "../src/ProjectManagement/Project.h"
+#include <Base.h>
+#include <ObjectTypes/Resource.h>
+#include <PhysicsWorld.h>
+#include <States/MeshState.h>
+#include <Project.h>
 #include <QMenu>
 #include <QMessageBox>
 #include <QDebug>
