@@ -58,8 +58,8 @@ qt5_wrap_cpp(Op3nD_MOCS ${Editor_HEADERS})
 
 qt5_add_resources(Op3nD_Resources ${O3Dsrc_project_SOURCE_DIR}/view/op3nd.qrc)
 
-add_executable(O3DEditor ${Editor_SRCS} ${Op3nD_MOCS})
-qt5_use_modules(O3DEditor Widgets)
+add_executable(O3DEditor ${Editor_SRCS} ${Op3nD_MOCS} ${Op3nD_FORM_HEADERS})
+qt5_use_modules(O3DEditor Widgets OpenGL)
 
 include_directories(
     ${QT_INCLUDES} 

@@ -8,19 +8,21 @@
 stack<QSFMLCanvas*> QSFMLCanvas::canvasStack;
 
 QSFMLCanvas::QSFMLCanvas(QWidget* Parent,/* const QPoint& Position, const QSize& Size,*/ unsigned int FrameTime) :
-QWidget       (Parent),
+QGLWidget       (Parent),
 myInitialized (false)
 {
-    setAttribute(Qt::WA_PaintOnScreen);
-    setAttribute(Qt::WA_OpaquePaintEvent);
-    setAttribute(Qt::WA_NoSystemBackground);
+    QWidget::setAttribute(Qt::WA_PaintOnScreen);
+    QWidget::setAttribute(Qt::WA_OpaquePaintEvent);
+    QWidget::setAttribute(Qt::WA_NoSystemBackground);
+    QWidget::setAttribute(Qt::WA_PaintUnclipped);
 
     setFocusPolicy(Qt::StrongFocus);
 
-    repaintTimer.setInterval(FrameTime);
     Base::getInstance()->setRC(this);
     Base::getInstance()->addController(this);
-      
+    
+    repaintTimer.setInterval(FrameTime);
+
     setContextMenuPolicy(Qt::ActionsContextMenu);
     currentSelected=nullptr;
     isEnabled=true;
@@ -62,11 +64,7 @@ void QSFMLCanvas::showEvent(QShowEvent*)
         #endif
 
         
-        RenderWindow::create(winId());
-
-        OnInit();
-        connect(&repaintTimer, SIGNAL(timeout()), this, SLOT(repaint()));
-        repaintTimer.start();
+        RenderWindow::create(QGLWidget::winId());
 
         myInitialized = true;
 	if(!canvasStack.empty()){
@@ -77,30 +75,21 @@ void QSFMLCanvas::showEvent(QShowEvent*)
     }
 }
 
-QPaintEngine* QSFMLCanvas::paintEngine() const
-{
-    return 0;
-}
-
-void QSFMLCanvas::paintEvent(QPaintEvent*)
-{
-  if(!isEnabled){
-    return;
-  }
-  OnUpdate();
-  
-  display();
-}
-
-void QSFMLCanvas::OnInit()
+void QSFMLCanvas::initializeGL()
 {
   RenderingContext::init();
+  connect(&repaintTimer, SIGNAL(timeout()), this, SLOT(update()));
+ repaintTimer.start();
+
 }
 
-void QSFMLCanvas::OnUpdate()
+void QSFMLCanvas::paintGL()
 {
-  Base::getInstance()->setRC(this);
-  Base::getInstance()->getStateManager()->iteration();
+  if(isEnabled){
+    Base::getInstance()->setRC(this);
+    Base::getInstance()->getStateManager()->iteration();
+    display();
+  }
 }
 
 void QSFMLCanvas::keyPressEvent(QKeyEvent* event)
@@ -171,18 +160,15 @@ void QSFMLCanvas::keyReleaseEvent(QKeyEvent* event)
   }
 }
 
-void QSFMLCanvas::resizeEvent(QResizeEvent* event)
+void QSFMLCanvas::resizeGL(int width, int height)
 {
-  QWidget::resizeEvent(event);
-  
-  int w=event->size().width();
-  int h=event->size().height();
-  Vector3 resolution(w,h,32);
+  Vector3 resolution(width,height,32);
   
   setResolution(resolution);
   
-  glViewport(0,0,w,h);
+  glViewport(0,0,width,height);
 }
+
 
 void QSFMLCanvas::mouseDoubleClickEvent(QMouseEvent* event)
 {
@@ -198,8 +184,10 @@ void QSFMLCanvas::mousePressEvent(QMouseEvent* event)
   if(curState!=nullptr){
     unsigned int *sel=curState->selection(event->x(),event->y());
     setSelection(sel);
-    emit selectionChanged(curState->getByIndex(sel[0]));
     currentSelected = curState->getByIndex(sel[0]);
+    if(currentSelected){
+      emit selectionChanged(curState->getByIndex(sel[0]));
+    }
   }
   QWidget::mousePressEvent(event);
 }

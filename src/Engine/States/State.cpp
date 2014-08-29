@@ -123,8 +123,16 @@ void State::loadFile(){
 }
 
 Editable* State::getByIndex(unsigned int ind){
-    if(!ind)return NULL;
-    return list.at(ind-1);
+  Editable* ret = nullptr;
+  
+  if(!ind || ind >= list.size()){
+    cout << __func__ << " Element " << ind << " not found" << endl;
+  }
+  else{
+    ret = list.at(ind-1);
+  }
+  
+  return ret;
 }
 
 StateType State::getType(){

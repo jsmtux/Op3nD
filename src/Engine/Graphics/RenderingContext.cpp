@@ -36,6 +36,7 @@ Vector3 RenderingContext::getResolution()
 void RenderingContext::setResolution(Vector3 res)
 {
   resolution=res;
+  glViewport(0,0,res.x,res.y);
   State* current=Base::getInstance()->getStateManager()->getCurState();
   if(current){
     current->updateResolution();

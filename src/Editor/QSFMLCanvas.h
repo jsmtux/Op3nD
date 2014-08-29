@@ -11,8 +11,9 @@
 #include "../Engine/Controller.h"
 #include "../Engine/ObjectTypes/Editable.h"
 #include "../Engine/ObjectTypes/Scripted.h"
+#include <QGLWidget>
 
-class QSFMLCanvas : public QWidget, public sf::RenderWindow, public RenderingContext, public Controller{
+class QSFMLCanvas : public QGLWidget, public sf::RenderWindow, public RenderingContext, public Controller{
   Q_OBJECT
 public :
   QSFMLCanvas(QWidget* Parent/*, const QPoint& Position, const QSize& Size*/, unsigned int FrameTime = 1);
@@ -21,14 +22,12 @@ public :
   void dragEnterEvent(QDragEnterEvent *event);
   void dropEvent(QDropEvent* event);
 private :
-  virtual void OnInit();
-  virtual void OnUpdate();
-  virtual QPaintEngine* paintEngine() const;
+  void initializeGL();
+  void resizeGL(int width, int height);
+  void paintGL();
   virtual void showEvent(QShowEvent*);
-  virtual void paintEvent(QPaintEvent*);
   virtual void keyPressEvent(QKeyEvent *event);
   virtual void keyReleaseEvent(QKeyEvent *event);
-  virtual void resizeEvent(QResizeEvent *event);
   virtual void mouseDoubleClickEvent(QMouseEvent *event);
   virtual void mousePressEvent(QMouseEvent *event);
   virtual void mouseReleaseEvent(QMouseEvent *event);
