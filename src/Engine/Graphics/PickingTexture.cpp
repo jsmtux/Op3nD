@@ -51,8 +51,8 @@ unsigned int* PickingTexture::ReadId(unsigned int x, unsigned int y)
 
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    ret[0]=-Pixel[2];
-    ret[1]=-Pixel[1];
+    ret[0]=Pixel[2];
+    ret[1]=Pixel[1];
     return ret;
 }
 

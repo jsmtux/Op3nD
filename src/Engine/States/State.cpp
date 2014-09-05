@@ -126,7 +126,7 @@ void State::loadFile(){
 Editable* State::getByIndex(unsigned int ind){
   Editable* ret = nullptr;
   
-  if(!ind || ind >= list.size()){
+  if(!ind || ind > list.size()){
     cout << __func__ << " Element " << ind << " not found" << endl;
   }
   else{
