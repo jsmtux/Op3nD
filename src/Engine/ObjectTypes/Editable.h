@@ -14,6 +14,7 @@ typedef enum {E_TILE,E_OBJECT,E_CAMERA,E_TEXT}edType;
 
 class Vector3;
 class Quaternion;
+class State;
 
 class Editable: public Networkable
 {
@@ -34,10 +35,13 @@ public:
     unsigned int getId();
     virtual void setId(unsigned int i);
 protected:
-    Editable(unsigned int i);
-    Editable();
+    Editable(State* state, unsigned int i);
+    Editable(State* state);
     unsigned int id;
     unsigned int pId;
+    State* getState() {return state;}
+private:
+    State* state;
 };
 
 #endif	/* EDITABLE_H */

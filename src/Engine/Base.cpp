@@ -2,6 +2,9 @@
  * @(#) Base.cpp
  */
 #include "Base.h"
+#include "Resources/FontLoader.h"
+#include "Resources/ImageLoader.h"
+#include "Resources/ModelLoader.h"
 
 
 #include <Project.h>
@@ -15,6 +18,15 @@ Base* Base::instance= new Base();
 Base::Base(){
     rc=NULL;
     currentProj=NULL;
+    resourceManager = new ResourceManager(this);
+    resourceManager->addResourceLoader(new FontLoader());
+    resourceManager->addResourceLoader(new ImageLoader());
+    resourceManager->addResourceLoader(new ModelLoader());
+}
+
+Base::~Base()
+{
+  delete resourceManager;
 }
 
 StateManager* Base::getStateManager()
@@ -63,6 +75,11 @@ vector<Controller*> &Base::getControllers(){
 
 void Base::setNode(NetNode* n){
     //netNode=n;
+}
+
+ResourceManager* Base::getResourceManager()
+{
+  return resourceManager;
 }
 
 void Base::setRC(RenderingContext* rc)

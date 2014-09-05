@@ -31,20 +31,25 @@ set(Op3nD_SRCS
  Math/Quaternion.cpp
  Math/Vector2.cpp
  Math/Vector3.cpp
- ObjectTypes/Box.cpp
  ObjectTypes/Camera.cpp
  ObjectTypes/Editable.cpp
- ObjectTypes/Image.cpp
- ObjectTypes/Light.cpp
- ObjectTypes/Line.cpp
- ObjectTypes/Model3d.cpp
- ObjectTypes/Physical.cpp
- ObjectTypes/Resource.cpp
  ObjectTypes/Scripted.cpp
- ObjectTypes/Text.cpp
- ObjectTypes/Tile.cpp
- ObjectTypes/Font.cpp
  ObjectTypes/Sprite.cpp
+ ObjectTypes/Tile.cpp
+ ObjectTypes/Physical.cpp
+ Resources/BaseResourceLoader.cpp
+ Resources/Line.cpp
+ Resources/Image.cpp
+ Resources/ResourceManager.cpp
+ Resources/Box.cpp
+ Resources/Model3d.cpp
+ Resources/ImageLoader.cpp
+ Resources/Font.cpp
+ Resources/ModelLoader.cpp
+ Resources/Text.cpp
+ Resources/Light.cpp
+ Resources/FontLoader.cpp
+ Resources/Resource.cpp
  States/EditorState.cpp
  States/MeshState.cpp
  States/PlayState.cpp

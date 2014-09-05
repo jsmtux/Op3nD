@@ -13,7 +13,7 @@ class Editable;
 
 class EditorState: public State{
 public:
-    EditorState(string n);
+    EditorState(ResourceManager* resourceManger, string n);
     void saveState();
     void iteration();
     void draw();

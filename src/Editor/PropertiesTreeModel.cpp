@@ -1,9 +1,9 @@
 #include "PropertiesTreeModel.h"
-#include "../Engine/ObjectTypes/Resource.h"
+#include "Resources/Resource.h"
 #include "../Engine/ObjectTypes/Tile.h"
 #include "../Engine/ObjectTypes/Scripted.h"
-#include "../Engine/ObjectTypes/Image.h"
-#include "../Engine/ObjectTypes/Model3d.h"
+#include "Resources/Image.h"
+#include "Resources/Model3d.h"
 #include <QDebug>
 
 PropertiesTreeModel::PropertiesTreeModel(Editable* editabe): QAbstractItemModel()

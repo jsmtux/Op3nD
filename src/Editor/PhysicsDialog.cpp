@@ -1,6 +1,6 @@
 #include "PhysicsDialog.h"
 #include <Base.h>
-#include <ObjectTypes/Resource.h>
+#include <Resources/Resource.h>
 #include <PhysicsWorld.h>
 #include <States/MeshState.h>
 #include <Project.h>
@@ -76,8 +76,8 @@ void PhysicsDialog::exec(string resource)
 {
   toEdit=resource;
   StateManager* stateManager= Base::getInstance()->getStateManager();
-  State* meshState= new MeshState("meshEditor");
-  Tile* mesh=new Tile(Vector3(0,0,0),Vector3(1,1,1),Quaternion(0,0,0,1),resource);
+  State* meshState= new MeshState(Base::getInstance()->getResourceManager(), "meshEditor");
+  Tile* mesh=new Tile(meshState, Vector3(0,0,0),Vector3(1,1,1),Quaternion(0,0,0,1),resource);
   mesh->setPhysical(NULL);
   meshState->addElement(mesh);
   stateManager->newState(meshState);

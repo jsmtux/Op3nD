@@ -48,7 +48,8 @@ int main(int argc, char** argv)
         currentProj->read();
         
         StateManager* stateManager=Base::getInstance()->getStateManager();
-        State* newSt=new PlayState(map);
+        State* newSt=new PlayState(Base::getInstance()->getResourceManager(), map);
+
         stateManager->newState(newSt);
         newSt->loadFile();
         rc->gameLoop();

@@ -10,10 +10,10 @@
 #include <QInputDialog>
 #include <QFileDialog>
 #include <Base.h>
-#include <ObjectTypes/Resource.h>
+#include <Resources/Resource.h>
 #include <ObjectTypes/Camera.h>
-#include <ObjectTypes/Font.h>
-#include <ObjectTypes/Text.h>
+#include <Resources/Font.h>
+#include <Resources/Text.h>
 #include <States/EditorState.h>
 #include "ResourceTreeModel.h"
 #include "SpinBoxDelegate.h"
@@ -97,7 +97,7 @@ void Op3nD::changeScene(QTreeWidgetItem* item, int column)
 {
   qDebug() << "Changing scene to :" << item->text(0);
   StateManager* stateManager = Base::getInstance()->getStateManager();
-  State* edState= new EditorState(item->text(0).toStdString());
+  State* edState= new EditorState(Base::getInstance()->getResourceManager() ,item->text(0).toStdString());
   edState->loadFile();
   stateManager->newState(edState);
 }
@@ -203,16 +203,16 @@ void Op3nD::elementDroppedScene(const QMimeData* data)
     Tile* tmp;
     switch(type){
       case Project::OBJECT:
-	toAdd = new Scripted(elements[i+1].toStdString());
+	toAdd = new Scripted(curState, elements[i+1].toStdString());
 	toAdd->setPos(pos);
 	break;
       case Project::IMAGE:
       case Project::MESH:
-	toAdd = new Tile(pos,Vector3(1,1,1),Quaternion::one,elements[i+1].toStdString());
+	toAdd = new Tile(curState, pos,Vector3(1,1,1),Quaternion::one,elements[i+1].toStdString());
 	break;
       case Project::FONT:
-	tmp = new Tile(pos,Vector3(1,1,1),Quaternion::one);
-	res = Text::loadText("Test is ok",Base::getInstance()->getProj()->getDir(elements[i+1].toStdString(),Project::FONT));
+	tmp = new Tile(curState, pos,Vector3(1,1,1),Quaternion::one);
+	//res = Text::loadText("Test is ok",Base::getInstance()->getProj()->getDir(elements[i+1].toStdString(),Project::FONT));
 	tmp->setResource(res);
 	toAdd = tmp;
 	break;
@@ -232,7 +232,7 @@ void Op3nD::addCameraToScene()
     msgBox.exec();
     return;
   }
-  Camera* toAdd= new Camera();
+  Camera* toAdd= new Camera(curState);
   Vector3 pos = curState->getCam()->getPos();
   toAdd->setPos(pos);
   curState->addCam(toAdd);

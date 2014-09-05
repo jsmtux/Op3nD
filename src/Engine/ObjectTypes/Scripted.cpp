@@ -22,7 +22,7 @@ lua_State* Scripted::L=NULL;
 vector<Scripted*> Scripted::list;
 Scripted* Scripted::currObject;
 
-Scripted::Scripted(string file, Vector3 p, Vector3 s, Vector3 r):Tile(p,s,r){
+Scripted::Scripted(State* _state, string file, Vector3 p, Vector3 s, Vector3 r):Tile(_state,p,s,r){
     currObject = NULL;
     loadFromFile(file);
 }
@@ -164,8 +164,8 @@ edType Scripted::getType(){
 
 #include "Tile.h"
 #include "Camera.h"
-#include "Model3d.h"
-#include "Text.h"
+#include "Resources/Model3d.h"
+#include "Resources/Text.h"
 class Tile;
 
 int Scripted::LaddToScene(lua_State* L){
@@ -196,7 +196,7 @@ int Scripted::LaddToScene(lua_State* L){
         siz.z = lua_tonumber(L,11);
     }
     
-    Base::getInstance()->getStateManager()->getCurState()->addElement(new Tile(pos,siz,rot,dir));
+    Base::getInstance()->getStateManager()->getCurState()->addElement(new Tile(Base::getInstance()->getStateManager()->getCurState(), pos, siz, rot, dir));
     return 0;
 }
 
@@ -267,7 +267,7 @@ int Scripted::LloadObject(lua_State *L){
     
     string file=lua_tostring(L,1);
     
-    Scripted *tmp= new Scripted(file);
+    Scripted *tmp= new Scripted(Base::getInstance()->getStateManager()->getCurState(), file);
     Base::getInstance()->getStateManager()->getCurState()->addElement(tmp);
     list.push_back(tmp);
     
@@ -845,7 +845,7 @@ int Scripted::LsetCurrentText(lua_State *L)
 using namespace MXML;
 
 
-Scripted::Scripted(MXML::Tag &code):Tile(Vector3::zero,Vector3(1,1,1),Vector3::zero){
+Scripted::Scripted(State* state, MXML::Tag &code):Tile(state, Vector3::zero,Vector3(1,1,1),Vector3::zero){
     fromXML(code);
 }
 

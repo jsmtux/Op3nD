@@ -6,11 +6,11 @@
 #include "../ObjectTypes/Camera.h"
 #include "../../ProjectManagement/Project.h"
 
-EditorState::EditorState(string n):State(n){
+EditorState::EditorState(ResourceManager* resourceManger, string n):State(resourceManger, n){
   selected=NULL;
-  handler = new Tile(Vector3(5,0,0),Vector3(1,1,1),Quaternion(0.,0.,0.,1.),"*untitled.3ds");
+  handler = new Tile(this, Vector3(5,0,0),Vector3(1,1,1),Quaternion(0.,0.,0.,1.),"*untitled.3ds");
   //initPhysicsWorld();
-  cameras.push_back(new Camera());
+  cameras.push_back(new Camera(this));
   currCam=cameras[0];
   currCam->setPosition(Vector3(0,0,-100));
 }

@@ -12,7 +12,7 @@
 #include "../Base.h"
 
 
-Camera::Camera(float ratio, float fov, float zNear, float zFar):visible(Vector3(0,0,0),Vector3(1,1,1),Quaternion(0,0,0,1),"*camera.3ds"){
+Camera::Camera(State* state, float ratio, float fov, float zNear, float zFar):Editable(state), visible(state, Vector3(0,0,0),Vector3(1,1,1),Quaternion(0,0,0,1),"*camera.3ds"){
     visible.setParentId(id);
     step=0.05;
     reloadMatrix();
@@ -25,11 +25,12 @@ Camera::Camera(float ratio, float fov, float zNear, float zFar):visible(Vector3(
     targetDefined=false;
 }
 
-Camera::Camera(MXML::Tag &code):visible(Vector3(0,0,0),Vector3(1,1,1),Quaternion(0,0,0,1),"*camera.3ds"){
+Camera::Camera(State* state, MXML::Tag &code): Editable(state), visible(state, Vector3(0,0,0),Vector3(1,1,1),Quaternion(0,0,0,1),"*camera.3ds"){
     visible.setParentId(id);
     step=0.05;
     
     reloadMatrix();
+    ResourceManager *resourceManager;
     
     target=Vector3(0,0,2);
     up=Vector3(0,1,0);

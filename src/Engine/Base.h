@@ -21,6 +21,7 @@
 #include "Math/Vector3.h"
 #include "../Network/NetNode.h"
 #include "Graphics/RenderingContext.h"
+#include "Resources/ResourceManager.h"
 
 class Project;
 
@@ -28,12 +29,15 @@ class Project;
 #include <mutex>
 #include <string>
 using namespace std;
+
+class ResourceManager;
 /**
  * Base class of the engine, holds state, rendering context and project information
  */
 class Base
 {	
 public:
+  ~Base();
   /**
     * Singleton, returns its object
     * @return singleton object
@@ -78,6 +82,8 @@ public:
   void setRC(RenderingContext* rc);
   RenderingContext* getRC();
   
+  ResourceManager* getResourceManager();
+  
   /**
     * Adds a connection either server or client
     * Resets the current project
@@ -90,6 +96,7 @@ private:
   RenderingContext *rc;
   Project * currentProj;
   vector<Controller*> controllers;
+  ResourceManager *resourceManager;
 };
 
 #endif

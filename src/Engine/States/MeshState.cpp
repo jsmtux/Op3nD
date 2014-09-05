@@ -4,10 +4,10 @@
 #include "../Base.h"
 #include "../PhysicsWorld.h"
 
-MeshState::MeshState(string name):State(name){
+MeshState::MeshState(ResourceManager* resourceManger, string name):State(resourceManager, name){
     initPhysicsWorld();
     
-    cameras.push_back(new Camera());
+    cameras.push_back(new Camera(this));
     currCam=cameras[0];
     currCam->setPosition(Vector3(0,0,-10));
 }

@@ -4,9 +4,9 @@
 
 #include "Tile.h"
 #include "Editable.h"
-#include "Resource.h"
+#include "Resources/Resource.h"
 #include "../Base.h"
-#include "Image.h"
+#include "Resources/Image.h"
 #include "Physical.h"
 #include "../Graphics/Shading.h"
 #include "../Math/Matrix.h"
@@ -20,7 +20,7 @@ GLuint Tile::VBO;
 GLuint Tile::IBO;
 #endif
 
-Tile::Tile(Vector3 p, Vector3 s, Quaternion r, string dirResource){
+Tile::Tile(State* _state, Vector3 p, Vector3 s, Quaternion r, string dirResource): Editable(_state){
   position=p;
   size=s;
   rotation=r;
@@ -30,10 +30,10 @@ Tile::Tile(Vector3 p, Vector3 s, Quaternion r, string dirResource){
     setResource(dirResource);
 }
 
-Tile::Tile(Tile &tile):Editable(tile.id){
+Tile::Tile(State* state, Tile &tile):Editable(state, tile.id){
   colored=tile.colored;
-  string resourceName=tile.resource->getName();
-  resource = NULL;
+  string resourceName= tile.resource->getName();
+  resource=NULL;
   if(!resourceName.empty())
     setResource(resourceName);
   
@@ -43,7 +43,7 @@ Tile::Tile(Tile &tile):Editable(tile.id){
   rotation=tile.rotation;
 }
 
-Tile::Tile(MXML::Tag &code){
+Tile::Tile(State* state, MXML::Tag &code): Editable(state){
   physInfo=NULL;
   resource=NULL;
   fromXML(code);
@@ -53,9 +53,6 @@ Tile::~Tile(){
   if(physInfo){
     Base::getInstance()->getStateManager()->getCurState()->deleteRigidBody(physInfo);
     physInfo->setUserPointer(NULL);
-  }
-  if(resource){
-    resource->free();
   }
 }
 
@@ -179,7 +176,7 @@ void Tile::fromXML(MXML::Tag &code){
     physInfo->setWorldTransform(trans);
   }
   if(code.contains("size"))size.fromXML(code["size"]["vector"]);
-
+  
   if(code.contains("image"))setResource(code["image"].getAttrib().getString());
 }
 
@@ -206,7 +203,7 @@ void Tile::setResource(string dirResource){
     cerr << "Adding resource to already resourced\n\n";
     return;
   }
-  resource=Resource::Load(dirResource);
+  resource=getState()->loadResource(dirResource);
   string name;
   if(exists(name=(Base::getInstance()->getProj()->getDir(dirResource)+".xml"))){
     Tag data;

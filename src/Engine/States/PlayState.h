@@ -11,8 +11,8 @@
 
 class PlayState: public State{
 public:
-    PlayState(string n);
-    PlayState(State *s);
+    PlayState(ResourceManager* resourceManger, string n);
+    PlayState(ResourceManager* resourceManger, State *s);
     StateType getType(){return GAMEST;}
     void updateElements();
     void iteration();

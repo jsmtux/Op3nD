@@ -26,8 +26,8 @@
 
 class Camera: public Editable{	
 public:
-    Camera(float ratio=-1, float fov=30.f, float zNear=0.1f, float zFar=1000.f);
-    Camera(MXML::Tag &code);
+    Camera(State* state, float ratio=-1, float fov=30.f, float zNear=0.1f, float zFar=1000.f);
+    Camera(State* state, MXML::Tag &code);
     /**
      * Sets the camera position
      * @param e camera position

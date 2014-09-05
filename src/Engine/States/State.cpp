@@ -4,24 +4,24 @@
 
 #include "State.h"
 
-#include "../Base.h"
-#include "../Timer.h"
-#include "../Controller.h"
-#include "../PhysicsWorld.h"
+#include "Base.h"
+#include "Timer.h"
+#include "Controller.h"
+#include "PhysicsWorld.h"
 
-#include "../ObjectTypes/Camera.h"
-#include "../ObjectTypes/Editable.h"
-#include "../ObjectTypes/Model3d.h"
-#include "../ObjectTypes/Scripted.h"
-#include "../ObjectTypes/Box.h"
-#include "../ObjectTypes/Line.h"
+#include "ObjectTypes/Camera.h"
+#include "ObjectTypes/Editable.h"
+#include "Resources/Model3d.h"
+#include "ObjectTypes/Scripted.h"
+#include "Resources/Box.h"
+#include "Resources/Line.h"
 
-#include "../Graphics/Shading.h"
-#include "../Graphics/PickingTexture.h"
-#include "../Graphics/RenderingContext.h"
-#include "../../ProjectManagement/Project.h"
-#include "../ObjectTypes/Image.h"
-#include "../ObjectTypes/Font.h"
+#include "Graphics/Shading.h"
+#include "Graphics/PickingTexture.h"
+#include "Graphics/RenderingContext.h"
+#include "Project.h"
+#include "Resources/Image.h"
+#include "Resources/Font.h"
 
 #include "StateUpdate.h"
 #include "PhysicsStateUpdate.h"
@@ -30,7 +30,7 @@
 #include <chrono>
 #include <thread>
 
-State::State(string n){
+State::State(ResourceManager* _resourceManger, string n): resourceManager(_resourceManger){
     name=n;
     pWorld =NULL;
 #ifndef NODRAW
@@ -50,17 +50,18 @@ State::State(string n){
 }
 
 State::State(State& s){
-    for(Camera *c:s.cameras){
-        //cameras.push_back(new Camera(*c));
-    }
-    for(Tile *t:s.tiles){
-        tiles.push_back(new Tile(*t));
-        addToList(tiles.back(),tiles.back()->getId());
-    }
-    for(Scripted *o:s.objects){
-        objects.push_back(new Scripted(*o));
-        addToList(objects.back(),objects.back()->getId());
-    }
+  resourceManager = s.resourceManager;
+  for(Camera *c:s.cameras){
+      //cameras.push_back(new Camera(*c));
+  }
+  for(Tile *t:s.tiles){
+      tiles.push_back(new Tile(*t));
+      addToList(tiles.back(),tiles.back()->getId());
+  }
+  for(Scripted *o:s.objects){
+      objects.push_back(new Scripted(*o));
+      addToList(objects.back(),objects.back()->getId());
+  }
 }
 
 void State::addToList(Editable* a, unsigned int i){    
@@ -87,39 +88,39 @@ State::~State(){
 }
 
 void State::loadFile(){
-    Image::init();
-    Line::init();
-    Scripted::Init();
-    Font::init();
-    if(getType()==EMPTYST)
-        return;
-    MXMLFile *file;
-    Tag info;
-    switch(name[name.size()-1]){
-        case 'l':
-            file= new XMLFile(Base::getInstance()->getProj()->getDir(name,Project::MAP).c_str(),info,"maps.dtd");
-            break;
-        case 'n':
-            //file=new BINFile(new Stream(new std::ifstream(Base::getInstance()->getProj()->getDir(name,MAP).c_str())),info,"maps.dtd");
-            break;
-        default:
-            throw "Unhandled type on call to load state\n";
+  Image::init();
+  Line::init();
+  Scripted::Init();
+  Font::init();
+  if(getType()==EMPTYST)
+      return;
+  MXMLFile *file;
+  Tag info;
+  switch(name[name.size()-1]){
+    case 'l':
+      file= new XMLFile(Base::getInstance()->getProj()->getDir(name,Project::MAP).c_str(),info,"maps.dtd");
+      break;
+    case 'n':
+      //file=new BINFile(new Stream(new std::ifstream(Base::getInstance()->getProj()->getDir(name,MAP).c_str())),info,"maps.dtd");
+      break;
+    default:
+      throw "Unhandled type on call to load state\n";
+  }
+  //TODO: bintype
+  //TODO wget file from remote node
+  file->read();
+  vector<Tag> listElements=info.getChildren();
+  for(int i=0;i<listElements.size();i++){
+    if(listElements[i].getName().compare("tile")==0){
+      addElement(new Tile(this, listElements[i]));
+    }else if(listElements[i].getName().compare("scripted")==0){
+      addElement(new Scripted(this, listElements[i]));
+    }else if(listElements[i].getName().compare("camera")==0){
+      addElement(new Camera(this, listElements[i]));
     }
-    //TODO: bintype
-    //TODO wget file from remote node
-    file->read();
-    vector<Tag> listElements=info.getChildren();
-    for(int i=0;i<listElements.size();i++){
-        if(listElements[i].getName().compare("tile")==0){
-            addElement(new Tile(listElements[i]));
-        }else if(listElements[i].getName().compare("scripted")==0){
-            addElement(new Scripted(listElements[i]));
-        }else if(listElements[i].getName().compare("camera")==0){
-            addElement(new Camera(listElements[i]));
-        }
-    }
-    cout << "Loading: " << glGetError() << endl;
-    delete file;
+  }
+  cout << "Loading: " << glGetError() << endl;
+  delete file;
 }
 
 Editable* State::getByIndex(unsigned int ind){
@@ -166,7 +167,7 @@ void State::beginUpdateLoop(){
 
 int State::addCam(Camera* cam){
   if(!cam){
-    cam= new Camera();
+    cam= new Camera(this);
   }
   cameras.push_back(cam);
   return cameras.size()-1;
@@ -182,10 +183,9 @@ void State::draw(){
 #ifndef NODRAW
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   currCam->view();
-  
-  for(int i=0;i<tiles.size();i++)
-      tiles[i]->draw();
-  
+  for(int i=0;i<tiles.size();i++){
+    tiles[i]->draw();
+  }
   for(int i=0;i<objects.size();i++){
     objects[i]->draw();
   }
@@ -293,19 +293,19 @@ void State::pause(){
 }
 
 void State::addElement(Editable *a){
-    addToList(a);
-    
-    switch(a->getType()){
-        case E_TILE:
-            tiles.push_back(static_cast<Tile*>(a));
-            break;
-        case E_OBJECT:
-            objects.push_back(static_cast<Scripted*>(a));
-            break;
-        case E_CAMERA:
-            cameras.push_back(static_cast<Camera*>(a));
-            break;
-    }
+  addToList(a);
+
+  switch(a->getType()){
+    case E_TILE:
+      tiles.push_back(static_cast<Tile*>(a));
+      break;
+    case E_OBJECT:
+      objects.push_back(static_cast<Scripted*>(a));
+      break;
+    case E_CAMERA:
+      cameras.push_back(static_cast<Camera*>(a));
+      break;
+  }
 }
 
 void State::addRigidBody(btRigidBody *body){
@@ -369,7 +369,7 @@ void State::fromXML(MXML::Tag &code){
                 cameras.push_back(NULL);
             }
             if(!cameras[id]){
-                cameras[id]=new Camera(c);
+                cameras[id]=new Camera(this, c);
                 continue;
             }
             cameras[id]->fromXML(c);
@@ -442,4 +442,10 @@ void State::setDebug(bool debug)
 PhysicsWorld* State::getPhysicsWorld()
 {
   return pWorld;
+}
+
+Resource* State::loadResource(string dir)
+{
+  cout << "State is " << this<< ", resource manager " << resourceManager << endl;
+  return resourceManager->loadResource(this, dir);
 }

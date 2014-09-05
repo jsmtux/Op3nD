@@ -6,6 +6,7 @@
 #define TILE_H_H
 
 #include <string>
+#include <memory>
 
 #ifndef ANDROID
 #include <GL/glew.h>
@@ -20,12 +21,13 @@ using namespace std;
 #include "../Math/Vector3.h"
 #include "../Math/Quaternion.h"
 class Resource;
+class State;
 
 class Tile:public Editable{	
 public:
-    Tile(Tile &tile);
-    Tile(MXML::Tag &code);
-    Tile(Vector3 p, Vector3 s, Quaternion r, string dirResource="");
+    Tile(State* state, Tile &tile);
+    Tile(State* state, MXML::Tag &code);
+    Tile(State* state, Vector3 p, Vector3 s, Quaternion r, string dirResource="");
     ~Tile();
     virtual void draw( );
     MXML::Tag toXML();

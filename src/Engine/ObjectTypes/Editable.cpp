@@ -5,14 +5,16 @@
 
 #include "../Graphics/Shading.h"
 
-Editable::Editable(){
+Editable::Editable(State* _state){
     id=0;
     pId=0;
+    state=_state;
 }
 
-Editable::Editable(unsigned int i){
+Editable::Editable(State* _state,unsigned int i){
     id=i;
     pId=0;
+    state=_state;
 }
 
 unsigned int Editable::getId(){

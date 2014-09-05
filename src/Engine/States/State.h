@@ -31,6 +31,7 @@ class PhysicsWorld;
 class PickingTexture;
 class Tile;
 class StateUpdate;
+class ResourceManager;
 
 typedef enum {EMPTYST, MESHST, EDITORST, GAMEST}StateType;
 
@@ -39,9 +40,10 @@ class State: public Networkable
 public:
     /**
      * Creates a new state
+     * @param resourceManager  handles the resouce loading
      * @param n name of the state
      */
-    State(string n);
+    State(ResourceManager* resourceManger, string n);
     State(State& s);
     ~State();
     /**
@@ -159,6 +161,8 @@ public:
     void setDebug(bool debug=true);
     
     PhysicsWorld* getPhysicsWorld();
+    
+    Resource* loadResource(string dir);
 protected:
     StateUpdate* stateUpdate;
     PhysicsWorld *pWorld;
@@ -167,6 +171,7 @@ protected:
     string name;
     
     NetNode *netNode;
+    ResourceManager *resourceManager;
 
 #ifndef NODRAW
     Shading* stest, *sselect;

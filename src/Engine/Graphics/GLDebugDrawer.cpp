@@ -1,5 +1,5 @@
 #include "GLDebugDrawer.h"
-#include "../ObjectTypes/Line.h"
+#include "Resources/Line.h"
 
 #include <stdio.h> //printf debugging
 GLDebugDrawer::GLDebugDrawer()

@@ -16,8 +16,8 @@ class Scripted: public Tile
 {	
 public:
     void update( );
-    Scripted(string file, Vector3 p=0, Vector3 s=Vector3(1,1,1), Vector3 r=0);
-    Scripted(MXML::Tag &code);
+    Scripted(State* state, string file, Vector3 p=0, Vector3 s=Vector3(1,1,1), Vector3 r=0);
+    Scripted(State* state, MXML::Tag &code);
     ~Scripted();
     virtual void fromXML( MXML::Tag &code );
     virtual MXML::Tag toXML( );

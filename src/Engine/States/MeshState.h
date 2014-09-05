@@ -13,7 +13,7 @@ using namespace std;
 
 class MeshState: public State{
 public:
-    MeshState(string name);
+    MeshState(ResourceManager* resourceManger, string name);
     void iteration();
     StateType getType(){return MESHST;}
 };

@@ -9,8 +9,8 @@
 #define	PHYSICAL_H
 
 #include "../../ProjectManagement/MXML.h"
-#include "../Math/Vector3.h"
-#include "Resource.h"
+#include "Math/Vector3.h"
+#include "Resources/Resource.h"
 #include <map>
 
 class Timer;
