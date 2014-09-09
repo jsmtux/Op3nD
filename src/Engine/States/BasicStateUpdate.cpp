@@ -5,6 +5,7 @@ BasicStateUpdate::BasicStateUpdate()
 {
   isStopped=true;
   updateTh = NULL;
+  updateStep = 1./15.;
 }
 
 void BasicStateUpdate::init(function< void() > func)
@@ -22,11 +23,11 @@ void BasicStateUpdate::updateLoop(){
         callback();
 	
 	for(Controller* c:Base::getInstance()->getControllers()){
-	  c->reset();
+	  c->finishIteration();
 	}
         updateLock->unlock();
         
-        tMillis sl=std::chrono::milliseconds(int(UPDATE_STEP*1000))- tUpdated.getTicks();
+        tMillis sl=std::chrono::milliseconds(int(updateStep*1000))- tUpdated.getTicks();
         std::this_thread::sleep_for(sl);
     }
 }

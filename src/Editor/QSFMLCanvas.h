@@ -38,6 +38,7 @@ private :
   bool isEnabled;
   Editable* currentSelected;
   QPoint mousePosition;
+  void setKeyState(int key, int pressed);
 signals:
   void selectionChanged(Editable* selection);
   void editObjectSource(Scripted* scripted);

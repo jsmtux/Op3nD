@@ -18,26 +18,29 @@ class Controller: public Networkable
 public:
     Controller();
     const bool* getKeys();
+    bool isKeyPressed(tkeys key);
     const float* getAxis();
     const unsigned int* getSelected();
     int getId();
-    
     static void init(lua_State* L);
     MXML::Tag toXML();
     MXML::Tag difference(Networkable& n);
     void fromXML(MXML::Tag &code);
-    void reset();
+    void finishIteration();
 protected:
     void setKey(tkeys key,bool value);
     void setAxis(taxis axis,float value);
     void setSelection(unsigned int* sel);
-private:
-    
+private:    
     int id;
-    bool vkeys[14];
-    float vaxis[4];
+    bool vkeys[K_END];//stores keys to send to game
+    bool tempKeys[K_END];//stores real pressed keys
+    int lastPressed[K_END];//stores how many iterations has been pressed
+    float vaxis[A_END];
+    float tempAxis[A_END];
     unsigned int selected[2];
     static int contNum;
+    int keyRepeatFrequency;
 };
 
 #endif

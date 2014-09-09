@@ -92,72 +92,55 @@ void QSFMLCanvas::paintGL()
   }
 }
 
+void QSFMLCanvas::setKeyState(int key, int pressed)
+{
+  switch(key){
+    case 16777235:
+      setAxis(A_X,-1 * pressed);
+      break;
+    case 16777237:
+      setAxis(A_X,1 * pressed);
+      break;
+    case 16777234:
+      setAxis(A_Y,-1 * pressed);
+      break;
+    case 16777236:
+      setAxis(A_Y,1 * pressed);
+      break;
+    case 87:
+      setKey(K_UP,pressed);
+      break;
+    case 83:
+      setKey(K_DOWN,pressed);
+      break;
+    case 65:
+      setKey(K_LEFT,pressed);
+      break;
+    case 68:
+      setKey(K_RIGHT,pressed);
+      break;
+    case 32: //space
+      setKey(K_A,pressed);
+      break;
+    case 16777223: //supr
+      setKey(K_B,pressed);
+      break;
+    default:
+      if(pressed)
+	cout << __func__ << " key " << key << "not handled" << endl;
+  }
+}
+
 void QSFMLCanvas::keyPressEvent(QKeyEvent* event)
 {
   QWidget::keyPressEvent(event);
-  switch(event->key()){
-    case 16777235:
-      setAxis(A_X,-1);
-      break;
-    case 16777237:
-      setAxis(A_X,1);
-      break;
-    case 16777234:
-      setAxis(A_Y,-1);
-      break;
-    case 16777236:
-      setAxis(A_Y,1);
-      break;
-    case 87:
-      setKey(K_UP,true);
-      break;
-    case 83:
-      setKey(K_DOWN,true);
-      break;
-    case 65:
-      setKey(K_LEFT,true);
-      break;
-    case 68:
-      setKey(K_RIGHT,true);
-      break;
-    case 32:
-      setKey(K_A,true);
-      break;
-  }
+  setKeyState(event->key(), 1);
 }
 
 void QSFMLCanvas::keyReleaseEvent(QKeyEvent* event)
 {
   QWidget::keyReleaseEvent(event);
-  switch(event->key()){
-    case 16777235:
-      setAxis(A_X,0);
-      break;
-    case 16777237:
-      setAxis(A_X,0);
-      break;
-    case 16777234:
-      setAxis(A_Y,0);
-      break;
-    case 16777236:
-      setAxis(A_Y,0);
-      break;
-    case 87:
-      setKey(K_UP,false);
-      break;
-    case 83:
-      setKey(K_DOWN,false);
-      break;
-    case 65:
-      setKey(K_LEFT,false);
-      break;
-    case 68:
-      setKey(K_RIGHT,false);
-      break;
-    case 32:
-      setKey(K_A,false);
-      break;
-  }
+  setKeyState(event->key(), 0);
 }
 
 void QSFMLCanvas::resizeGL(int width, int height)

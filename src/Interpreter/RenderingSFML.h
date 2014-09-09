@@ -13,13 +13,13 @@ using namespace std;
 
 class RenderingSFML: public RenderingContext, public Controller
 {
-private:
-    sf::Window* window;
 public:
-    void init();
-    void update();
-    RenderingSFML();
-    void gameLoop();
+  void init();
+  void update();
+  RenderingSFML();
+  void gameLoop();
+private:
+  sf::Window* window;
 };
 
 #endif

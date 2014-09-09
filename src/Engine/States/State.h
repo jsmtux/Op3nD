@@ -72,7 +72,7 @@ public:
      */
     unsigned int* selection( const int x, const int y );
     /**
-     * Performs an iteration on the state
+     * Performs a graphics iteration on the state
      */
     virtual void iteration();
     /**

@@ -34,7 +34,6 @@ set(Op3nD_SRCS
  ObjectTypes/Camera.cpp
  ObjectTypes/Editable.cpp
  ObjectTypes/Scripted.cpp
- ObjectTypes/Sprite.cpp
  ObjectTypes/Tile.cpp
  ObjectTypes/Physical.cpp
  Resources/BaseResourceLoader.cpp
