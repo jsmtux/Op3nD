@@ -25,6 +25,7 @@ Op3nD::Op3nD()
   projectDialog->exec();
   
   window.setupUi(this);
+  window.SFMLWidget->QWidget::setVisible(false);
   
   luaEditor= new LuaEditor(this);
   
@@ -99,6 +100,7 @@ void Op3nD::changeScene(QTreeWidgetItem* item, int column)
   StateManager* stateManager = Base::getInstance()->getStateManager();
   State* edState= new EditorState(Base::getInstance()->getResourceManager() ,item->text(0).toStdString());
   edState->loadFile();
+  window.SFMLWidget->QWidget::setVisible(true);
   stateManager->newState(edState);
 }
 
