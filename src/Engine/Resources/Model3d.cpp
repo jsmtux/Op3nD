@@ -36,11 +36,11 @@ Model3d::Model3d(Assimp::Importer *_importer, GLuint *_buffers, vector<Resource*
 void Model3d::Draw(){
 #ifndef NODRAW
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
-    glEnableVertexAttribArray(Shading::getActive()->getPosLocation());
-    glVertexAttribPointer(Shading::getActive()->getPosLocation(), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(Shading::getActive()->getVarLocation("Position"));
+    glVertexAttribPointer(Shading::getActive()->getVarLocation("Position"), 3, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
-    glEnableVertexAttribArray(Shading::getActive()->getTexLocation());
-    glVertexAttribPointer(Shading::getActive()->getTexLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(Shading::getActive()->getVarLocation("TexCoord"));
+    glVertexAttribPointer(Shading::getActive()->getVarLocation("TexCoord"), 2, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -52,14 +52,14 @@ void Model3d::Draw(){
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
     
-    Shading::getActive()->setAnimated(scene->HasAnimations());
+    Shading::getActive()->setBool(scene->HasAnimations(), "animated");
     
     vector<Matrix> transforms;
     boneTransform(animTime,transforms);
     animTime+=TIME_TO_SECONDS(Base::getInstance()->getStateManager()->getCurState()->getDiffTime());
     
     for(int i=0;i<transforms.size();i++){
-        Shading::getActive()->setBoneTransform(i,transforms[i]);
+	Shading::getActive()->setMatrix(transforms[i], "gBones", i);
     }
     
     for (unsigned int i = 0 ; i < meshes.size() ; i++) {

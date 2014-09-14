@@ -21,8 +21,9 @@
 #include <string>
 using namespace std;
 
-#include "../Math/Matrix.h"
-#include "../Math/Vector3.h"
+#include "Math/Matrix.h"
+#include "Math/Vector3.h"
+#include "Math/Vector2.h"
 
 #define MAX_BONES 100
 /*
@@ -62,25 +63,26 @@ public:
     void useProgram();
     void compileShader();
     GLuint getProgramInd();
-    GLuint getPosLocation();
-    GLuint getTexLocation();
-    GLuint getNormLocation();
-    GLuint getSamplerLocation();
     void deleteShading();
     static Shading* getActive();
+    void setMatrix(const Matrix &mat, string name, int ind = -1);
+    Matrix getMatrix(string name, int ind = -1);
+    void setVector3(const Vector3 &vec, string name, int ind = -1);
+    Vector3 getVector3(string name, int ind = -1);
+    void setVector2(const Vector2 &vec, string name, int ind = -1);
+    Vector2 getVector2(string name, int ind = -1);
+    void setInt(unsigned int value, string name, int ind = -1);
+    unsigned int getInt(string name, int ind = -1);
+    void setBool(bool value, string name, int ind = -1);
+    bool getBool(string name, int ind = -1);
+    void update();
+    static void push();
+    static void pop();
+    GLint getVarLocation(string name, int index=-1);
+    
     void setWVP(Matrix w);
     void setWorldPos(Matrix pos);
     void setObjMat(Matrix obj);
-    Matrix getObjMat();
-    void setColor(Vector3 col);
-    void setBoneTransform(uint ind, const Matrix& transform);
-    void update();
-    void setObjInd(unsigned int ind);
-    void setMeshInd(unsigned int ind);
-    void setAnimated(bool animated);
-    GLint getVarLocation(string name, int index=-1);
-    static void push();
-    static void pop();
 private:
     void addShader(string shader, GLenum shadertype);
     GLint getId(string name, int index=-1);
@@ -94,7 +96,6 @@ private:
     static Matrix WVP, worldMat, objMat;
     
     GLuint wvpId, worldMatId, objMatId, animatedId;
-    GLuint objId, meshId;
     GLint program;
     GLuint colorId;
     GLuint boneLocation[MAX_BONES];

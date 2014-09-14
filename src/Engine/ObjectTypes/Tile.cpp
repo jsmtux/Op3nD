@@ -149,7 +149,7 @@ Vector3 Tile::getAngVel(){
 
 void Tile::draw( ){
   #ifndef NODRAW
-  Shading::getActive()->setObjInd(getId());
+  Shading::getActive()->setInt(getId(), "gObjectIndex");
   if(resource)
     Shading::getActive()->setObjMat(getTrans()*resource->getTransform());
   #endif

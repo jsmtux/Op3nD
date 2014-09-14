@@ -49,7 +49,7 @@ void Font::Draw(string text)
     text="ABCDEFGHIJKLMNOPQRSTVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789";
   }
   float x=0,y=0;
-  Matrix baseMat=Shading::getActive()->getObjMat();
+  Matrix baseMat=Shading::getActive()->getMatrix("gObjMat");
   for(char c:text){
     if(c=='\n'){
       y+=line_height;
@@ -80,18 +80,18 @@ void Font::draw(Glyph g)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glAlphaFunc(GL_GREATER, 0.1f);
     glEnable(GL_ALPHA_TEST);
-    glEnableVertexAttribArray(Shading::getActive()->getPosLocation());
-    glEnableVertexAttribArray(Shading::getActive()->getTexLocation());
+    glEnableVertexAttribArray(Shading::getActive()->getVarLocation("Position"));
+    glEnableVertexAttribArray(Shading::getActive()->getVarLocation("TexCoord"));
     
     glBindBuffer(GL_ARRAY_BUFFER, g.VBO);
-    glVertexAttribPointer(Shading::getActive()->getPosLocation(), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-    glVertexAttribPointer(Shading::getActive()->getTexLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
+    glVertexAttribPointer(Shading::getActive()->getVarLocation("Position"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    glVertexAttribPointer(Shading::getActive()->getVarLocation("TexCoord"), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
     
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*)0);
     
-    glDisableVertexAttribArray(Shading::getActive()->getPosLocation());
-    glDisableVertexAttribArray(Shading::getActive()->getTexLocation());
+    glDisableVertexAttribArray(Shading::getActive()->getVarLocation("Position"));
+    glDisableVertexAttribArray(Shading::getActive()->getVarLocation("TexCoord"));
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     glBindTexture(GL_TEXTURE_2D, 0);

@@ -161,20 +161,22 @@ Resource* ModelLoader::loadInternal(State* state, string dir)
 	  Indices.push_back(Face.mIndices[0]);
 	}
       }
-    }    
+    }
+
+    Shading* current = Shading::getActive();
     maps = initMaterials(state, scene);
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(Shading::getActive()->getPosLocation());
-    glVertexAttribPointer(Shading::getActive()->getPosLocation(), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(INDEX_BUFFER);
+    glVertexAttribPointer(INDEX_BUFFER, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(Shading::getActive()->getTexLocation());
-    glVertexAttribPointer(Shading::getActive()->getTexLocation(), 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(POS_VB);
+    glVertexAttribPointer(POS_VB, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(Shading::getActive()->getNormLocation());
-    glVertexAttribPointer(Shading::getActive()->getNormLocation(), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(NORMAL_VB);
+    glVertexAttribPointer(NORMAL_VB, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BONE_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);

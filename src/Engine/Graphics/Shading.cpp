@@ -123,17 +123,21 @@ void Shading::compileShader(){
 
 GLint Shading::getId(string name, int index)
 {
-  if(index != -1){
-    stringstream str;
-    str << name << "[" << index <<"]";
-    name = str.str();
+  GLint tmp = glGetUniformLocation(program, name.c_str());
+  if(tmp == -1){
+    tmp = glGetAttribLocation(program, name.c_str());
   }
-  return glGetUniformLocation(program, name.c_str());
+  return tmp;
 }
 
 GLint Shading::getVarLocation(string name, int index)
 {
   map<string,GLint>::iterator tmp;
+  if(index != -1){
+    stringstream str;
+    str << name << "[" << index <<"]";
+    name = str.str();
+  }
   if((tmp=shaderLocs.find(name))==shaderLocs.end()){
     cout << name << "not found";
     GLint ret = getId(name, index);
@@ -164,9 +168,6 @@ void Shading::initVars(){
   worldMatId=getId("gWorld");
   objMatId=getId("gObjMat");
   
-  objId=getId("gObjectIndex");
-  meshId=getId("gMeshIndex");
-  
   colorId=getId("color");
   
   animatedId=getId("animated");
@@ -177,9 +178,68 @@ void Shading::initVars(){
 
 }
 
-void  Shading::setBoneTransform(uint ind, const Matrix& transform){
-  assert(ind<MAX_BONES);
-  glUniformMatrix4fv(boneLocation[ind],1,GL_TRUE,(const GLfloat*)transform.m);
+void Shading::setMatrix(const Matrix& mat, string name, int ind)
+{
+  GLint loc = getVarLocation(name, ind);
+  if(loc!=0xFFFFFFFF){
+    glUniformMatrix4fv(loc, 1, GL_TRUE, (const GLfloat*)mat.m);
+  }
+}
+
+Matrix Shading::getMatrix(string name, int ind)
+{
+}
+
+void Shading::setVector3(const Vector3& vec, string name, int ind)
+{
+  GLint loc = getVarLocation(name, ind);
+  if(loc!=0xFFFFFFFF){
+    glUniform3f(colorId, vec.x, vec.y, vec.z );
+  }
+}
+
+Vector3 Shading::getVector3(string name, int ind)
+{
+
+}
+
+void Shading::setVector2(const Vector2& vec, string name, int ind)
+{
+  GLint loc = getVarLocation(name, ind);
+  if(loc!=0xFFFFFFFF){
+    glUniform2f(loc, vec.x, vec.y);
+  }
+}
+
+Vector2 Shading::getVector2(string name, int ind)
+{
+
+}
+
+void Shading::setInt(unsigned int value, string name, int ind)
+{
+  GLint loc = getVarLocation(name, ind);
+  if(loc!=0xFFFFFFFF){
+    glUniform1i(loc, value);
+  }
+}
+
+unsigned int Shading::getInt(string name, int ind)
+{
+
+}
+
+void Shading::setBool(bool value, string name, int ind)
+{
+  GLint loc = getVarLocation(name, ind);
+  if(loc!=0xFFFFFFFF){
+    glUniform1i(loc, value);
+  }
+}
+
+bool Shading::getBool(string name, int ind)
+{
+
 }
 
 void Shading::setWVP(Matrix w){
@@ -192,12 +252,7 @@ void Shading::setWorldPos(Matrix pos){
 
 void Shading::setObjMat(Matrix obj){    
   objMat=obj;
-  glUniformMatrix4fv(objMatId, 1, GL_TRUE, &(objMat).m[0][0]);
-}
-
-Matrix Shading::getObjMat()
-{
-  return objMat;
+  setMatrix(objMat, "gObjMat");
 }
 
 void Shading::useProgram(){
@@ -214,36 +269,6 @@ Shading* Shading::getActive(){
   return active;
 }
 
-void Shading::setColor(Vector3 col){
-  glUniform3f(colorId, col.x, col.y, col.z );
-}
-
-void Shading::setObjInd(unsigned int ind){
-  if(objId!=0xFFFFFFFF){
-    #ifndef ANDROID
-    glUniform1ui(objId, ind);
-    #else
-    glUniform1i(objId, ind);
-    #endif
-  }
-}
-
-void Shading::setMeshInd(unsigned int ind){
-  if(meshId!=0xFFFFFFFF){
-    #ifndef ANDROID
-    glUniform1ui(meshId, ind);
-    #else
-    glUniform1i(meshId, ind);
-    #endif
-  }
-}
-
-void Shading::setAnimated(bool animated){
-  if(animatedId!=0xFFFFFFFF){
-    glUniform1i(animatedId, animated);
-  }
-}
-
 void Shading::push(){
   shaderStack.push(active);
 }
@@ -252,24 +277,4 @@ void Shading::pop(){
   if(shaderStack.empty())return;
   shaderStack.top()->useProgram();
   shaderStack.pop();    
-}
-
-GLuint Shading::getPosLocation()
-{
-  return 0;
-}
-
-GLuint Shading::getTexLocation()
-{
-  return 1;
-}
-
-GLuint Shading::getNormLocation()
-{
-  return 2;
-}
-
-GLuint Shading::getSamplerLocation()
-{
-  return 3;
 }

@@ -42,13 +42,8 @@ Image::~Image()
 void Image::Bind(Vector2 offset, Vector2 size){
 #ifndef NODRAW
   Shading* current = Shading::getActive();
-  GLuint pos;
-  if((pos=current->getVarLocation("offset"))!=-1){
-    glUniform2f(pos, offset.x, offset.y);
-  }
-  if((pos=current->getVarLocation("size"))!=-1){
-    glUniform2f(pos, size.x, size.y);
-  }
+  current->setVector2(offset, "offset");
+  current->setVector2(size, "size");
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, imageId);
 #endif
@@ -63,20 +58,20 @@ void Image::Draw(Vector2 offset, Vector2 size){
 #ifndef NODRAW
     Shading* current = Shading::getActive();
     glDisable(GL_CULL_FACE);
-    glEnableVertexAttribArray(current->getPosLocation());
-    glEnableVertexAttribArray(current->getTexLocation());
+    glEnableVertexAttribArray(current->getVarLocation("Position"));
+    glEnableVertexAttribArray(current->getVarLocation("TexCoord"));
 //    glEnableVertexAttribArray(Shading::getActive()->getNormLocation());
     
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(current->getPosLocation(), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-    glVertexAttribPointer(current->getTexLocation(), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
+    glVertexAttribPointer(current->getVarLocation("Position"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    glVertexAttribPointer(current->getVarLocation("TexCoord"), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
 //    glVertexAttribPointer(getNormLocation(), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
     
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*)0);
     
-    glDisableVertexAttribArray(current->getPosLocation());
-    glDisableVertexAttribArray(current->getTexLocation());
+    glDisableVertexAttribArray(current->getVarLocation("Position"));
+    glDisableVertexAttribArray(current->getVarLocation("TexCoord"));
 //    glDisableVertexAttribArray(Shading::getActive()->getNormLocation());
     glEnable(GL_CULL_FACE);
 #endif
