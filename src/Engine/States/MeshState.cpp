@@ -4,7 +4,7 @@
 #include "../Base.h"
 #include "../PhysicsWorld.h"
 
-MeshState::MeshState(ResourceManager* resourceManger, string name):State(resourceManager, name){
+MeshState::MeshState(ResourceManager* _resourceManager, string name):State(_resourceManager, name){
     initPhysicsWorld();
     
     cameras.push_back(new Camera(this));
