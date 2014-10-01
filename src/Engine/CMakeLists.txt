@@ -26,7 +26,8 @@ set(Op3nD_SRCS
  Graphics/GLDebugDrawer.cpp
  Graphics/PickingTexture.cpp
  Graphics/RenderingContext.cpp
- Graphics/Shading.cpp
+ Graphics/Shader.cpp
+ Graphics/Renderer.cpp
  Math/Matrix.cpp
  Math/Quaternion.cpp
  Math/Vector2.cpp

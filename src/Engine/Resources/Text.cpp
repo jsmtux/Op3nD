@@ -7,9 +7,9 @@ Text::Text(string _text, Font* _font)
   font = _font;
 }
 
-void Text::Draw()
+void Text::Draw(Shader* shader)
 {
-  font->Draw(text);
+  font->Draw(shader, text);
 }
 
 Resource::ResourceType Text::getType()

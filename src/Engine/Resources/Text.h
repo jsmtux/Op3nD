@@ -6,12 +6,12 @@
 #define TEXT_H_H
 #include "Resource.h"
 #include "Font.h"
-#include "../Math/Quaternion.h"
+#include "Math/Quaternion.h"
 
 class Text: public Resource{
 public:
   ResourceType getType();
-  void Draw();
+  void Draw(Shader* shader);
   void setText(string text);
   string getText();
 private:

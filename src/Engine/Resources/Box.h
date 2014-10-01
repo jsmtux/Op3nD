@@ -11,7 +11,7 @@
 
 class Box:public Resource{
 public:
-    void Draw();
+    void Draw(Shader *shader);
     ResourceType getType();
     static Box* loadBox();
     void del();

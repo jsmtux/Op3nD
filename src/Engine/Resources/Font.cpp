@@ -1,17 +1,16 @@
 #include "Font.h"
 #include <fstream>
-#include "../Math/Vector2.h"
-#include "../Graphics/Shading.h"
+#include "Math/Vector2.h"
+#include "Graphics/Shader.h"
 #include "Model3d.h"
-#include "../../ProjectManagement/Project.h"
+#include "Project.h"
 
 GLuint Font::IBO=0;
-Shading* Font::textShader;
 
 void Font::init()
 {
-  textShader= new Shading;
-  textShader->initShader(Project::common()->getDir("text.sfx",Project::SHADER));
+  //textShader= new Shader;
+  //textShader->initShader(Project::common()->getDir("text.sfx",Project::SHADER));
 }
 
 Font::Font(map<char,Glyph> glyphs, int _line_height, float _tex_line_height, GLuint _texture)
@@ -43,13 +42,13 @@ void Font::init_VBO()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Font::Draw(string text)
+void Font::Draw(Shader* shader, string text)
 {
   if(text.empty()){
     text="ABCDEFGHIJKLMNOPQRSTVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789";
   }
   float x=0,y=0;
-  Matrix baseMat=Shading::getActive()->getMatrix("gObjMat");
+  Matrix baseMat=shader->getMatrix("gObjMat");
   for(char c:text){
     if(c=='\n'){
       y+=line_height;
@@ -58,18 +57,17 @@ void Font::Draw(string text)
     Glyph g= table[c];
     Matrix trans;
     trans.setTranslationTransform(x,y,0);
-    Shading::getActive()->setObjMat(baseMat * trans );
-    draw(g);
+    shader->setMatrix(baseMat * trans , "gObjtMat");
+    draw(shader, g);
     x+=g.advance*0.1;
   }
-  Shading::getActive()->setObjMat(baseMat);
+  shader->setMatrix(baseMat, "gObjMat");
 }
 
-void Font::draw(Glyph g)
+void Font::draw(Shader* shader, Glyph g)
 {
 #ifndef NODRAW
-  Shading::push();
-  textShader->useProgram();
+  //textShader->useProgram();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDisable(GL_CULL_FACE);
@@ -80,22 +78,21 @@ void Font::draw(Glyph g)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glAlphaFunc(GL_GREATER, 0.1f);
     glEnable(GL_ALPHA_TEST);
-    glEnableVertexAttribArray(Shading::getActive()->getVarLocation("Position"));
-    glEnableVertexAttribArray(Shading::getActive()->getVarLocation("TexCoord"));
+    glEnableVertexAttribArray(shader->getVarLocation("Position"));
+    glEnableVertexAttribArray(shader->getVarLocation("TexCoord"));
     
     glBindBuffer(GL_ARRAY_BUFFER, g.VBO);
-    glVertexAttribPointer(Shading::getActive()->getVarLocation("Position"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-    glVertexAttribPointer(Shading::getActive()->getVarLocation("TexCoord"), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
+    glVertexAttribPointer(shader->getVarLocation("Position"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    glVertexAttribPointer(shader->getVarLocation("TexCoord"), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
     
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*)0);
     
-    glDisableVertexAttribArray(Shading::getActive()->getVarLocation("Position"));
-    glDisableVertexAttribArray(Shading::getActive()->getVarLocation("TexCoord"));
+    glDisableVertexAttribArray(shader->getVarLocation("Position"));
+    glDisableVertexAttribArray(shader->getVarLocation("TexCoord"));
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     glBindTexture(GL_TEXTURE_2D, 0);
-  Shading::pop();
 #endif
 }
 

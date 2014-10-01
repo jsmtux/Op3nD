@@ -4,12 +4,12 @@
 
 
 #include "Camera.h"
-#include "../Math/Matrix.h"
-#include "../Math/Vector3.h"
-#include "../Math/Quaternion.h"
+#include "Math/Matrix.h"
+#include "Math/Vector3.h"
+#include "Math/Quaternion.h"
 #include "Tile.h"
-#include "../Graphics/Shading.h"
-#include "../Base.h"
+#include "Graphics/Shader.h"
+#include "Base.h"
 
 
 Camera::Camera(State* state, float ratio, float fov, float zNear, float zFar):Editable(state), visible(state, Vector3(0,0,0),Vector3(1,1,1),Quaternion(0,0,0,1),"*camera.3ds"){
@@ -70,7 +70,7 @@ void Camera::reloadMatrix()
 }
 
 
-void Camera::view( ){
+void Camera::view(RendererBase* renderer){
   Matrix camMat;
   N = target.normalized();
   U = up.normalized();
@@ -81,9 +81,7 @@ void Camera::view( ){
   camMat.m[1][0] = V.x; camMat.m[1][1] = V.y; camMat.m[1][2] = V.z; camMat.m[1][3] = 0.0f;
   camMat.m[2][0] = N.x; camMat.m[2][1] = N.y; camMat.m[2][2] = N.z; camMat.m[2][3] = 0.0f;
   camMat.m[3][0] = 0.0f; camMat.m[3][1] = 0.0f; camMat.m[3][2] = 0.0f; camMat.m[3][3] = 1.0f;
-#ifndef NODRAW    
-  Shading::getActive()->setWVP(perspMat*camMat*(-pos).toPositionMatrix());
-#endif
+  renderer->setWVP(perspMat*camMat*(-pos).toPositionMatrix());
 }
 
 void Camera::setId(unsigned int id){
@@ -91,7 +89,7 @@ void Camera::setId(unsigned int id){
     visible.setParentId(id);
 }
 
-void Camera::orthoView(){
+void Camera::orthoView(RendererBase* renderer){
     Matrix camMat;
     
     N = target.normalized();
@@ -105,7 +103,7 @@ void Camera::orthoView(){
     camMat.m[2][0] = N.x; camMat.m[2][1] = N.y; camMat.m[2][2] = N.z; camMat.m[2][3] = 0.0f;
     camMat.m[3][0] = 0.0f; camMat.m[3][1] = 0.0f; camMat.m[3][2] = 0.0f; camMat.m[3][3] = 1.0f;
 #ifndef NODRAW    
-    Shading::getActive()->setWVP(orthoMat*camMat*(-pos).toPositionMatrix());
+    renderer->setWVP(orthoMat*camMat*(-pos).toPositionMatrix());
 #endif
 }
 
@@ -222,9 +220,9 @@ Quaternion Camera::getRot(){
     return Quaternion(0,0,0,1);
 }
 
-void Camera::draw(){
+void Camera::draw(Shader* shader){
     visible.setPos(pos);
-    visible.draw();
+    visible.draw(shader);
 }
 
 edType Camera::getType(){

@@ -9,6 +9,7 @@
 #define	GLDEBUGDRAWER_H
 
 #include "LinearMath/btIDebugDraw.h"
+#include "Shader.h"
 
 
 class GLDebugDrawer : public btIDebugDraw
@@ -27,6 +28,7 @@ public:
     void draw3dText(const btVector3& location,const char* textString);
     void setDebugMode(int debugMode);
     int getDebugMode() const { return m_debugMode;}
+    Shader* currentShader;
 };
 
 #endif	/* GLDEBUGDRAWER_H */

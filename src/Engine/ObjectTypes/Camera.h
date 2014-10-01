@@ -23,6 +23,7 @@
 #include "../Math/Vector3.h"
 #include "../Math/Quaternion.h"
 #include "../Math/Matrix.h"
+#include <Graphics/Renderer.h>
 
 class Camera: public Editable{	
 public:
@@ -38,12 +39,12 @@ public:
     /**
      * Updates the world position according tho the camera coordinates
      */
-    void view( );    
+    void view(RendererBase* renderer);    
     /**
      * Updates the world position according tho the camera coordinates
      * without perspective correction
      */
-    void orthoView();
+    void orthoView(RendererBase* renderer);
     /**
      * Moves the camera
      * @param v amount of movement
@@ -81,7 +82,7 @@ public:
     void setPos(Vector3 p);
     void setRot(Quaternion s);
     void setSize(Vector3 r);
-    void draw();
+    void draw(Shader* shader);
     edType getType();
     void reloadMatrix();
 private:

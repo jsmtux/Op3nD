@@ -1,6 +1,5 @@
 #include "ModelLoader.h"
 #include "Model3d.h"
-#include "Graphics/Shading.h"
 #include <Base.h>
 #include <assimp/postprocess.h>
 
@@ -163,7 +162,6 @@ Resource* ModelLoader::loadInternal(State* state, string dir)
       }
     }
 
-    Shading* current = Shading::getActive();
     maps = initMaterials(state, scene);
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);

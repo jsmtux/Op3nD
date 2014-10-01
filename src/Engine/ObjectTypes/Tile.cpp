@@ -8,10 +8,10 @@
 #include "../Base.h"
 #include "Resources/Image.h"
 #include "Physical.h"
-#include "../Graphics/Shading.h"
-#include "../Math/Matrix.h"
-#include "../PhysicsWorld.h"
-#include "../../ProjectManagement/Project.h"
+#include "Graphics/Shader.h"
+#include "Math/Matrix.h"
+#include "PhysicsWorld.h"
+#include "Project.h"
 
 extern Image* imtmp;
 
@@ -34,8 +34,9 @@ Tile::Tile(State* state, Tile &tile):Editable(state, tile.id){
   colored=tile.colored;
   string resourceName= tile.resource->getName();
   resource=NULL;
-  if(!resourceName.empty())
+  if(!resourceName.empty()){
     setResource(resourceName);
+  }
   
   physInfo=NULL;
   position=tile.position;
@@ -147,19 +148,17 @@ Vector3 Tile::getAngVel(){
   return Vector3(0,0,0);
 }
 
-void Tile::draw( ){
-  #ifndef NODRAW
-  Shading::getActive()->setInt(getId(), "gObjectIndex");
+void Tile::draw(Shader* shader){
+  shader->setInt(getId(), "gObjectIndex");
   if(resource)
-    Shading::getActive()->setObjMat(getTrans()*resource->getTransform());
-  #endif
+    shader->setMatrix(getTrans()*resource->getTransform(), "gObjMat");
   if(physInfo){
     btTransform trans= physInfo->getWorldTransform();
     position=Vector3(trans.getOrigin());
     rotation=Quaternion(trans.getRotation());
   }
   if(resource){
-    resource->Draw();
+    resource->Draw(shader);
   }
 }
 
@@ -189,6 +188,8 @@ void Tile::setResource(Resource* res)
     return;
   }
   resource=res;
+  cout << "Resource set for " << res->getName() << " registering shader " << resource->defaultShader() << endl;
+  getState()->registerShader(this, resource->defaultShader());
   string name;
   if(exists(name=(Base::getInstance()->getProj()->getDir(res->getName())+".xml"))){
     Tag data;
@@ -203,14 +204,7 @@ void Tile::setResource(string dirResource){
     cerr << "Adding resource to already resourced\n\n";
     return;
   }
-  resource=getState()->loadResource(dirResource);
-  string name;
-  if(exists(name=(Base::getInstance()->getProj()->getDir(dirResource)+".xml"))){
-    Tag data;
-    XMLFile pdata(name,data,"physical.dtd");
-    pdata.read();
-    setPhysical(data);
-  }
+  setResource(getState()->loadResource(dirResource));
 }
 
 MXML::Tag Tile::toXML(){

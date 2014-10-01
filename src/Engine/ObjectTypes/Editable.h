@@ -15,6 +15,7 @@ typedef enum {E_TILE,E_OBJECT,E_CAMERA,E_TEXT}edType;
 class Vector3;
 class Quaternion;
 class State;
+class Shader;
 
 class Editable: public Networkable
 {
@@ -25,7 +26,7 @@ public:
     virtual void setPos(Vector3 p)=0;
     virtual void setRot(Quaternion s)=0;
     virtual void setSize(Vector3 r)=0;
-    virtual void draw()=0;
+    virtual void draw(Shader* shader)=0;
     /**
      * return type of editable entity
      * @return edType according to type

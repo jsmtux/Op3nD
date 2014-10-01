@@ -18,18 +18,19 @@
 using namespace std;
 
 #include "Editable.h"
-#include "../Math/Vector3.h"
-#include "../Math/Quaternion.h"
+#include "Math/Vector3.h"
+#include "Math/Quaternion.h"
+#include "Graphics/Shader.h"
 class Resource;
 class State;
 
-class Tile:public Editable{	
+class Tile:public Editable{
 public:
     Tile(State* state, Tile &tile);
     Tile(State* state, MXML::Tag &code);
     Tile(State* state, Vector3 p, Vector3 s, Quaternion r, string dirResource="");
     ~Tile();
-    virtual void draw( );
+    virtual void draw(Shader* shader);
     MXML::Tag toXML();
     MXML::Tag difference(Networkable &n);
     void fromXML(MXML::Tag &code);

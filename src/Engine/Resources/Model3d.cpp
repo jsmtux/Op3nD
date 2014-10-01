@@ -9,8 +9,8 @@
 #include "Resource.h"
 #include "../../ProjectManagement/MXML.h"
 #include "../../ProjectManagement/Project.h"
-#include "../Base.h"
-#include "../Graphics/Shading.h"
+#include "Base.h"
+#include "Graphics/Shader.h"
 
 Resource::ResourceType Model3d::getType()
 {
@@ -33,14 +33,14 @@ Model3d::Model3d(Assimp::Importer *_importer, GLuint *_buffers, vector<Resource*
     scaleTransform = _scaleTransform;
 }
 
-void Model3d::Draw(){
+void Model3d::Draw(Shader *shader){
 #ifndef NODRAW
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
-    glEnableVertexAttribArray(Shading::getActive()->getVarLocation("Position"));
-    glVertexAttribPointer(Shading::getActive()->getVarLocation("Position"), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(shader->getVarLocation("Position"));
+    glVertexAttribPointer(shader->getVarLocation("Position"), 3, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
-    glEnableVertexAttribArray(Shading::getActive()->getVarLocation("TexCoord"));
-    glVertexAttribPointer(Shading::getActive()->getVarLocation("TexCoord"), 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(shader->getVarLocation("TexCoord"));
+    glVertexAttribPointer(shader->getVarLocation("TexCoord"), 2, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -52,21 +52,21 @@ void Model3d::Draw(){
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
     
-    Shading::getActive()->setBool(scene->HasAnimations(), "animated");
+    shader->setBool(scene->HasAnimations(), "animated");
     
     vector<Matrix> transforms;
     boneTransform(animTime,transforms);
     animTime+=TIME_TO_SECONDS(Base::getInstance()->getStateManager()->getCurState()->getDiffTime());
     
     for(int i=0;i<transforms.size();i++){
-	Shading::getActive()->setMatrix(transforms[i], "gBones", i);
+	shader->setMatrix(transforms[i], "gBones", i);
     }
     
     for (unsigned int i = 0 ; i < meshes.size() ; i++) {
         const unsigned int MaterialIndex = meshes[i].MaterialIndex;
 
        if (MaterialIndex < maps.size() && maps[MaterialIndex]) {
-           dynamic_cast<Image*>(maps[MaterialIndex])->Bind();
+           dynamic_cast<Image*>(maps[MaterialIndex])->Bind(shader);
        }
        #ifndef ANDROID
         glDrawElementsBaseVertex(GL_TRIANGLES,

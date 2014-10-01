@@ -15,17 +15,18 @@ using namespace std;
 #endif
 #include <btBulletDynamicsCommon.h>
 
-#include "../../ProjectManagement/MXML.h"
+#include "MXML.h"
 using namespace MXML;
 
-#include "../Timer.h"
-#include "../Controller.h"
-#include "../ObjectTypes/Scripted.h"
-#include "../../Network/NetNode.h"
+#include "Timer.h"
+#include "Controller.h"
+#include "ObjectTypes/Scripted.h"
+#include "../Network/NetNode.h"
+#include "Graphics/Renderer.h"
 
 class Editable;
 class Object;
-class Shading;
+class Shader;
 class Camera;
 class PhysicsWorld;
 class PickingTexture;
@@ -163,6 +164,11 @@ public:
     PhysicsWorld* getPhysicsWorld();
     
     Resource* loadResource(string dir);
+    /**
+     * Adds a tile to the renderers with the specified shader
+     * @param shaderName the name of the shader
+     */
+    void registerShader(Tile* tile, string shaderName);
 protected:
     StateUpdate* stateUpdate;
     PhysicsWorld *pWorld;
@@ -172,11 +178,10 @@ protected:
     
     NetNode *netNode;
     ResourceManager *resourceManager;
-
-#ifndef NODRAW
-    Shading* stest, *sselect;
-    PickingTexture *ptext;
-#endif    
+    
+    PickingRenderer pickingRenderer;
+    RendererBase drawingRenderer;
+    
     vector<Editable*> list;
     vector<Camera*> cameras;
     Camera* currCam;

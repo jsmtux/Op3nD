@@ -97,7 +97,7 @@ class Model3d: public Resource
 {
 public:
     virtual ~Model3d();
-    void Draw();
+    void Draw(Shader* shader);
     ResourceType getType();
     //animation
     vector<string> getAnimations();

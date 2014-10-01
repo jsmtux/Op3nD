@@ -13,7 +13,7 @@ GLDebugDrawer::~GLDebugDrawer()
 }
 
 void	GLDebugDrawer::drawLine(const btVector3& from,const btVector3& to,const btVector3& fromColor, const btVector3& toColor){
-    Line::drawLine(from,to,fromColor);
+    Line::drawLine(currentShader, from,to,fromColor);
 }
 
 void	GLDebugDrawer::drawLine(const btVector3& from,const btVector3& to,const btVector3& color){
@@ -41,8 +41,8 @@ void GLDebugDrawer::drawSphere (const btVector3& p, btScalar radius, const btVec
 			btScalar lng = 2 * SIMD_PI * (btScalar) (j - 1) / longs;
 			btScalar x = cos(lng);
 			btScalar y = sin(lng);
-                        Line::drawLine(prev,(x * zr0, y * zr0, z0),color);
-                        Line::drawLine((x * zr0, y * zr0, z0),(x * zr1, y * zr1, z1),color);//strip
+                        Line::drawLine(currentShader, prev,(x * zr0, y * zr0, z0),color);
+                        Line::drawLine(currentShader, (x * zr0, y * zr0, z0),(x * zr1, y * zr1, z1),color);//strip
                         prev=(x * zr1, y * zr1, z1);
 		}
 	}

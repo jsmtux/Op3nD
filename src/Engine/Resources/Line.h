@@ -8,7 +8,7 @@
 #ifndef LINE_H
 #define	LINE_H
 #include "Resource.h"
-class Shading;
+class Shader;
 #include "../Math/Vector3.h"
 #ifndef ANDROID
 #include <GL/glew.h>
@@ -20,16 +20,16 @@ class Shading;
 
 class Line: public Resource{
 public:
-    void Draw(); 
+    void Draw(Shader* shader);
     ResourceType getType();
     void del();
-    static void drawLine(Vector3 b, Vector3 e, Vector3 c);
+    static void drawLine(Shader* shader, Vector3 b, Vector3 e, Vector3 c);
     static void init();
+    string defaultShader() {return "color.sfx";}
 private:
     Vector3 begin, end, color;
 #ifndef NODRAW
-    static GLuint VBO; 
-    static Shading* colorShader;
+    static GLuint VBO;
 #endif
 };
 

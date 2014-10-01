@@ -56,15 +56,15 @@ struct DirectionalLightLocation{
     GLint DiffuseIntensity;
 };
 **/
-class Shading{
+class Shader{
 public:
-    Shading();
+    Shader();
+    Shader(string file);
     virtual void initShader(string file);
     void useProgram();
     void compileShader();
     GLuint getProgramInd();
     void deleteShading();
-    static Shading* getActive();
     void setMatrix(const Matrix &mat, string name, int ind = -1);
     Matrix getMatrix(string name, int ind = -1);
     void setVector3(const Vector3 &vec, string name, int ind = -1);
@@ -75,27 +75,16 @@ public:
     unsigned int getInt(string name, int ind = -1);
     void setBool(bool value, string name, int ind = -1);
     bool getBool(string name, int ind = -1);
-    void update();
-    static void push();
-    static void pop();
     GLint getVarLocation(string name, int index=-1);
-    
-    void setWVP(Matrix w);
-    void setWorldPos(Matrix pos);
-    void setObjMat(Matrix obj);
 private:
     void addShader(string shader, GLenum shadertype);
     GLint getId(string name, int index=-1);
     virtual void initVars();
-    
-    static Shading* active;
-    static vector<GLuint> shaderlist;
-    static stack<Shading*> shaderStack;
+
     map<string, GLint> shaderLocs;
+    vector<GLuint> shaderlist;
     
-    static Matrix WVP, worldMat, objMat;
-    
-    GLuint wvpId, worldMatId, objMatId, animatedId;
+    GLuint animatedId;
     GLint program;
     GLuint colorId;
     GLuint boneLocation[MAX_BONES];

@@ -4,7 +4,7 @@
 
 Box* Box::stBox=new Box();
 
-void Box::Draw(){
+void Box::Draw(Shader* shader){
     /*Vector3 Vertices[8] = {
     Vector3(-0.5f, -0.5f,-0.5f),
     Vector3(0.5f, -0.5f,-0.5f),

@@ -16,7 +16,7 @@
 #include "Resources/Box.h"
 #include "Resources/Line.h"
 
-#include "Graphics/Shading.h"
+#include "Graphics/Shader.h"
 #include "Graphics/PickingTexture.h"
 #include "Graphics/RenderingContext.h"
 #include "Project.h"
@@ -26,6 +26,7 @@
 #include "StateUpdate.h"
 #include "PhysicsStateUpdate.h"
 #include "BasicStateUpdate.h"
+#include "Graphics/Renderer.h"
 
 #include <chrono>
 #include <thread>
@@ -34,16 +35,7 @@ State::State(ResourceManager* _resourceManger, string n): resourceManager(_resou
     name=n;
     pWorld =NULL;
 #ifndef NODRAW
-    stest=new Shading();
-    stest->initShader(Project::common()->getDir("normal.sfx",Project::SHADER));
-    sselect=new Shading();
-    sselect->initShader(Project::common()->getDir("picking.sfx",Project::SHADER));
-
-    Vector3 res=Base::getInstance()->getRC()->getResolution();    
-    
-    ptext = new PickingTexture(res.x,res.y);
-    
-    stest->useProgram();
+    Vector3 res=Base::getInstance()->getRC()->getResolution();
 #endif
     netNode=NULL;
     stateUpdate=NULL;
@@ -180,19 +172,8 @@ void State::setCam(int no){
 }
 
 void State::draw(){
-#ifndef NODRAW
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  currCam->view();
-  for(int i=0;i<tiles.size();i++){
-    tiles[i]->draw();
-  }
-  for(int i=0;i<objects.size();i++){
-    objects[i]->draw();
-  }
-  
-  Shading::getActive()->setObjMat(Matrix());
-  if(pWorld&&debug)pWorld->draw();
-#endif
+  currCam->view(&drawingRenderer);
+  drawingRenderer.draw();
 }
 
 void State::updateElements(){
@@ -200,7 +181,7 @@ void State::updateElements(){
     if(netNode&&!netNode->isServing()){
         netNode->sendUpdate();
     }
-    if(currCam)currCam->view();
+    if(currCam)currCam->view(&drawingRenderer);
     if(!netNode||!netNode->thinClient()){
       bool needsClean=false;
       for(int i=0;i<objects.size();i++){
@@ -221,7 +202,7 @@ void State::updateElements(){
       }
       if(netNode){
 	  for(int i=0;i<list.size();i++){
-	      list[i]->draw();
+	      //list[i]->draw();
 	  }
       }
     }
@@ -239,11 +220,7 @@ void State::updateElements(){
     }
 }
 
-void State::iteration(){  
-#ifndef NODRAW
-    stest->useProgram();
-    stest->update();
-#endif
+void State::iteration(){
 }
 
 void State::clear(){
@@ -266,19 +243,9 @@ void State::clear(){
     list.clear();
 }
 
- unsigned int* State::selection( const int x, const int y ){
-#ifndef NODRAW
-    ptext->bind();
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    sselect->useProgram();
-
-    draw();
-
-    ptext->unBind();
-    return ptext->ReadId(x,y);
-#endif
+unsigned int* State::selection( const int x, const int y ){
+   pickingRenderer.draw();
+   return pickingRenderer.getValue(x, y);
 }
 
 string State::getName(){
@@ -429,9 +396,10 @@ void State::updateResolution()
   for(Camera* cam:cameras){
     cam->reloadMatrix();
   }
-  delete ptext;
+
   Vector3 res = Base::getInstance()->getRC()->getResolution();
-  ptext = new PickingTexture(res.x,res.y);
+
+  pickingRenderer.setResolution(Vector2(res.x, res.y));
 }
 
 void State::setDebug(bool debug)
@@ -448,4 +416,10 @@ Resource* State::loadResource(string dir)
 {
   cout << "State is " << this<< ", resource manager " << resourceManager << endl;
   return resourceManager->loadResource(this, dir);
+}
+
+void State::registerShader(Tile* tile, string shaderName)
+{
+  pickingRenderer.addElement(tile);
+  drawingRenderer.setShading(tile, shaderName);
 }

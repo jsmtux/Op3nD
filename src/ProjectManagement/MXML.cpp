@@ -198,98 +198,112 @@ string nextToken(string full, string delimiters = " \t\n") {
 #include <bits/stl_vector.h>
 
 void XMLFile::read() {
-    std::ifstream file(dir.c_str());
-    if (!file.is_open()) {
-        cerr << "File "<< dir <<" does not exist" << endl;
-        return;
-    }
-    string line;
-    int s = 0;
-    stack<Tag*> sTag;
-    string token;
-    string ntag;
-    string att;
-    Tag curTag;
-    string rootName;
-    string prevName;
-    float parseF;
-    bool prev=true;
+  if(dir.back() == '/'){
+    cerr << "File is a directory, not opening" << endl;
+    return;
+  }
+  std::ifstream file(dir.c_str());
+  if (!file.is_open()) {
+      cerr << "File "<< dir <<" does not exist" << endl;
+      return;
+  }
+  string line;
+  int s = 0;
+  stack<Tag*> sTag;
+  string token;
+  string ntag;
+  string att;
+  Tag curTag;
+  string rootName;
+  string prevName;
+  float parseF;
+  bool prev=true;
 
-    while (!file.eof()) {
-        getline(file, line);
-        if (line.empty())continue;
-        try {
-            while (!(token = nextToken(line)).empty()) {
-                switch (s) {
-                    case 0://Doctype not found yet
-                        if (token.compare("<!DOCTYPE") != 0)throw "Error on doctype";
-                        rootName = nextToken(line);
-                        nextToken(line);
-                        dtd = nextToken(line);
-                        dtd = dtd.substr(1, dtd.size() - 3);
-                        DTD::newDTD(dtd);
-                        while (!(token = nextToken(line)).empty());
-                        s++;
-                        break;
-                    case 1:
-                        switch (getTokenType(token)) {
-                            case BEGIN://found opening tag
-                                ntag = token.substr(1, token.size() - 2);
-                                curTag = Tag(ntag);
-                                if (sTag.empty()) {
-                                    root = curTag;
-                                    sTag.push(&root);
-                                } else {
-                                    sTag.top()->addChildren(curTag);
-                                    sTag.push(&sTag.top()->getChildren().back());
-                                }
-                                break;
-                            case NONE://inside tag
-                                if(prev){
-                                    //att=att+string("\n");
-                                    prevName=sTag.top()->getName();
-                                }else{
-                                    att = string("");
-                                    prev=true;
-                                }
-                                while (token[0] != '<' && !token.empty()) {//adds until newline or end tag
-                                    if(att.size()>0)att+=string(" ");
-                                    att += token;
-                                    token = nextToken(line);
-                                }
-                                
-                                switch (DTD::getType(dtd, sTag.top()->getName())) {//inserts the read string into the structure
-                                    case INT:
-                                        sTag.top()->setAttrib(Attribute(atoi(att.c_str())));
-                                        break;
-                                    case FLOAT:
-                                        istringstream(att) >> parseF;
-                                        sTag.top()->setAttrib(Attribute(parseF));
-                                        break;
-                                    case STRING:
-                                        sTag.top()->setAttrib(Attribute(att));
-                                        break;
-                                }
-                                if (token.empty())
-                                    break;
-                            case END://found closing tag
-                                prev=false;
-                                ntag = token.substr(2, token.size() - 3);
-                                if (sTag.empty())throw "Tags don't match";
-                                string last = sTag.top()->getName();
-                                sTag.pop();
-                                if (last.compare(ntag) != 0)throw "Tags don't match";
-                                break;
-                        }
-                        break;
-                }
-            }
-        } catch (const char* error) {
-            cout << error << endl;
-            break;
-        }
+  while (!file.eof()) {
+    getline(file, line);
+    if (line.empty())continue;
+    try {
+      while (!(token = nextToken(line)).empty()) {
+	switch (s) {
+	  case 0://Doctype not found yet
+	  {
+	    if (token.compare("<!DOCTYPE") != 0)throw "Error on doctype";
+	    rootName = nextToken(line);
+	    nextToken(line);
+	    dtd = nextToken(line);
+	    dtd = dtd.substr(1, dtd.size() - 3);
+	    DTD::newDTD(dtd);
+	    while (!(token = nextToken(line)).empty());
+	    s++;
+	    break;
+	  }
+	  case 1:
+	  {
+	    switch (getTokenType(token)) {
+	      case BEGIN://found opening tag
+	      {
+		ntag = token.substr(1, token.size() - 2);
+		curTag = Tag(ntag);
+		if (sTag.empty()) {
+		  root = curTag;
+		  sTag.push(&root);
+		} else {
+		  sTag.top()->addChildren(curTag);
+		  sTag.push(&sTag.top()->getChildren().back());
+		}
+		break;
+	      }
+	      case NONE://inside tag
+	      {
+		if(prev){
+		  //att=att+string("\n");
+		  prevName=sTag.top()->getName();
+		}else{
+		  att = string("");
+		  prev=true;
+		}
+		while (token[0] != '<' && !token.empty()) {//adds until newline or end tag
+		  if(att.size()>0)att+=string(" ");
+		  att += token;
+		  token = nextToken(line);
+		}
+		
+		switch (DTD::getType(dtd, sTag.top()->getName())) {//inserts the read string into the structure
+		  case INT:
+		    sTag.top()->setAttrib(Attribute(atoi(att.c_str())));
+		    break;
+		  case FLOAT:
+		    istringstream(att) >> parseF;
+		    sTag.top()->setAttrib(Attribute(parseF));
+		    break;
+		  case STRING:
+		    sTag.top()->setAttrib(Attribute(att));
+		    break;
+		}
+		if (token.empty())
+		  break;
+	      }
+	      case END://found closing tag
+	      {
+		prev=false;
+		ntag = token.substr(2, token.size() - 3);
+		if (sTag.empty())throw "Tags don't match";
+		string last = sTag.top()->getName();
+		sTag.pop();
+		if (last.compare(ntag) != 0)throw "Tags don't match";
+		break;
+	      }
+	    }
+	    break;
+	  }
+	}
+      }
+    } catch (const char* error) {
+	cout << error << endl;
+	break;
     }
-    file.close();
+  }
+  file.close();
 }
 
 tToken XMLFile::getTokenType(string tok) {
@@ -506,49 +520,49 @@ int DTD::getNo(string dtd, string tag, string search) {
 }
 
 DTD::DTD(string file) {
-    ifstream text(file.c_str());
-    if (!text.is_open()) {
-        cout << "File " << file << " does not exist\n";
-        throw "DTD does not exist";
-    }
-    string line, token;
+  ifstream text(file.c_str());
+  if (!text.is_open()) {
+      cout << "File " << file << " does not exist\n";
+      throw "DTD does not exist";
+  }
+  string line, token;
 
-    while (!text.eof()) {
-        getline(text, line);
-        if (line.empty() || line[0] == '#')continue;
-        if (nextToken(line).compare("<!ELEMENT") != 0)throw "unexpected line in dtd file";
-        string name = nextToken(line);
-        string desc = nextToken(line);
-        switch (desc[0]) {
-            case '#':
-                lines[name] = DefLine(stringToType(desc.substr(1, desc.size() - 2)));
-                break;
-            case '(':
-                DefLine tmp;
-                string str;
-                char mult;
-                for (int i = 1; i < desc.size(); i++) {
-                    switch (desc[i]) {
-                        case ',':
-                        case ')':
-                            tmp.addLine(str, mult);
-                            str = "";
-                            break;
-                        case '*':
-                            mult = '*';
-                            break;
-                        case '?':
-                            mult = '?';
-                            break;
-                        case ' ':
-                            break;
-                        default:
-                            str += desc[i];
-                    }
-                }
-                lines[name] = tmp;
-                break;
-        }
+  while (!text.eof()) {
+    getline(text, line);
+    if (line.empty() || line[0] == '#')continue;
+    if (nextToken(line).compare("<!ELEMENT") != 0)throw "unexpected line in dtd file";
+    string name = nextToken(line);
+    string desc = nextToken(line);
+    switch (desc[0]) {
+      case '#':
+	lines[name] = DefLine(stringToType(desc.substr(1, desc.size() - 2)));
+	break;
+      case '(':
+	DefLine tmp;
+	string str;
+	char mult;
+	for (int i = 1; i < desc.size(); i++) {
+	  switch (desc[i]) {
+	    case ',':
+	    case ')':
+	      tmp.addLine(str, mult);
+	      str = "";
+	      break;
+	    case '*':
+	      mult = '*';
+	      break;
+	    case '?':
+	      mult = '?';
+	      break;
+	    case ' ':
+	      break;
+	    default:
+	      str += desc[i];
+	  }
+	}
+	lines[name] = tmp;
+	break;
     }
-    text.close();
+  }
+  text.close();
 }
