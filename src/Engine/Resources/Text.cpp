@@ -2,14 +2,15 @@
 #include "FontLoader.h"
 
 Text::Text(string _text, Font* _font)
+  :Resource(_text)
 {
   text = _text;
   font = _font;
 }
 
-void Text::Draw()
+void Text::Draw(Shader* shader)
 {
-  font->Draw(text);
+  font->Draw(shader, text);
 }
 
 Resource::ResourceType Text::getType()

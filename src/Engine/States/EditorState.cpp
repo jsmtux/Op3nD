@@ -16,7 +16,7 @@ EditorState::EditorState(ResourceManager* resourceManger, string n):State(resour
 }
 
 
-#include "../Graphics/Shading.h"
+#include "Graphics/Shader.h"
 
 int prevSel=-1;
 void EditorState::iteration(){
@@ -30,12 +30,11 @@ void EditorState::draw(){
   if(selected!=NULL){
     glClear(GL_DEPTH_BUFFER_BIT);
     handler->setPos(selected->getPos());
-    handler->draw();
   }
-  for(int i=0;i<cameras.size();i++){
+  /*for(int i=0;i<cameras.size();i++){
     if(cameras[i]!=currCam)
       cameras[i]->draw();        
-  }
+  }*/
   #endif
 }
 

@@ -37,6 +37,7 @@
 #include "../Math/Matrix.h"
 #include "Resource.h"
 
+#include <string>
 #include <memory>
 
 struct MeshEntry {
@@ -97,7 +98,7 @@ class Model3d: public Resource
 {
 public:
     virtual ~Model3d();
-    void Draw();
+    void Draw(Shader* shader);
     ResourceType getType();
     //animation
     vector<string> getAnimations();
@@ -105,9 +106,10 @@ public:
     void changeAnimation(string newAnimation);
     float getAnimationTime();
     void setLoop(bool isLoop);
-    Model3d(Assimp::Importer *importer, GLuint *buffers, vector<Resource*> maps, vector<MeshEntry> meshes, map<string,unsigned int> boneMapping, 
-	    unsigned int numBones, vector<BoneInfo> boneInfo, Matrix _globalInverseTransform, const aiScene* scene,
-	    float animTime, Matrix scaleTransform);
+    Model3d(string name, Assimp::Importer *_importer, GLuint *_buffers, vector<Resource*> _maps, vector<MeshEntry> _meshes, map<string,unsigned int> _boneMapping, 
+    unsigned int _numBones, vector<BoneInfo> _boneInfo, Matrix _globalInverseTransform, const aiScene* _scene,
+    float _animTime, Matrix _scaleTransform);
+    string getDefaultShader(){return "normal.sfx";}
 private:
     void boneTransform(float timeInSeconds, vector<Matrix>& transforms);
     float timeToAnimationTime(float t);

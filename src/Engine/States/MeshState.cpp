@@ -13,7 +13,7 @@ MeshState::MeshState(ResourceManager* _resourceManager, string name):State(_reso
 }
 
 void MeshState::iteration(){
-    currCam->view();
+    currCam->view(&forwardRenderer);
     currCam->orientate(Vector3(0,0,0));
     State::iteration();
     State::draw();

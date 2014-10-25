@@ -81,5 +81,5 @@ Resource* FontLoader::loadInternal(State* state, string dir)
                GL_UNSIGNED_BYTE, tex_data);
   // And delete the texture memory block
   delete[] tex_data;
-  return new Font(table, texture, line_height, tex_line_height);
+  return new Font(dir, table, texture, line_height, tex_line_height);
 }

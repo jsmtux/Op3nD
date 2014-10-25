@@ -1,21 +1,20 @@
 #include "Line.h"
-#include "../Math/Vector3.h"
-#include "../Graphics/Shading.h"
-#include "../../ProjectManagement/Project.h"
+#include "Math/Vector3.h"
+#include "Graphics/Shader.h"
+#include "Project.h"
 
 #ifndef NODRAW
 GLuint Line::VBO;
-Shading* Line::colorShader;
+Shader* Line::colorShader;
 #endif
 
-void Line::Draw(){
-    drawLine(begin,end,color);
+void Line::Draw(Shader* shader){
+    drawLine(shader, begin,end,color);
 }
 
-void Line::drawLine(Vector3 b, Vector3 e, Vector3 c){
+void Line::drawLine(Shader* shader, Vector3 b, Vector3 e, Vector3 c){
 #ifndef NODRAW
 #ifndef ANDROID
-    Shading::push();
     colorShader->useProgram();
     Vector3 Vertices[2];
     Vertices[0] = b;
@@ -28,9 +27,6 @@ void Line::drawLine(Vector3 b, Vector3 e, Vector3 c){
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glDrawArrays(GL_LINES, 0, 2);
-
-
-    Shading::pop();
 #endif
 #endif
 }
@@ -42,7 +38,7 @@ Resource::ResourceType Line::getType(){
 void Line::init(){    
 #ifndef NODRAW
 #ifndef ANDROID
-    colorShader = new Shading();
+    colorShader = new Shader();
     colorShader->initShader(Project::common()->getDir("color.sfx",Project::SHADER));
     glGenBuffers(1, &VBO);
 #endif

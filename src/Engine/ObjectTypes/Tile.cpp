@@ -5,15 +5,14 @@
 #include "Tile.h"
 #include "Editable.h"
 #include "Resources/Resource.h"
-#include "../Base.h"
+#include "Base.h"
 #include "Resources/Image.h"
 #include "Physical.h"
-#include "../Graphics/Shading.h"
-#include "../Math/Matrix.h"
-#include "../PhysicsWorld.h"
-#include "../../ProjectManagement/Project.h"
-
-extern Image* imtmp;
+#include "Graphics/Shader.h"
+#include "Math/Matrix.h"
+#include "PhysicsWorld.h"
+#include "Project.h"
+#include "Graphics/Shader.h"
 
 #ifndef NODRAW
 GLuint Tile::VBO;
@@ -36,7 +35,7 @@ Tile::Tile(State* state, Tile &tile):Editable(state, tile.id){
   resource=NULL;
   if(!resourceName.empty())
     setResource(resourceName);
-  
+
   physInfo=NULL;
   position=tile.position;
   size=tile.size;
@@ -51,7 +50,7 @@ Tile::Tile(State* state, MXML::Tag &code): Editable(state){
 
 Tile::~Tile(){
   if(physInfo){
-    Base::getInstance()->getStateManager()->getCurState()->deleteRigidBody(physInfo);
+    getState()->deleteRigidBody(physInfo);
     physInfo->setUserPointer(NULL);
   }
 }
@@ -147,11 +146,12 @@ Vector3 Tile::getAngVel(){
   return Vector3(0,0,0);
 }
 
-void Tile::draw( ){
+void Tile::draw(Shader* shader){
   #ifndef NODRAW
-  Shading::getActive()->setInt(getId(), "gObjectIndex");
-  if(resource)
-    Shading::getActive()->setObjMat(getTrans()*resource->getTransform());
+  shader->setUInt(getId(), "gObjectIndex");
+  if(resource){
+    shader->setMatrix(getTrans()*resource->getTransform(),"gObjMat");
+  }
   #endif
   if(physInfo){
     btTransform trans= physInfo->getWorldTransform();
@@ -159,7 +159,7 @@ void Tile::draw( ){
     rotation=Quaternion(trans.getRotation());
   }
   if(resource){
-    resource->Draw();
+    resource->Draw(shader);
   }
 }
 
@@ -189,9 +189,11 @@ void Tile::setResource(Resource* res)
     return;
   }
   resource=res;
+  getState()->addDrawElement(this, res->getDefaultShader());
   string name;
-  if(exists(name=(Base::getInstance()->getProj()->getDir(res->getName())+".xml"))){
+  if(exists(name=res->getName()+".xml")){
     Tag data;
+    cout << "Found physical for " << res->getName() << endl;
     XMLFile pdata(name,data,"physical.dtd");
     pdata.read();
     setPhysical(data);
@@ -201,15 +203,10 @@ void Tile::setResource(Resource* res)
 void Tile::setResource(string dirResource){
   if(resource){
     cerr << "Adding resource to already resourced\n\n";
-    return;
   }
-  resource=getState()->loadResource(dirResource);
-  string name;
-  if(exists(name=(Base::getInstance()->getProj()->getDir(dirResource)+".xml"))){
-    Tag data;
-    XMLFile pdata(name,data,"physical.dtd");
-    pdata.read();
-    setPhysical(data);
+  else
+  {
+    setResource(getState()->loadResource(dirResource));
   }
 }
 

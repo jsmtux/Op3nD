@@ -3,7 +3,7 @@
 #include "../Math/Vector3.h"
 #include "../Math/Quaternion.h"
 
-#include "../Graphics/Shading.h"
+#include "../Graphics/Shader.h"
 
 Editable::Editable(State* _state){
     id=0;

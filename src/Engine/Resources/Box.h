@@ -11,10 +11,12 @@
 
 class Box:public Resource{
 public:
-    void Draw();
+    Box(): Resource("box"){}
+    void Draw(Shader* shader);
     ResourceType getType();
     static Box* loadBox();
     void del();
+    string getDefaultShader(){return "color.sfx";}
 private:
     static Box* stBox;
 };

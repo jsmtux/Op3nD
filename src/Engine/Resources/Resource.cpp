@@ -17,7 +17,9 @@
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 #endif
 
-Resource::Resource(){
+Resource::Resource(string name)
+  :name(name)
+{
 }
 
 string Resource::getName(){

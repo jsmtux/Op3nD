@@ -4,7 +4,7 @@
 
 
 #include "Light.h"
-void Light::draw( )
+void Light::draw(Shader* shader)
 {
 	
 }

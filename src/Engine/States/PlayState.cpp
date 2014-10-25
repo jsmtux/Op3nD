@@ -20,7 +20,7 @@ void PlayState::iteration(){
         cameras[0]->orientate(Vector3(0,0,10));
     }
     currCam= cameras[0];
-    currCam->view();
+    currCam->view(&forwardRenderer);
     currCam->orientate(Vector3(0,0,0));
     State::iteration();
     stepPhysWorld();

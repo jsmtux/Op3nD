@@ -1,7 +1,7 @@
 #include <list>
 #include <vector>
 
-#include "Shading.h"
+#include "Shader.h"
 
 #include "../Math/Matrix.h"
 #include "../Math/Vector3.h"
@@ -25,20 +25,11 @@ static void printGLString(const char *name, GLenum s) {
 }
 #endif
 
-Shading* Shading::active;
-stack<Shading*> Shading::shaderStack;
-vector<GLuint> Shading::shaderlist;
-Matrix Shading::WVP;
-Matrix Shading::worldMat;
-Matrix Shading::objMat;
-
-Shading::Shading():program(glCreateProgram()){ 
-  active = NULL;
+Shader::Shader():program(glCreateProgram()){
   worldMatId=-1;
-  objMatId=-1;
 }
 
-void Shading::initShader(string file){
+void Shader::initShader(string file){
   MXML::Tag root;
   MXML::XMLFile shaderFile(file,root,"shaders.dtd");
   shaderFile.read();
@@ -57,25 +48,16 @@ void Shading::initShader(string file){
   compileShader();
 }
 
-void Shading::update(){    
+void Shader::update(const Matrix& WVP, const Matrix& worldMat){    
   #ifndef ANDROID
   glUniformMatrix4fv(wvpId, 1, GL_TRUE, &(WVP).m[0][0]);
-  
-  glUniformMatrix4fv(objMatId, 1, GL_TRUE, &(objMat).m[0][0]);
   #else
   Matrix mat;
   glUniformMatrix4fv(wvpId, 1, GL_FALSE, &WVP.transposed().m[0][0]);
-  
-  glUniformMatrix4fv(objMatId, 1, GL_FALSE, &objMat.transposed().m[0][0]);	
   #endif
 }
 
-void Shading::deleteShading(){
-  for (vector<GLuint>::iterator it = shaderlist.begin() ; it != shaderlist.end() ; ++it)
-  {
-    glDeleteShader(*it);
-  }
-  
+void Shader::deleteShading(){
   if (program != 0)
   {
     glDeleteProgram(program);
@@ -83,9 +65,8 @@ void Shading::deleteShading(){
   }
 }
 
-void Shading::addShader(string shader, GLenum shadertype){
+void Shader::addShader(string shader, GLenum shadertype){
   GLuint ShaderObj= glCreateShader(shadertype);
-  shaderlist.push_back(ShaderObj);
   const GLchar* p[1];
   p[0] = shader.c_str();
   GLint Lengths[1];
@@ -108,7 +89,7 @@ void Shading::addShader(string shader, GLenum shadertype){
   glAttachShader(program, ShaderObj);
 }
 
-void Shading::compileShader(){
+void Shader::compileShader(){
   glLinkProgram(program);
   GLint success;
   glGetProgramiv(program, GL_LINK_STATUS, &success);
@@ -121,7 +102,7 @@ void Shading::compileShader(){
   initVars();
 }
 
-GLint Shading::getId(string name, int index)
+GLint Shader::getId(string name, int index)
 {
   GLint tmp = glGetUniformLocation(program, name.c_str());
   if(tmp == -1){
@@ -130,12 +111,12 @@ GLint Shading::getId(string name, int index)
   return tmp;
 }
 
-GLint Shading::getVarLocation(string name, int index)
+GLint Shader::getVarLocation(string name, int index)
 {
   map<string,GLint>::iterator tmp;
   if(index != -1){
     stringstream str;
-    str << name << "[" << index <<"]";
+    str << name << "[" << index << "]";
     name = str.str();
   }
   if((tmp=shaderLocs.find(name))==shaderLocs.end()){
@@ -145,10 +126,11 @@ GLint Shading::getVarLocation(string name, int index)
     cout << "Its location is " << ret << endl;
     return ret;
   }
+  GLint ret = getId(name, index);
   return tmp->second;
 }
 
-void Shading::initVars(){
+void Shader::initVars(){
   #ifdef ANDROID
   posId = glGetAttribLocation(gProgram, "Position");
   checkGlError("glGetAttribLocation");
@@ -166,11 +148,6 @@ void Shading::initVars(){
   
   wvpId=getId("gWVP");
   worldMatId=getId("gWorld");
-  objMatId=getId("gObjMat");
-  
-  colorId=getId("color");
-  
-  animatedId=getId("animated");
 
   for(int i=0;i<MAX_BONES;i++){
     boneLocation[i] = getId("gBones", i);
@@ -178,103 +155,109 @@ void Shading::initVars(){
 
 }
 
-void Shading::setMatrix(const Matrix& mat, string name, int ind)
+bool Shader::setMatrix(const Matrix& mat, string name, int ind)
 {
+  bool ret = false;
   GLint loc = getVarLocation(name, ind);
   if(loc!=0xFFFFFFFF){
     glUniformMatrix4fv(loc, 1, GL_TRUE, (const GLfloat*)mat.m);
+    ret = true;
   }
+  return ret;
 }
 
-Matrix Shading::getMatrix(string name, int ind)
+Matrix Shader::getMatrix(string name, int ind)
 {
 }
 
-void Shading::setVector3(const Vector3& vec, string name, int ind)
+bool Shader::setVector3(const Vector3& vec, string name, int ind)
 {
+  bool ret = false;
   GLint loc = getVarLocation(name, ind);
   if(loc!=0xFFFFFFFF){
-    glUniform3f(colorId, vec.x, vec.y, vec.z );
+    glUniform3f(getId("color"), vec.x, vec.y, vec.z );
+    ret = true;
   }
+  return ret;
 }
 
-Vector3 Shading::getVector3(string name, int ind)
+Vector3 Shader::getVector3(string name, int ind)
 {
 
 }
 
-void Shading::setVector2(const Vector2& vec, string name, int ind)
+bool Shader::setVector2(const Vector2& vec, string name, int ind)
 {
+  bool ret = false;
   GLint loc = getVarLocation(name, ind);
   if(loc!=0xFFFFFFFF){
     glUniform2f(loc, vec.x, vec.y);
+    ret = true;
   }
+  return ret;
 }
 
-Vector2 Shading::getVector2(string name, int ind)
+Vector2 Shader::getVector2(string name, int ind)
 {
 
 }
 
-void Shading::setInt(unsigned int value, string name, int ind)
+bool Shader::setInt(unsigned int value, string name, int ind)
 {
+  bool ret = false;
   GLint loc = getVarLocation(name, ind);
   if(loc!=0xFFFFFFFF){
     glUniform1i(loc, value);
+    ret = true;
   }
+  return ret;
 }
 
-unsigned int Shading::getInt(string name, int ind)
+unsigned int Shader::getInt(string name, int ind)
 {
 
 }
 
-void Shading::setBool(bool value, string name, int ind)
+bool Shader::setUInt(unsigned int value, string name, int ind)
 {
+  bool ret = false;
+  GLint loc = getVarLocation(name, ind);
+  if(loc!=0xFFFFFFFF){
+    glUniform1ui(loc, value);
+    ret = true;
+  }
+  return ret;
+}
+
+unsigned int Shader::getUInt(string name, int ind)
+{
+
+}
+
+bool Shader::setBool(bool value, string name, int ind)
+{
+  bool ret = false;
   GLint loc = getVarLocation(name, ind);
   if(loc!=0xFFFFFFFF){
     glUniform1i(loc, value);
+    ret = true;
   }
+  return ret;
 }
 
-bool Shading::getBool(string name, int ind)
+bool Shader::getBool(string name, int ind)
 {
 
 }
 
-void Shading::setWVP(Matrix w){
-  WVP=w;
-}
-
-void Shading::setWorldPos(Matrix pos){
-  worldMat=pos;
-}
-
-void Shading::setObjMat(Matrix obj){    
-  objMat=obj;
-  setMatrix(objMat, "gObjMat");
-}
-
-void Shading::useProgram(){
-  active=this;
+void Shader::useProgram(){
   glUseProgram(program);
-  update();
 }
 
-GLuint Shading::getProgramInd(){
+GLuint Shader::getProgramInd(){
   return program;
 }
 
-Shading* Shading::getActive(){
-  return active;
-}
-
-void Shading::push(){
-  shaderStack.push(active);
-}
-
-void Shading::pop(){
-  if(shaderStack.empty())return;
-  shaderStack.top()->useProgram();
-  shaderStack.pop();    
+void Shader::setObjMat(Matrix obj){
+  setMatrix(obj, "gObjMat");
 }

@@ -8,10 +8,9 @@
 
 class Light: public Resource
 {
-	
 public:
-	void draw( );
-	
+      void draw(Shader* shader);
+      string getDefaultShader(){return "normal.sfx";}
 };
 
 #endif

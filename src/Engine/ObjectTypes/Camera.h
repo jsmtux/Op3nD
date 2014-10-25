@@ -15,14 +15,16 @@
 
 #include <math.h>
 
-#include "../../ProjectManagement/MXML.h"
+#include "MXML.h"
 
 #include "Tile.h"
 #include "Editable.h"
 
-#include "../Math/Vector3.h"
-#include "../Math/Quaternion.h"
-#include "../Math/Matrix.h"
+#include "Math/Vector3.h"
+#include "Math/Quaternion.h"
+#include "Math/Matrix.h"
+
+class Renderer;
 
 class Camera: public Editable{	
 public:
@@ -38,12 +40,12 @@ public:
     /**
      * Updates the world position according tho the camera coordinates
      */
-    void view( );    
+    void view(Renderer* renderer);    
     /**
      * Updates the world position according tho the camera coordinates
      * without perspective correction
      */
-    void orthoView();
+    void orthoView(Renderer* renderer);
     /**
      * Moves the camera
      * @param v amount of movement
@@ -81,7 +83,7 @@ public:
     void setPos(Vector3 p);
     void setRot(Quaternion s);
     void setSize(Vector3 r);
-    void draw();
+    void draw(Shader* shader);
     edType getType();
     void reloadMatrix();
 private:

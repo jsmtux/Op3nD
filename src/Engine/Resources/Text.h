@@ -11,9 +11,10 @@
 class Text: public Resource{
 public:
   ResourceType getType();
-  void Draw();
+  void Draw(Shader* shader);
   void setText(string text);
   string getText();
+  string getDefaultShader(){return "text.sfx";}
 private:
   Text(string text, Font* font);
   Font* font;

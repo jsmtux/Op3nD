@@ -15,20 +15,20 @@ using namespace std;
 #endif
 #include <btBulletDynamicsCommon.h>
 
-#include "../../ProjectManagement/MXML.h"
+#include "MXML.h"
 using namespace MXML;
 
-#include "../Timer.h"
-#include "../Controller.h"
-#include "../ObjectTypes/Scripted.h"
+#include "Timer.h"
+#include "Controller.h"
+#include "ObjectTypes/Scripted.h"
 #include "../../Network/NetNode.h"
+#include "Graphics/Renderer.h"
 
 class Editable;
 class Object;
-class Shading;
+class Shader;
 class Camera;
 class PhysicsWorld;
-class PickingTexture;
 class Tile;
 class StateUpdate;
 class ResourceManager;
@@ -36,7 +36,7 @@ class ResourceManager;
 typedef enum {EMPTYST, MESHST, EDITORST, GAMEST}StateType;
 
 class State: public Networkable
-{	
+{
 public:
     /**
      * Creates a new state
@@ -64,13 +64,6 @@ public:
      * Stops the state
      */
     void pause();
-    /**
-     * Selects the object in the positions x y
-     * @param x mouse postition
-     * @param y mouse position
-     * @return id of the object
-     */
-    unsigned int* selection( const int x, const int y );
     /**
      * Performs a graphics iteration on the state
      */
@@ -150,6 +143,8 @@ public:
     
     void setNetNode(NetNode *n);
     
+    unsigned int* selection( const int x, const int y );
+    
     /**
      * Returns the time elapsed since last update
      * @return time since last update
@@ -163,6 +158,8 @@ public:
     PhysicsWorld* getPhysicsWorld();
     
     Resource* loadResource(string dir);
+    
+    void* addDrawElement(Editable* editable, string shaderName);
 protected:
     StateUpdate* stateUpdate;
     PhysicsWorld *pWorld;
@@ -172,11 +169,10 @@ protected:
     
     NetNode *netNode;
     ResourceManager *resourceManager;
+    
+    Renderer forwardRenderer;
+    PickingRenderer pickingRenderer;
 
-#ifndef NODRAW
-    Shading* stest, *sselect;
-    PickingTexture *ptext;
-#endif    
     vector<Editable*> list;
     vector<Camera*> cameras;
     Camera* currCam;
