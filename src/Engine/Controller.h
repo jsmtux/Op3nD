@@ -37,7 +37,6 @@ private:
     bool tempKeys[K_END];//stores real pressed keys
     int lastPressed[K_END];//stores how many iterations has been pressed
     float vaxis[A_END];
-    float tempAxis[A_END];
     unsigned int selected[2];
     static int contNum;
     int keyRepeatFrequency;

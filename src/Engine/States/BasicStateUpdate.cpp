@@ -21,7 +21,7 @@ void BasicStateUpdate::updateLoop(){
         
         updateLock->lock();
         callback();
-	
+
 	for(Controller* c:Base::getInstance()->getControllers()){
 	  c->finishIteration();
 	}

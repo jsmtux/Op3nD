@@ -107,10 +107,7 @@ void Controller::setKey(tkeys key,bool value){
 }
 
 void Controller::setAxis(taxis axis,float value){
-  tempAxis[axis] = value;
-  if(fabs(tempAxis[axis]) > fabs(vaxis[axis])){
-    vaxis[axis]=value;
-  }
+  vaxis[axis]=value;
 }
 
 void Controller::setSelection(unsigned int* sel){

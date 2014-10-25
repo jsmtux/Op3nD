@@ -23,6 +23,9 @@ void PlayState::iteration(){
     currCam->view(&forwardRenderer);
     currCam->orientate(Vector3(0,0,0));
     State::iteration();
+    for(Controller* c:Base::getInstance()->getControllers()){
+      c->finishIteration();
+    }
     stepPhysWorld();
     draw();
 }
