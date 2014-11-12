@@ -30,6 +30,20 @@ void* Renderer::addDrawElement(Editable* editable, string shaderName)
   set.toDrawList.push_back(editable);
 }
 
+void Renderer::deleteElement(Editable* editable)
+{
+  std::map<std::string, ShaderSet>::iterator it;
+  for (it = shaderList.begin(); it != shaderList.end(); it++)
+  {
+    std::vector<Editable*> *list = &it->second.toDrawList;
+    std::vector<Editable*>::iterator it2 = std::find(list->begin(), list->end(), editable);
+    if (it2 != list->end())
+    {
+      list->erase(it2);
+    }
+  }
+}
+
 void Renderer::setWVP(Matrix w){
   WVP=w;
 }

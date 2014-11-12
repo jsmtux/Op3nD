@@ -20,30 +20,33 @@ class Shader;
 class Editable: public Networkable
 {
 public:
-    virtual Vector3 getPos()=0;
-    virtual Vector3 getSize()=0;
-    virtual Quaternion getRot()=0;
-    virtual void setPos(Vector3 p)=0;
-    virtual void setRot(Quaternion s)=0;
-    virtual void setSize(Vector3 r)=0;
-    virtual void draw(Shader* shader)=0;
-    /**
-     * return type of editable entity
-     * @return edType according to type
-     */
-    virtual edType getType()=0;
-    void setParentId(unsigned int p);
-    unsigned int getId();
-    virtual void setId(unsigned int i);
+  virtual ~Editable() = 0;
+  virtual Vector3 getPos()=0;
+  virtual Vector3 getSize()=0;
+  virtual Quaternion getRot()=0;
+  virtual void setPos(Vector3 p)=0;
+  virtual void setRot(Quaternion s)=0;
+  virtual void setSize(Vector3 r)=0;
+  virtual void draw(Shader* shader)=0;
+  /**
+    * return type of editable entity
+    * @return edType according to type
+    */
+  virtual edType getType()=0;
+  void setParentId(unsigned int p);
+  unsigned int getId();
+  virtual void setId(unsigned int i);
 protected:
-    Editable(State* state, unsigned int i);
-    Editable(State* state);
-    unsigned int id;
-    unsigned int pId;
-    State* getState() {return state;}
+  Editable(State* state, unsigned int i);
+  Editable(State* state);
+  unsigned int id;
+  unsigned int pId;
+  State* getState() {return state;}
 private:
-    State* state;
+  State* state;
 };
+
+inline Editable::~Editable() {};
 
 #endif	/* EDITABLE_H */
 

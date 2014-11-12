@@ -21,6 +21,7 @@
 #include "Project.h"
 #include "Resources/Image.h"
 #include "Resources/Font.h"
+#include "Script/ScriptManager.h"
 
 #include "StateUpdate.h"
 #include "PhysicsStateUpdate.h"
@@ -32,6 +33,7 @@
 State::State(ResourceManager* _resourceManger, string n)
   : resourceManager(_resourceManger)
   , pickingRenderer(Base::getInstance()->getRC()->getResolution())
+  , scriptManager(new ScriptManager(this))
 {
     name=n;
     pWorld =NULL;
@@ -68,11 +70,12 @@ void State::addToList(Editable* a, unsigned int i){
     }
 }
 
-void State::deleteElement(unsigned int id)
+void State::deleteElement(Editable* ed)
 {
-  Editable* element=getByIndex(id);
-  delete element;
-  list.erase(list.begin()+id-1);
+  forwardRenderer.deleteElement(ed);
+  pickingRenderer.deleteElement(ed);
+  list.erase(std::find(list.begin(), list.end(), ed));
+  delete ed;
 }
 
 State::~State(){
@@ -82,7 +85,6 @@ State::~State(){
 void State::loadFile(){
   Image::init();
   Line::init();
-  Scripted::Init();
   Font::init();
   if(getType()==EMPTYST)
       return;
@@ -106,7 +108,7 @@ void State::loadFile(){
     if(listElements[i].getName().compare("tile")==0){
       addElement(new Tile(this, listElements[i]));
     }else if(listElements[i].getName().compare("scripted")==0){
-      addElement(new Scripted(this, listElements[i]));
+      addElement(new Scripted(this, listElements[i], scriptManager.get()));
     }else if(listElements[i].getName().compare("camera")==0){
       addElement(new Camera(this, listElements[i]));
     }
@@ -188,23 +190,7 @@ void State::updateElements(){
     }
     if(currCam)currCam->view(&forwardRenderer);
     if(!netNode||!netNode->thinClient()){
-      bool needsClean=false;
-      for(int i=0;i<objects.size();i++){
-	if(!objects[i]->needsDelete()){
-	  objects[i]->update();
-	}
-	needsClean=needsClean||objects[i]->needsDelete();
-      }
-      if(needsClean){
-	std::vector<Scripted*>::iterator iter;
-	for (iter = objects.begin(); iter != objects.end(); ) {
-	    if ((*iter)->needsDelete()){
-	      delete (*iter);
-	      iter = objects.erase(iter);
-	    }else
-		++iter;
-	}
-      }
+      scriptManager->update();
       if(netNode){
 	  for(int i=0;i<list.size();i++){
 	      list[i]->draw(NULL);
@@ -327,7 +313,7 @@ void State::fromXML(MXML::Tag &code){
             if(t==NULL){
                 cout << "UNINITUALIZED\n";
             }else{
-                t->fromXML(c);
+                t->fromXML(c, scriptManager.get());
             }
         }
         if(c.getName().compare("camera")==0){

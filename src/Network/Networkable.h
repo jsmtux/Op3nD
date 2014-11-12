@@ -10,9 +10,11 @@
 class Networkable
 {	
 public:
-    virtual MXML::Tag toXML()=0;
-    virtual void fromXML(MXML::Tag &code)=0;
-    virtual MXML::Tag difference(Networkable &n)=0;
+  virtual ~Networkable() = 0;
+  virtual MXML::Tag toXML()=0;
+  virtual void fromXML(MXML::Tag &code)=0;
+  virtual MXML::Tag difference(Networkable &n)=0;
 };
 
+inline Networkable::~Networkable() {};
 #endif

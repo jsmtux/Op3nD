@@ -205,7 +205,7 @@ void Op3nD::elementDroppedScene(const QMimeData* data)
     Tile* tmp;
     switch(type){
       case Project::OBJECT:
-	toAdd = new Scripted(curState, elements[i+1].toStdString());
+	toAdd = new Scripted(curState, elements[i+1].toStdString(), curState->scriptManager.get());
 	toAdd->setPos(pos);
 	break;
       case Project::IMAGE:

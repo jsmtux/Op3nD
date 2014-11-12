@@ -17,6 +17,7 @@ public:
   void draw();
 
   void* addDrawElement(Editable* editable, std::string shaderName);
+  void deleteElement(Editable* editable);
 
   void setWVP(Matrix w);
   void setWorldPos(Matrix pos);

@@ -58,6 +58,7 @@ set(Op3nD_SRCS
  States/StateUpdate.cpp
  States/BasicStateUpdate.cpp
  States/PhysicsStateUpdate.cpp
+ Script/ScriptManager.cpp
  )
 
 add_library(o3dengine STATIC ${Op3nD_SRCS})

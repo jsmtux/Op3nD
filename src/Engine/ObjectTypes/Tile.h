@@ -29,7 +29,7 @@ public:
     Tile(State* state, Tile &tile);
     Tile(State* state, MXML::Tag &code);
     Tile(State* state, Vector3 p, Vector3 s, Quaternion r, string dirResource="");
-    ~Tile();
+    virtual ~Tile();
     virtual void draw(Shader* shader);
     MXML::Tag toXML();
     MXML::Tag difference(Networkable &n);

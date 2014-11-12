@@ -32,6 +32,7 @@ class PhysicsWorld;
 class Tile;
 class StateUpdate;
 class ResourceManager;
+class ScriptManager;
 
 typedef enum {EMPTYST, MESHST, EDITORST, GAMEST}StateType;
 
@@ -80,10 +81,10 @@ public:
     /**
      * Deletes an ellement
      */
-    void deleteElement(unsigned int id);
+    void deleteElement(Editable *ed);
     /**
      * Loads an state saved in a file
-     */    
+     */
     void loadFile();
     /**
      * Draws the scene
@@ -160,6 +161,8 @@ public:
     Resource* loadResource(string dir);
     
     void* addDrawElement(Editable* editable, string shaderName);
+
+    unique_ptr<ScriptManager> scriptManager;
 protected:
     StateUpdate* stateUpdate;
     PhysicsWorld *pWorld;
